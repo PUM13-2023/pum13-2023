@@ -21,4 +21,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[dev]
           nox
-          
+      - name: Save code coverage file
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage_${{ matrix.os }}_${{ matrix.python-version }}.xml
+          path: ./coverage.xml
+      - name: Save test result file
+        uses: actions/upload-artifact@v3
+        with:
+          name: test_result_${{ matrix.os }}_${{ matrix.python-version }}.xml
+          path: ./test_result.xml
