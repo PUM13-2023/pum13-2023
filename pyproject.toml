@@ -4,9 +4,12 @@ requires = ["setuptools", "setuptools-scm"]
 
 [project]
 classifiers = ["Programming Language :: Python :: 3"]
-dependencies = []
-description = "python-template"
-name = "python-template"
+dependencies = [
+  "dash == 2.8.1",
+  "pymongo == 4.3.3"
+]
+name = "pum13-2023"
+description = "Data visualization dashboard written with Dash"
 readme = "README.md"
 requires-python = ">=3.10"
 version = "0.0.1"
