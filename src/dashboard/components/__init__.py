@@ -1,0 +1,1 @@
+from components.test_component import *
