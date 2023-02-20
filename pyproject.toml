@@ -31,8 +31,10 @@ dev = [
 
 [tool.mypy]
 disable_error_code = "misc"
+mypy_path = "src/dashboard/"
 exclude = "migrations"
 strict = true
+
 
 [[tool.mypy.overrides]]
 module = "dash.*"
