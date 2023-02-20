@@ -9,7 +9,7 @@ def fmt_check(s: nox.Session) -> None:
 
 @nox.session(venv_backend="none")
 def lint(s: nox.Session) -> None:
-    s.run("pflake8", "--color", "always")
+    s.run("pflake8", "--color", "always", "src", "tests")
 
 
 @nox.session(venv_backend="none")
