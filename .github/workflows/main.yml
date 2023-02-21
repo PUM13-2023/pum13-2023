@@ -25,9 +25,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[dev]
       - name: Run linter
-        run: nox --session lint
+        run: nox -t lint
       - name: Run tests
-        run: nox --session test
+        run: nox -t test
       - name: Save code coverage file
         uses: actions/upload-artifact@v3
         with:
