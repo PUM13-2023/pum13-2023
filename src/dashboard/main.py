@@ -2,7 +2,9 @@ import dash
 from dash import Dash, html
 from dash.dependencies import Component
 
-app = Dash(__name__, use_pages=True)
+external_scripts = ["https://tailwindcss.com/", {"src": "https://cdn.tailwindcss.com"}]
+
+app = Dash(__name__, use_pages=True, external_scripts=external_scripts)
 
 
 def page_container() -> Component:
