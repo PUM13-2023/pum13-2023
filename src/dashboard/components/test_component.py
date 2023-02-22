@@ -1,4 +1,3 @@
-import dash
 from dash import html
 from dash.dependencies import Component
 

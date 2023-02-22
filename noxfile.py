@@ -9,7 +9,10 @@ def fmt_check(s: nox.Session) -> None:
 
 @nox.session(name="lint", venv_backend="none")
 def lint(s: nox.Session) -> None:
-    s.run("pflake8", "--color", "always", "src", "tests")
+    s.run("pflake8",
+          "--color", "always",
+          "--per-file-ignores", "*__init__.py:F401",
+          "src", "tests")
 
 
 @nox.session(name="lint", venv_backend="none")

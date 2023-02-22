@@ -1,2 +1,2 @@
-import dash
-
+def do_stuff() -> bool:
+    return True
