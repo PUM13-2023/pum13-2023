@@ -1,20 +1,24 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from enum import Enum
+
+from .test_enum import WebBrowser
+
+# The id used for the username text field
+ID_USERNAME_ELEMENT = 'username'
+
+# The id used for the password text field
+ID_PASSWORD_ELEMENT = 'password'
+
+# The id used for the login button
+ID_LOGIN_ELEMENT = 'login_button'
+
+# Login credentials for the test user
+USERS_USERNAME = 'chris'
+USERS_PASSWORD = 'qwerty'
 
 
-class WebBrowser(Enum):
-    FIREFOX = 1
-    CHROME = 2
-
-
-# The link toi the home website.
-WEBSITE = 'http://www.python.org'
-WEB_BROWSER = WebBrowser.FIREFOX
-
-
-def test_login(web_browser: WebBrowser):
+def test_login(website: str, web_browser: WebBrowser):
+    # Starting up the browser
     match web_browser:
         case WebBrowser.FIREFOX:
             print('==============================')
@@ -24,30 +28,20 @@ def test_login(web_browser: WebBrowser):
         case WebBrowser.CHROME:
             print('==============================')
             print('Testing login on chrome')
-            driver = webdriver.Safari()
-    driver.get(WEBSITE)
+            driver = webdriver.Chrome()
+    driver.get(website)
 
-    title_test = 'Python' in driver.title
-    assert title_test
-    if not title_test:
-        print('Result: FAIL')
-        print('==============================')
-        driver.close()
+    # Finding the username text field and filling out the text field with
+    # the username
+    username_text_field = driver.find_element(By.NAME, ID_USERNAME_ELEMENT)
+    username_text_field.clear()
+    username_text_field.send_keys(USERS_USERNAME)
 
-    elem = driver.find_element(By.NAME, 'q')
-    elem.clear()
-    elem.send_keys('pycon')
-    elem.send_keys(Keys.RETURN)
+    password_text_field = driver.find_element(By.NAME, ID_PASSWORD_ELEMENT)
+    password_text_field.clear()
+    password_text_field.send_keys(USERS_PASSWORD)
 
-    assert 'No results found.' not in driver.page_source
-    print('Result: PASS')
-    print('==============================')
+    login_button = driver.find_element(By.NAME, ID_LOGIN_ELEMENT)
+    login_button.click()
+
     driver.close()
-
-
-def main():
-    test_login(WEB_BROWSER)
-
-
-if __name__ == '__main__':
-    main()
