@@ -8,5 +8,4 @@ dash.register_page(__name__, path="/")
 
 
 def layout() -> Component:
-    return html.Div(children=[html.H1(children="Index page!"),
-                              test_component()])
+    return html.Div(children=[html.H1(children="Index page!"), test_component()])
