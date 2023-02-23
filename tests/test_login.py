@@ -5,6 +5,7 @@ from time import sleep
 from enum import Enum
 
 from .test_enum import WebBrowser
+import pytest
 
 
 class LoginSettings(Enum):
@@ -130,7 +131,8 @@ def try_successfull_login(driver: webdriver) -> bool:
     is_in_home_page(driver)
     assert (is_in_home_page)
 
-    # Check that we are still  in the homepage after refreshing in the login page.
+    # Check that we are still  in the homepage after
+    # refreshing in the login page.
     driver.refresh()
     in_home_page: bool = is_in_home_page(driver)
     assert (is_in_home_page)
@@ -139,3 +141,4 @@ def try_successfull_login(driver: webdriver) -> bool:
 
 
 def try_logout(driver: webdriver) -> None:
+    return
