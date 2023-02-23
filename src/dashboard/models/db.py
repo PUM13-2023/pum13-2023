@@ -1,9 +1,8 @@
 import os
 
+from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.database import Database
-from dotenv import load_dotenv
-
 
 load_dotenv()
 
@@ -13,7 +12,7 @@ def connect(server_url: str, db_name: str) -> Database:
 
     server_url: the MongoDB URL to connnect to.
     db_name: the database object to retrieve.
-    
+
     """
     client = MongoClient(server_url)
     db = client[db_name]
