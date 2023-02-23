@@ -8,7 +8,9 @@ dependencies = [
   "dash == 2.9.3",
   "pymongo == 4.3.3",
   "pandas == 2.0.0",
-  "polars == 0.17.4"
+  "polars == 0.17.4",
+  "pymongo == 4.3.3",
+  "python-dotenv == 0.21.1"
 ]
 name = "pum13-2023"
 description = "Data visualization dashboard written with Dash"
