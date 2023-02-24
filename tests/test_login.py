@@ -47,14 +47,14 @@ class TestLogin():
                 driver: webdriver = webdriver.Firefox()
             case WebBrowser.CHROME:
                 driver: webdriver = webdriver.Chrome()
-        driver.get(Settings.START_PAGE_URL)
         yield driver
         driver.close()
 
     @pytest.mark.test_login
+    @pytest.mark.test_unsuccessful_login
     @pytest.mark.usefixtures('browser_driver')
     def test_unsuccessful_login(self, browser_driver: webdriver):
-
+        browser_driver.get(Settings.START_PAGE_URL)
         # Try logging in with wrong password and username
         self.try_login(Settings.WRONG_USERNAME,
                        Settings.WRONG_PASSWORD,
@@ -76,6 +76,7 @@ class TestLogin():
     @pytest.mark.test_login
     @pytest.mark.usefixtures('browser_driver')
     def test_successfull_login(self, browser_driver: webdriver):
+        browser_driver.get(Settings.START_PAGE_URL)
         self.try_login(Settings.USERS_USERNAME,
                        Settings.USERS_PASSWORD,
                        browser_driver)
@@ -90,6 +91,7 @@ class TestLogin():
     @pytest.mark.test_login
     @pytest.mark.usefixtures('browser_driver')
     def test_logout(self, browser_driver: webdriver):
+        browser_driver.get(Settings.START_PAGE_URL)
         self.try_login(Settings.USERS_USERNAME,
                        Settings.USERS_PASSWORD,
                        browser_driver)
@@ -110,7 +112,7 @@ class TestLogin():
         return n_username_text == 1
 
     def try_login(self, username, password, driver) -> bool:
-        self.is_in_login_screen(webdriver)
+        self.is_in_login_screen(driver)
         username_text_field: WebElement = self.get_username_field(driver)
         username_text_field.clear()
         username_text_field.send_keys(username)
@@ -146,9 +148,9 @@ class TestLogin():
 
     def is_in_login_screen(self, driver: webdriver) -> None:
         msg = "It is not in the login screen"
-        assert self.get_username_field(webdriver) is not None, msg
-        assert self.get_password_field(webdriver) is not None, msg
-        assert self.get_password_field(webdriver) is not None, msg
+        assert self.get_username_field(driver) is not None, msg
+        assert self.get_password_field(driver) is not None, msg
+        assert self.get_password_field(driver) is not None, msg
 
     def get_logout_button(self, driver: webdriver) -> None:
         logout_buttons = driver.find_elements(
