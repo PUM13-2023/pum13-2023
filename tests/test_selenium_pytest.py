@@ -3,25 +3,29 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.keys import Keys
 from time import sleep
-from .test_enum import WebBrowser
 
 import pytest
 
 
 class Settings():
     YOUTUBE = 'https://www.youtube.com/'
-    WEB_BROWSER = WebBrowser.FIREFOX
 
 
 class TestSeleniumPytest():
 
     @pytest.fixture(scope="session")
-    def browser_driver(self):
-        match Settings.WEB_BROWSER:
-            case WebBrowser.FIREFOX:
-                driver = webdriver.Firefox()
-            case WebBrowser.CHROME:
+    def browser_driver(self, request):
+        match request.config.option.browser:
+            case 'chrome':
                 driver = webdriver.Chrome()
+            case 'safari':
+                driver = webdriver.Safari()
+            case 'edge':
+                driver = webdriver.Edge()
+            case 'chromium':
+                driver = webdriver.ChromiumEdge()
+            case _:
+                driver = webdriver.Firefox()
         yield driver
         driver.close()
 

@@ -2,14 +2,12 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from time import sleep
-from .test_enum import WebBrowser
 
 import pytest
 
 
 class Settings():
     START_PAGE_URL = 'https://www.google.com/'
-    WEB_BROWSER = WebBrowser.FIREFOX
 
     # The name used for the username text field
     NAME_USERNAME_ELEMENT = 'username'
@@ -38,19 +36,26 @@ class Settings():
     SLEEP_TIME_REFRESH = 3
 
 
+@pytest.mark.test_login
 class TestLogin():
 
     @pytest.fixture()
-    def browser_driver(self):
-        match Settings.WEB_BROWSER:
-            case WebBrowser.FIREFOX:
-                driver: webdriver = webdriver.Firefox()
-            case WebBrowser.CHROME:
-                driver: webdriver = webdriver.Chrome()
+    def browser_driver(self, request):
+        driver: webdriver
+        match request.config.option.browser:
+            case 'chrome':
+                driver = webdriver.Chrome()
+            case 'safari':
+                driver = webdriver.Safari()
+            case 'edge':
+                driver = webdriver.Edge()
+            case 'chromium':
+                driver = webdriver.ChromiumEdge()
+            case _:
+                driver = webdriver.Firefox()
         yield driver
         driver.close()
 
-    @pytest.mark.test_login
     @pytest.mark.test_unsuccessful_login
     @pytest.mark.usefixtures('browser_driver')
     def test_unsuccessful_login(self, browser_driver: webdriver):
@@ -73,7 +78,7 @@ class TestLogin():
                        browser_driver)
         self.check_login_error_pop_up(browser_driver)
 
-    @pytest.mark.test_login
+    @pytest.mark.test_successful_login
     @pytest.mark.usefixtures('browser_driver')
     def test_successfull_login(self, browser_driver: webdriver):
         browser_driver.get(Settings.START_PAGE_URL)
@@ -88,7 +93,7 @@ class TestLogin():
         browser_driver.refresh()
         self.is_in_home_page(browser_driver)
 
-    @pytest.mark.test_login
+    @pytest.mark.test_logout
     @pytest.mark.usefixtures('browser_driver')
     def test_logout(self, browser_driver: webdriver):
         browser_driver.get(Settings.START_PAGE_URL)
