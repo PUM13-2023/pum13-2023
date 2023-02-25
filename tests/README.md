@@ -16,7 +16,7 @@ pytest -m ${test_mark}
 ```
 Please refer to the [test chapter](#Test) to find all test marks.
 ## Flags
-- `--browser` specifies with browser driver to use to run the test. The options that are available currently are `chrome`, `firefox`, `safari`, `edge` and `chromium`. If the flags is not given then it defaults to Firefox because it is the best browser.
+- `--browser` specifies with browser driver to use to run the test. The options that are available currently are `chrome`, `firefox`, `safari`, `edge` and `chromium`. If the flags is not given or an invalid value is given then it defaults to `firefox` because it is the best browser.
 
 # Test
 ## test_login
