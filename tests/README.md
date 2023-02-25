@@ -16,8 +16,9 @@ pytest -m ${test_mark}
 ```
 Please refer to the [test chapter](#Test) to find all test marks.
 ## Flags
-- `--browser` specifies with browser driver to use to run the test. The options that are available currently are `chrome`, `firefox`, `safari`, `edge` and `chromium`. If the flags is not given or an invalid value is given then it defaults to `firefox` because it is the best browser.
+- `--browser` specifies with browser driver to use to run the test. The options that are available currently are `chrome`, `firefox`, `safari`, `edge` and `chromium`. If the flags is not given or an invalid value is given then it defaults to `firefox` because it is the best browser. Use example `pytest --browser chrome` to use the chrome webdriver.
 
+- `--speedmult` specifies the speed multiplier of the test. There are places in the test that calls the sleep() function and this flags changes the wait time by the given multiplier. Use example `pytest --speedmult 0.7` to decrease the wait time by 30 %. ***NOTE: The test may sometimes fail if the wait time is to short.***
 # Test
 ## test_login
 - test_unsuccessfull_login

@@ -32,12 +32,15 @@ class Settings():
 
     SLEEP_TIME_USERNAME_FIELD = 1
     SLEEP_TIME_PASSWORD_FIELD = 1
-    SLEEP_TIME_LOGIN_BUTTON = 3
-    SLEEP_TIME_REFRESH = 3
+    SLEEP_TIME_LOGIN_BUTTON = 2
+    SLEEP_TIME_REFRESH = 2
 
 
 @pytest.mark.test_login
 class TestLogin():
+    @pytest.fixture(scope='session')
+    def speed_mult(self, request):
+        self.spd_mult = float(request.config.option.speedmult)
 
     @pytest.fixture()
     def browser_driver(self, request):
@@ -94,15 +97,15 @@ class TestLogin():
         self.is_in_home_page(browser_driver)
 
     @pytest.mark.test_logout
-    @pytest.mark.usefixtures('browser_driver')
-    def test_logout(self, browser_driver: webdriver):
+    @pytest.mark.usefixtures('browser_driver', 'speed_mult')
+    def test_logout(self, browser_driver: webdriver, speed_mult: float):
         browser_driver.get(Settings.START_PAGE_URL)
         self.try_login(Settings.USERS_USERNAME,
                        Settings.USERS_PASSWORD,
                        browser_driver)
         # Check that we are still in the homepage after logging in
         self.is_in_home_page(browser_driver)
-        sleep(Settings.SLEEP_TIME_REFRESH)
+        sleep(self.spd_mult * Settings.SLEEP_TIME_REFRESH)
         
         # Press the log out button
         logout_button = self.get_logout_button(browser_driver)
@@ -121,25 +124,25 @@ class TestLogin():
         username_text_field: WebElement = self.get_username_field(driver)
         username_text_field.clear()
         username_text_field.send_keys(username)
-        sleep(Settings.SLEEP_TIME_USERNAME_FIELD)
+        sleep(self.spd_mult * Settings.SLEEP_TIME_USERNAME_FIELD)
 
         password_text_field: WebElement = self.get_password_field(driver)
         password_text_field.clear()
         password_text_field.send_keys(password)
-        sleep(Settings.SLEEP_TIME_PASSWORD_FIELD)
+        sleep(self.spd_mult * Settings.SLEEP_TIME_PASSWORD_FIELD)
 
         login_button = self.get_login_button(driver)
         login_button.click()
-        sleep(Settings.SLEEP_TIME_LOGIN_BUTTON)
+        sleep(self.spd_mult * Settings.SLEEP_TIME_LOGIN_BUTTON)
 
-    def check_login_error_pop_up(driver: webdriver) -> None:
+    def check_login_error_pop_up(self, driver: webdriver) -> None:
         # Check if the login error pop up exist and then refresh the site and
         # check that it does not exist.
         pop_up_element: WebElement = driver.find_element(
             By.ID, Settings.ID_POP_UP_ELEMENT)
         assert (pop_up_element is not None)
         driver.refresh()
-        sleep(Settings.SLEEP_TIME_REFRESH)
+        sleep(self.spd_mult * Settings.SLEEP_TIME_REFRESH)
         pop_up_element: WebElement = driver.find_element(
             By.ID, Settings.ID_POP_UP_ELEMENT)
         assert (pop_up_element is None)
