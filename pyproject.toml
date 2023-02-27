@@ -70,3 +70,4 @@ markers = [
     "test_successful_login: A test that would try to login to the system.",
     "test_logout: A test that would try to log out from the system.",
 ]
+
