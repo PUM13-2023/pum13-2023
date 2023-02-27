@@ -6,7 +6,7 @@ requires = ["setuptools", "setuptools-scm"]
 classifiers = ["Programming Language :: Python :: 3"]
 dependencies = [
   "dash == 2.8.1",
-  "pymongo == 4.3.3",
+  "mongoengine == 0.26.0",
   "python-dotenv == 0.21.1"
 ]
 name = "pum13-2023"
@@ -39,6 +39,10 @@ strict = true
 
 [[tool.mypy.overrides]]
 module = "dash.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "mongoengine.*"
 ignore_missing_imports = true
 
 [tool.flake8]
