@@ -62,7 +62,7 @@ src_paths = ["src"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = ""
+addopts = "-k 'not youtube'"
 markers = [
     "youtube",
     "test_login: This are test that will test the login capabilities of the website.",
