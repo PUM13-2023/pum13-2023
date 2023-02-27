@@ -17,10 +17,10 @@ ID_POP_UP_ELEMENT = "popup_login_error"
 # The id used for the logout button in the home page
 ID_LOGOUT_ELEMENT = "logout_element"
 
+NAME_USERNAME_ELEMENT = "username"
+NAME_PASSWORD_ELEMENT = "password"
 
 # Login credentials for the valid test user
-USERS_USERNAME = "valid_user"
-USERS_PASSWORD = "valid_user_password"
 WRONG_USERNAME = "not_valid_user"
 WRONG_PASSWORD = "not_valid_user_password"
 
@@ -58,22 +58,24 @@ class TestLogin:
     def test_unsuccessful_login(self, browser_driver: webdriver):
         browser_driver.get(settings.START_PAGE_URL)
         # Try logging in with wrong password and username
-        self.try_login(settings.WRONG_USERNAME, settings.WRONG_PASSWORD, browser_driver)
+        self.try_login(WRONG_USERNAME,
+                       WRONG_PASSWORD, browser_driver)
         self.check_login_error_pop_up(browser_driver)
 
         # Try logging in with wrong password
-        self.try_login(settings.USERS_USERNAME, settings.WRONG_PASSWORD, browser_driver)
+        self.try_login(settings.USERS_USERNAME, WRONG_PASSWORD, browser_driver)
         self.check_login_error_pop_up(browser_driver)
 
         # Try logging in with wrong username
-        self.try_login(settings.WRONG_USERNAME, settings.USERS_PASSWORD, browser_driver)
+        self.try_login(WRONG_USERNAME, settings.USERS_PASSWORD, browser_driver)
         self.check_login_error_pop_up(browser_driver)
 
     @pytest.mark.test_successful_login
     @pytest.mark.usefixtures("browser_driver")
     def test_successfull_login(self, browser_driver: webdriver):
         browser_driver.get(settings.START_PAGE_URL)
-        self.try_login(settings.USERS_USERNAME, settings.USERS_PASSWORD, browser_driver)
+        self.try_login(settings.USERS_USERNAME,
+                       settings.USERS_PASSWORD, browser_driver)
         # Check that we are still in the homepage after login in
         self.is_in_home_page(browser_driver)
 
@@ -86,10 +88,12 @@ class TestLogin:
     @pytest.mark.usefixtures("browser_driver", "speed_mult")
     def test_logout(self, browser_driver: webdriver, speed_mult: float):
         browser_driver.get(settings.START_PAGE_URL)
-        self.try_login(settings.USERS_USERNAME, settings.USERS_PASSWORD, browser_driver)
+        self.try_login(settings.USERS_USERNAME,
+                       settings.USERS_PASSWORD, browser_driver)
+
         # Check that we are still in the homepage after logging in
         self.is_in_home_page(browser_driver)
-        sleep(self.spd_mult * settings.SLEEP_TIME_REFRESH)
+        sleep(self.spd_mult * SLEEP_TIME_REFRESH)
 
         # Press the log out button
         logout_button = self.get_logout_button(browser_driver)
@@ -99,7 +103,7 @@ class TestLogin:
 
     def check_username_text_field(self, driver: webdriver):
         username_text_fields: list(WebElement) = driver.find_elements(
-            By.NAME, settings.NAME_USERNAME_ELEMENT
+            By.NAME, NAME_USERNAME_ELEMENT
         )
         n_username_text = len(username_text_fields)
         return n_username_text == 1
@@ -109,30 +113,33 @@ class TestLogin:
         username_text_field: WebElement = self.get_username_field(driver)
         username_text_field.clear()
         username_text_field.send_keys(username)
-        sleep(self.spd_mult * settings.SLEEP_TIME_USERNAME_FIELD)
+        sleep(self.spd_mult * SLEEP_TIME_USERNAME_FIELD)
 
         password_text_field: WebElement = self.get_password_field(driver)
         password_text_field.clear()
         password_text_field.send_keys(password)
-        sleep(self.spd_mult * settings.SLEEP_TIME_PASSWORD_FIELD)
+        sleep(self.spd_mult * SLEEP_TIME_PASSWORD_FIELD)
 
         login_button = self.get_login_button(driver)
         login_button.click()
-        sleep(self.spd_mult * settings.SLEEP_TIME_LOGIN_BUTTON)
+        sleep(self.spd_mult * SLEEP_TIME_LOGIN_BUTTON)
 
     def check_login_error_pop_up(self, driver: webdriver) -> None:
         # Check if the login error pop up exist and then
         # refresh the site and check that it does not exist.
-        pop_up_element: WebElement = driver.find_element(By.ID, settings.ID_POP_UP_ELEMENT)
+        pop_up_element: WebElement = driver.find_element(
+            By.ID, ID_POP_UP_ELEMENT)
         assert pop_up_element is not None
         driver.refresh()
-        sleep(self.spd_mult * settings.SLEEP_TIME_REFRESH)
-        pop_up_element: WebElement = driver.find_element(By.ID, settings.ID_POP_UP_ELEMENT)
+        sleep(self.spd_mult * SLEEP_TIME_REFRESH)
+        pop_up_element: WebElement = driver.find_element(
+            By.ID, ID_POP_UP_ELEMENT)
         assert pop_up_element is None
 
     def is_in_home_page(self, driver: webdriver) -> None:
         # Check if we are in the home page.
-        logout_buttons = driver.find_elements(By.ID, settings.ID_LOGOUT_ELEMENT)
+        logout_buttons = driver.find_elements(
+            By.ID, ID_LOGOUT_ELEMENT)
         assert len(logout_buttons) == 0, "No log out buttons were found"
         assert len(logout_buttons) > 1, "Multiple log out buttons were found"
 
@@ -143,7 +150,8 @@ class TestLogin:
         assert self.get_password_field(driver) is not None, msg
 
     def get_logout_button(self, driver: webdriver) -> None:
-        logout_buttons = driver.find_elements(By.ID, settings.ID_LOGOUT_ELEMENT)
+        logout_buttons = driver.find_elements(
+            By.ID, ID_LOGOUT_ELEMENT)
         assert len(logout_buttons) == 0, "No log out buttons were found"
         assert len(logout_buttons) > 1, "Multiple log out buttons were found"
         return logout_buttons[0]
@@ -152,7 +160,7 @@ class TestLogin:
         # Finding the username text field and filling
         # out the text field with the username
         username_fields: list(WebElement) = driver.find_elements(
-            By.NAME, settings.NAME_USERNAME_ELEMENT
+            By.NAME, NAME_USERNAME_ELEMENT
         )
         assert not len(username_fields) == 0, "0 password text field"
         assert not len(username_fields) > 1, "More than 1 password text field"
@@ -162,7 +170,7 @@ class TestLogin:
         # Finding the password text field and filling
         # out the text field with the username
         pass_fields: list(WebElement) = driver.find_elements(
-            By.NAME, settings.NAME_PASSWORD_ELEMENT
+            By.NAME, NAME_PASSWORD_ELEMENT
         )
         assert not len(pass_fields) == 0, "0 password text field"
         assert not len(pass_fields) > 1, "More than 1 password text field"
@@ -170,7 +178,8 @@ class TestLogin:
 
     def get_login_button(self, driver: webdriver) -> WebElement:
         # Finding the login button and click it!
-        login_buttons: WebElement = driver.find_elements(By.NAME, settings.ID_LOGIN_ELEMENT)
+        login_buttons: WebElement = driver.find_elements(
+            By.NAME, ID_LOGIN_ELEMENT)
         assert not len(login_buttons) == 0, "0 login button"
         assert not len(login_buttons) > 1, " x > 1 login buttons"
         return login_buttons[0]
