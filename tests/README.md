@@ -5,7 +5,7 @@ pip -v
 ```
 If it shows the directory to the current project that you are in the right directory. If you are not please refer to the installation guide at the root of the project.
 ## Running the test
-To run all the test run:
+To run all the pytest run:
 ```sh
 pytest
 ```
