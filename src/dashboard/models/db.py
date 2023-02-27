@@ -1,5 +1,4 @@
 import os
-import sys
 from typing import Tuple
 
 from dotenv import load_dotenv
@@ -19,7 +18,8 @@ def connect(server_url: str, db_name: str) -> Database[DocumentType] | None:
         db_name (str): the database object to retrieve.
 
     Returns:
-        Database[DocumentType] | None: A Database object if a connection could be established, otherwise returns None.
+        Database[DocumentType] | None: A Database object if a connection
+        could be established, otherwise returns None.
     """
     try:
         client: MongoClient[DocumentType] = MongoClient(server_url)
