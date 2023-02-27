@@ -6,9 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 
-
-class Settings:
-    YOUTUBE = "https://www.youtube.com/"
+YOUTUBE = "https://www.youtube.com/"
 
 
 class TestSeleniumPytest:
@@ -31,7 +29,7 @@ class TestSeleniumPytest:
     @pytest.mark.youtube
     @pytest.mark.usefixtures("browser_driver")
     def test_play_youtube_video(self, browser_driver):
-        browser_driver.get(Settings.YOUTUBE)
+        browser_driver.get(YOUTUBE)
         sleep(1)
         accept_all_button = browser_driver.find_elements(
             By.XPATH,
