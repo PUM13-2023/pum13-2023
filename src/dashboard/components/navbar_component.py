@@ -10,7 +10,7 @@ navbar_items = [
 ]
 
 
-def generate_navbar_items(item_to_highlight: str = None) -> list[html.P]:
+def generate_navbar_items(item_to_highlight: str = "") -> list[html.P]:
     """
     Returns a list of navbar items with a
     specified name to highlight in the navbar.
@@ -22,7 +22,7 @@ def generate_navbar_items(item_to_highlight: str = None) -> list[html.P]:
     pass
 
 
-def navbar_component(page_name: str = None) -> Component:
+def navbar_component(page_name: str = "") -> Component:
     """
     Returns a vertical navbar component with a specified highlighted item.
     Empty argument can be passed into this function in order to remove
@@ -33,15 +33,16 @@ def navbar_component(page_name: str = None) -> Component:
     """
     return (
         html.Div(
+            id='main-navbar',
             className='bg-[#636AF2] justify-center text-left',
             children=[
                 html.Div(
-                    className='inline-block flex-col space-y-2 w-max [&>p]:px-10 [&>p]:py-5 mt-[3.5rem] '
-                              'text-white/75',
+                    className='inline-block flex-col space-y-2 w-max [&>a]:px-10 [&>a]:py-5 mt-[3.5rem] '
+                              'text-white/75 [&>a]:block',
                     children=[
                         highlight_item('Home'),
-                        html.P('Dashboards'),
-                        html.P('Shared dashboards')
+                        html.A('Dashboards', href='Dashboards'),
+                        html.A('Shared dashboards', href='Shared Dashboards')
                     ]
 
                 ),
