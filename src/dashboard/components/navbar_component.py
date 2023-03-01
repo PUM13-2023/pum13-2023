@@ -14,9 +14,7 @@ def generate_navbar_items(item_to_highlight: str = None) -> list[html.P]:
     """
     Returns a list of navbar items with a
     specified name to highlight in the navbar.
-    Empty argument can be passed into this function to generate
-    a list without any highlighted items which is used in subpages
-    that aren't correlated to the navbar items
+
 
     args
     item_to_highlight: Name of the item to mark as highlighted
@@ -24,9 +22,11 @@ def generate_navbar_items(item_to_highlight: str = None) -> list[html.P]:
     pass
 
 
-def navbar_component(page_name: str) -> Component:
+def navbar_component(page_name: str = None) -> Component:
     """
     Returns a vertical navbar component with a specified highlighted item.
+    Empty argument can be passed into this function in order to remove
+    highlighted items which is used in subpages that aren't correlated to the navbar items
 
     args
     page_name: Name of the item to be highlighted in the navbar
@@ -41,7 +41,8 @@ def navbar_component(page_name: str) -> Component:
                     children=[
                         highlight_item('Home'),
                         html.P('Dashboards'),
-                        html.P('Shared dashboards')]
+                        html.P('Shared dashboards')
+                    ]
 
                 ),
             ]
