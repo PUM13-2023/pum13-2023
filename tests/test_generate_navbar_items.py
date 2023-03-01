@@ -1,9 +1,9 @@
 import pytest
 from dashboard.components.navbar_component import generate_navbar_items, navbar_items
+from dashboard.components.highlight_item import HIGHLIGHT_CLASSNAME
 
-ITEM_EXIST = "Dashboard"
+ITEM_EXIST = "Dashboards"
 ITEM_NOT_EXIST = "😂😂😂"
-HIGHLIGHT_ID = "highlight-home"
 navbar_items_count = len(navbar_items)
 
 
@@ -11,7 +11,7 @@ navbar_items_count = len(navbar_items)
 class TestGenerateNavbarItems:
     def test_item_not_exist(self):
         navbar_list = generate_navbar_items(ITEM_NOT_EXIST)
-        assert navbar_list == 'Item to highlight does not exist in the navbar'
+        assert not navbar_list
 
     def test_item_exist(self):
         navbar_list = generate_navbar_items(ITEM_EXIST)
@@ -27,40 +27,25 @@ class TestGenerateNavbarItems:
 
     def test_no_highlighted_exist(self):
         navbar_list = generate_navbar_items()
-        requested_id = False
         for item in navbar_list:
-            if item.id == HIGHLIGHT_ID:
-                requested_id = item.id
-                break
-
-        assert not requested_id
+            assert HIGHLIGHT_CLASSNAME not in item
 
     def test_highlighted_exist(self):
         navbar_list = generate_navbar_items(ITEM_EXIST)
-        found_id = False
+        found_class = False
         for item in navbar_list:
-            if item.id:
-                found_id = True
-                break
+            if HIGHLIGHT_CLASSNAME in item:
+                found_class = True
 
-        assert found_id
+        assert found_class
 
     def test_highlighted_correct_item(self):
         navbar_list = generate_navbar_items(ITEM_EXIST)
-        requested_id = False
+        requested_class = False
         for item in navbar_list:
-            if item.id == HIGHLIGHT_ID:
-                requested_id = item.id
+            if item.classname == HIGHLIGHT_CLASSNAME:
+                requested_class = True
                 break
 
-        assert requested_id == HIGHLIGHT_ID
+        assert requested_class
 
-    def test_highlighted_wrong_item(self):
-        navbar_list = generate_navbar_items(ITEM_EXIST)
-        not_found = False
-        for item in navbar_list:
-            if item.id == HIGHLIGHT_ID:
-                not_found = True
-                break
-
-        assert not_found
