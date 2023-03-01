@@ -5,6 +5,12 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 
 
+PORT = 3030
+HOST = '127.0.0.1'
+URL = f'http://{HOST}:{PORT}'
+
+
+@pytest.mark.test_navbar_component
 class TestNavbarComponent:
     @pytest.fixture(scope="session")
     def browser_driver(self, request):
@@ -22,22 +28,23 @@ class TestNavbarComponent:
         yield driver
         driver.close()
 
-    @pytest.mark.buttons_exist
+    @pytest.mark.usefixtures('browser_driver')
     def find_buttons(self, browser_driver):
-        pass
+        browser_driver.get(URL)
+        navbar = browser_driver.find_element(
+            By.ID,
+            'main-navbar'
+        )
+        assert navbar
 
-    @pytest.mark.navbar_exists
     def find_navbar(self, browser_driver):
-        pass
+        assert True
 
-    @pytest.mark.redirect_home
     def redirect_home(self, browser_driver):
-        pass
+        assert True
 
-    @pytest.mark.redirect_dashboards
     def redirect_dashboards(self, browser_driver):
-        pass
+        assert True
 
-    @pytest.mark.redirect_shared_dashboards
-    def redirect_shared_dashoards(self, browser_driver):
-        pass
+    def redirect_shared_dashboards(self, browser_driver):
+        assert True
