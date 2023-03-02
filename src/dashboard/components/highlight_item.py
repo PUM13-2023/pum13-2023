@@ -1,5 +1,4 @@
 from dash import html
-from dash.dependencies import Component
 
 HIGHLIGHT_CLASSNAME = "border-r-4 border-r-white text-white bg-[#777DF2]"
 
