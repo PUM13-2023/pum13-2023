@@ -116,7 +116,8 @@ class TestNavbarComponent:
     @pytest.mark.usefixtures('browser_driver')
     def test_redirect_shared_dashboards(self, browser_driver: webdriver) -> None:
         """
-        Test that the Shared Dashboards item redirects to the correct page
+        Test that the Shared Dashboards item redirects
+        to the correct page
         """
         browser_driver.back()
         browser_driver.get(URL)
