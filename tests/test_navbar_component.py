@@ -6,7 +6,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from dashboard.components.navbar_component import navbar_items
 
-TIMEOUT = 10
+TIMEOUT = 3
 PORT = 3030
 HOST = "127.0.0.1"
 URL = f"http://{HOST}:{str(PORT)}"
@@ -27,15 +27,22 @@ class TestNavbarComponent:
         driver: webdriver
         match request.config.option.browser:
             case "chrome":
-                driver = webdriver.Chrome()
+                options = webdriver.ChromeOptions()
+                options.add_argument("--headless")
+                driver = webdriver.Chrome(options=options)
             case "safari":
+                # Headless not possible yet?
                 driver = webdriver.Safari()
             case "edge":
-                driver = webdriver.Edge()
+                options = webdriver.EdgeOptions()
+                options.add_argument("--headless")
+                driver = webdriver.Edge(options=options)
             case "chromium":
-                driver = webdriver.ChromiumEdge()
+                driver = webdriver.ChromiumEdge().create_options().add_argument("--headless")
             case _:
-                driver = webdriver.Firefox()
+                options = webdriver.FirefoxOptions()
+                options.add_argument("--headless")
+                driver = webdriver.Firefox(options=options)
         yield driver
         driver.close()
 
