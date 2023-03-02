@@ -18,21 +18,28 @@ version = "0.0.1"
 dev = [
   "isort == 5.12.0",
   "black == 23.1.0",
-  "mypy == 1.0.0",
+  "mypy == 1.0.1",
   "nox == 2022.11.21",
   "pytest == 7.2.1",
   "flake8 == 6.0.0",
-  "flake8-bugbear == 23.1.20",
+  "flake8-bugbear == 23.2.13",
   "flake8-comprehensions == 3.10.1",
   "pep8-naming == 0.13.3",
   "pyproject-flake8 == 6.0.0.post1",
   "pytest-cov == 4.0.0",
+  "selenium == 4.8.2",
 ]
 
 [tool.mypy]
 disable_error_code = "misc"
+mypy_path = "src/dashboard/"
 exclude = "migrations"
 strict = true
+
+
+[[tool.mypy.overrides]]
+module = "dash.*"
+ignore_missing_imports = true
 
 [tool.flake8]
 exclude = "venv,.nox,docs"
@@ -51,3 +58,16 @@ line_length = 99
 profile = "black"
 skip_gitignore = true
 src_paths = ["src"]
+
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-k 'not youtube'"
+markers = [
+    "youtube",
+    "test_login: This are test that will test the login capabilities of the website.",
+    "test_unsuccessful_login: A test that would try to login with invalid username and password.",
+    "test_successful_login: A test that would try to login to the system.",
+    "test_logout: A test that would try to log out from the system.",
+]
+
