@@ -8,12 +8,12 @@ from dashboard.components.navbar_component import navbar_items
 
 TIMEOUT = 10
 PORT = 3030
-HOST = '127.0.0.1'
-URL = f'http://{HOST}:{str(PORT)}'
+HOST = "127.0.0.1"
+URL = f"http://{HOST}:{str(PORT)}"
 navbar_count = len(navbar_items)
-HOME_URL = f'{URL}/Home'
-DASHBOARD_URL = f'{URL}/Dashboards'
-SHARED_DASHBOARDS_URL = f'{URL}/Shared Dashboards'
+HOME_URL = f"{URL}/Home"
+DASHBOARD_URL = f"{URL}/Dashboards"
+SHARED_DASHBOARDS_URL = f"{URL}/Shared Dashboards"
 
 
 @pytest.mark.test_navbar_component
@@ -39,7 +39,7 @@ class TestNavbarComponent:
         yield driver
         driver.close()
 
-    @pytest.mark.usefixtures('browser_driver')
+    @pytest.mark.usefixtures("browser_driver")
     def test_find_navbar(self, browser_driver: webdriver) -> None:
         """
         Test that a navbar element exists on the page
@@ -50,14 +50,11 @@ class TestNavbarComponent:
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
 
-        navbar = browser_driver.find_element(
-            By.ID,
-            'main-navbar'
-        )
+        navbar = browser_driver.find_element(By.ID, "main-navbar")
 
         assert navbar
 
-    @pytest.mark.usefixtures('browser_driver')
+    @pytest.mark.usefixtures("browser_driver")
     def test_find_buttons(self, browser_driver: webdriver) -> None:
         """
         Test that the navbar items exist on the page
@@ -69,12 +66,12 @@ class TestNavbarComponent:
 
         navbar = browser_driver.find_elements(
             By.TAG_NAME,
-            'a',
+            "a",
         )
 
         assert len(navbar) == navbar_count
 
-    @pytest.mark.usefixtures('browser_driver')
+    @pytest.mark.usefixtures("browser_driver")
     def test_redirect_home(self, browser_driver: webdriver) -> None:
         """
         Test that the Home item redirects to the correct page
@@ -84,16 +81,13 @@ class TestNavbarComponent:
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
 
-        link = browser_driver.find_element(
-            By.LINK_TEXT,
-            'Home'
-        )
+        link = browser_driver.find_element(By.LINK_TEXT, "Home")
 
-        assert link.text == 'Home'
+        assert link.text == "Home"
         link.click()
         assert browser_driver.current_url == HOME_URL
 
-    @pytest.mark.usefixtures('browser_driver')
+    @pytest.mark.usefixtures("browser_driver")
     def test_redirect_dashboards(self, browser_driver: webdriver) -> None:
         """
         Test that the Dashboards item redirects to the correct page
@@ -105,16 +99,13 @@ class TestNavbarComponent:
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
 
-        link = browser_driver.find_element(
-            By.LINK_TEXT,
-            'Dashboards'
-        )
+        link = browser_driver.find_element(By.LINK_TEXT, "Dashboards")
 
-        assert link.text == 'Dashboards'
+        assert link.text == "Dashboards"
         link.click()
         assert browser_driver.current_url == DASHBOARD_URL
 
-    @pytest.mark.usefixtures('browser_driver')
+    @pytest.mark.usefixtures("browser_driver")
     def test_redirect_shared_dashboards(self, browser_driver: webdriver) -> None:
         """
         Test that the Shared Dashboards item redirects
@@ -127,11 +118,8 @@ class TestNavbarComponent:
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
 
-        link = browser_driver.find_element(
-            By.LINK_TEXT,
-            'Shared Dashboards'
-        )
+        link = browser_driver.find_element(By.LINK_TEXT, "Shared Dashboards")
 
-        assert link.text == 'Shared Dashboards'
+        assert link.text == "Shared Dashboards"
         link.click()
         assert browser_driver.current_url == SHARED_DASHBOARDS_URL

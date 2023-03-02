@@ -2,7 +2,7 @@ import dash
 from dash import html
 from dash.dependencies import Component
 
-from dashboard.components import experimental_component
+from dashboard.components.experimental_component import experimental_component
 
 dash.register_page(__name__, path="/")
 
