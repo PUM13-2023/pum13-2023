@@ -1,11 +1,27 @@
 import pytest
 
+from dash import html
 from dashboard.components.highlight_item import HIGHLIGHT_CLASSNAME
 from dashboard.components.navbar_component import generate_navbar_items, navbar_items
 
 ITEM_EXIST = "Dashboards"
 ITEM_NOT_EXIST = "😂😂😂"
 navbar_items_count = len(navbar_items)
+
+
+def classname_attr_exists(element: html.A) -> bool:
+    """
+    Check that html tag A has the className attribute
+    Returns True if found else False
+
+    args
+    element: the anchor tag to look into
+    """
+    try:
+        if getattr(element, "className") == HIGHLIGHT_CLASSNAME:
+            return True
+    except AttributeError:
+        return False
 
 
 @pytest.mark.test_generate_navbar_items
@@ -58,9 +74,11 @@ class TestGenerateNavbarItems:
         """
         navbar_list = generate_navbar_items(ITEM_EXIST)
         found_class = False
+
         for item in navbar_list:
-            if HIGHLIGHT_CLASSNAME in item:
+            if classname_attr_exists(item):
                 found_class = True
+                break
 
         assert found_class
 
@@ -71,7 +89,7 @@ class TestGenerateNavbarItems:
         navbar_list = generate_navbar_items(ITEM_EXIST)
         requested_class = False
         for item in navbar_list:
-            if item.classname == HIGHLIGHT_CLASSNAME:
+            if classname_attr_exists(item) and item.children == ITEM_EXIST:
                 requested_class = True
                 break
 

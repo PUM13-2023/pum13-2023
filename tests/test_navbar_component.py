@@ -13,7 +13,7 @@ URL = f"http://{HOST}:{str(PORT)}"
 navbar_count = len(navbar_items)
 HOME_URL = f"{URL}/Home"
 DASHBOARD_URL = f"{URL}/Dashboards"
-SHARED_DASHBOARDS_URL = f"{URL}/Shared Dashboards"
+SHARED_DASHBOARDS_URL = f"{URL}/Shared%20Dashboards"
 
 
 @pytest.mark.test_navbar_component
@@ -108,7 +108,6 @@ class TestNavbarComponent:
 
         link = browser_driver.find_element(By.LINK_TEXT, "Dashboards")
 
-        assert link.text == "Dashboards"
         link.click()
         assert browser_driver.current_url == DASHBOARD_URL
 
@@ -127,6 +126,5 @@ class TestNavbarComponent:
 
         link = browser_driver.find_element(By.LINK_TEXT, "Shared Dashboards")
 
-        assert link.text == "Shared Dashboards"
         link.click()
         assert browser_driver.current_url == SHARED_DASHBOARDS_URL

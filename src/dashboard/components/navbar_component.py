@@ -3,19 +3,30 @@ from dash.dependencies import Component
 
 from dashboard.components.highlight_item import highlight_item
 
-navbar_items = ["Home", "Dashboards", "Shared dashboards" "Logout"]
+navbar_items = ["Home", "Dashboards", "Shared Dashboards", "Logout"]
 
 
-def generate_navbar_items(item_to_highlight: str = "") -> list[html.P]:
+def generate_navbar_items(item_to_highlight: str = "") -> list[html.A]:
     """
     Returns a list of navbar items with a
     specified name to highlight in the navbar.
 
-
     args
     item_to_highlight: Name of the item to mark as highlighted
     """
-    return []
+    navbar_list: list[html.A] = []
+
+    if item_to_highlight == "Logout" or item_to_highlight not in navbar_items:
+        return []
+
+    for item in navbar_items:
+        if item == item_to_highlight:
+            navbar_list.append(highlight_item(item))
+
+        else:
+            navbar_list.append(html.A(item, href=f'/{item}'))
+
+    return navbar_list
 
 
 def navbar_component(page_name: str = "") -> Component:
@@ -37,11 +48,7 @@ def navbar_component(page_name: str = "") -> Component:
                 className="inline-block flex-col space-y-2 w-max "
                 "[&>a]:px-10 [&>a]:py-5 mt-[3.5rem] "
                 "text-white/75 [&>a]:block",
-                children=[
-                    highlight_item("Home"),
-                    html.A("Dashboards", href="Dashboards"),
-                    html.A("Shared dashboards", href="Shared Dashboards"),
-                ],
+                children=generate_navbar_items(page_name),
             ),
         ],
     )
