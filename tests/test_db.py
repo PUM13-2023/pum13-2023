@@ -1,4 +1,4 @@
-from dashboard.models import db
+from dashboard.models import db, user
 
 
 def test_data_db_connection() -> None:
@@ -6,4 +6,4 @@ def test_data_db_connection() -> None:
 
 
 def test_user_db_connection() -> None:
-    db.connect_user_db("user-db")
+    db.connect_user_db()

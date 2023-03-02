@@ -1,20 +1,10 @@
 import os
-from typing import Tuple
+from typing import Tuple, Optional
 
 from dotenv import load_dotenv
 import mongoengine
 
 load_dotenv()
-
-
-def connect(server_url: str, db_name: str, alias: str) -> None:
-    """Connect to a MongoDB database.
-
-    Args:
-        server_url (str): the MongoDB URL to connnect to.
-        db_name (str): the database object to retrieve.
-    """
-    mongoengine.connect(alias=alias, host=server_url, name=db_name)
 
 
 def get_connection_params(url_env_name: str, db_env_name: str) -> Tuple[str, str]:
@@ -28,11 +18,10 @@ def get_connection_params(url_env_name: str, db_env_name: str) -> Tuple[str, str
 
 def connect_data_db(alias: str) -> None:
     server_url, db_name = get_connection_params("DATA_DB_URL", "DATA_DB_NAME")
+    mongoengine.connect(alias=alias, host=server_url, name=db_name)
 
-    connect(server_url, db_name, alias)
 
-
-def connect_user_db(alias: str) -> None:
+def connect_user_db() -> None:
     server_url, db_name = get_connection_params("USER_DB_URL", "USER_DB_NAME")
 
-    connect(server_url, db_name, alias)
+    mongoengine.connect(host=server_url, name=db_name)
