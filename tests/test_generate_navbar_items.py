@@ -1,6 +1,7 @@
 import pytest
-from dashboard.components.navbar_component import generate_navbar_items, navbar_items
+
 from dashboard.components.highlight_item import HIGHLIGHT_CLASSNAME
+from dashboard.components.navbar_component import generate_navbar_items, navbar_items
 
 ITEM_EXIST = "Dashboards"
 ITEM_NOT_EXIST = "😂😂😂"

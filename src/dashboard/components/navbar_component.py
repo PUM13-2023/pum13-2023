@@ -1,5 +1,6 @@
 from dash import html
 from dash.dependencies import Component
+
 from dashboard.components.highlight_item import highlight_item
 
 navbar_items = ["Home", "Dashboards", "Shared dashboards" "Logout"]
@@ -14,7 +15,7 @@ def generate_navbar_items(item_to_highlight: str = "") -> list[html.P]:
     args
     item_to_highlight: Name of the item to mark as highlighted
     """
-    pass
+    return []
 
 
 def navbar_component(page_name: str = "") -> Component:
