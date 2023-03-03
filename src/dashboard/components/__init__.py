@@ -1,1 +1,3 @@
-from dashboard.components.test_component import test_component as test_component
+from dashboard.components.experimental_component import (
+    experimental_component as experimental_component,
+)
