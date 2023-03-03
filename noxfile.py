@@ -15,9 +15,7 @@ def fmt(s: nox.Session) -> None:
 
 @nox.session(tags=["lint"], venv_backend="none")
 def lint(s: nox.Session) -> None:
-    s.run(
-        "pflake8", "--color", "always", "--per-file-ignores", "*__init__.py:F401", "src", "tests"
-    )
+    s.run("pflake8", "--color", "always")
 
 
 @nox.session(tags=["lint"], venv_backend="none")
