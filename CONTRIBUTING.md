@@ -3,10 +3,11 @@
 To ensure a smooth workflow contributors should follow these guidelines.
 
 ## Table of Contents
-- [Branch Structure](#branch-structure)
+
+- [Branch Structure](#branch-structure)
 - [Commit Messages](#commit-messages)
 - [Rebasing](#rebasing)
-- [Pull Requests](#pull-request)
+- [Pull Requests](#pull-requests)
 - [Example](#example)
 
 ## Branch Structure
