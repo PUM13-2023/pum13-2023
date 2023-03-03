@@ -24,7 +24,7 @@ def generate_navbar_items(item_to_highlight: str = "") -> list[html.A]:
             navbar_list.append(highlight_item(item))
 
         else:
-            navbar_list.append(html.A(item, href=f'/{item}'))
+            navbar_list.append(html.A(item, href=f"/{item}"))
 
     return navbar_list
 

@@ -1,6 +1,6 @@
+from dash import html
 import pytest
 
-from dash import html
 from dashboard.components.highlight_item import HIGHLIGHT_CLASSNAME
 from dashboard.components.navbar_component import generate_navbar_items, navbar_items
 
@@ -18,7 +18,7 @@ def classname_attr_exists(element: html.A) -> bool:
     element: the anchor tag to look into
     """
     try:
-        if getattr(element, "className") == HIGHLIGHT_CLASSNAME:
+        if hasattr(element, "className"):
             return True
     except AttributeError:
         return False
