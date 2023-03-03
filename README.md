@@ -7,9 +7,10 @@ Dash framework.
 ## Table of Contents
 
 - [Installation](#installation)
-- [Documentation](#documentation)
+- [Contributing](#contributing)
 - [Project structure](#project-structure)
 - [Enforcing Code Quality](#enforcing-code-quality)
+- [Dependencies](#dependencies)
 
 ## Installation
 
@@ -36,10 +37,12 @@ source venv/bin/activate
 pip install -e '.[dev]'
 ```
 
-### Note
-* The `-e` flag installs the project in *edit* mode, meaning that the installed
-package refers to the project source directory. Omiting this flag results in
-hard-to-find bugs as changes to the code are not applied as expected.
+> Note: The `-e` flag installs the project in *edit* mode, meaning that the installed
+> package refers to the project source directory. Omiting this flag results in
+> hard-to-find bugs as changes to the code are not applied as expected.
+
+## Contributing
+For information on how to contribute, see [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 
 ## Project structure
 
