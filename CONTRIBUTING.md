@@ -77,7 +77,8 @@ If you fix a small error in your previous commit, use
 git commit --amend
 ```
 to update the previous commit with the fix. This can also be used to address
-errors made in the commit message.
+errors made in the commit message. Like with any commits, the changes must be
+staged with `git add` first.
 
 ## Using `git rebase -i HEAD~<n>`
 If you need to edit commits further back in history, use
@@ -116,7 +117,7 @@ git switch -c add-feature
 ```
 Make changes, autoformat, lint and run tests.
 ```bash
-vim src/...
+# Make changes to codebase
 
 nox -s fmt
 nox -t lint
