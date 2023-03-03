@@ -47,8 +47,8 @@ per-file-ignores = """
   /tests/*: D100 D101 D102 D10 D104
   __init__.py: F401
 """
-select = "src"
-exclude = "venv,.nox,docs"
+select = ["src", "tests"]
+exclude = [".venv", "venv", ".nox", "docs", ".git", ".github"]
 extend-ignore = ["E203"]
 extend-immutable-calls = ["Argument"]
 max-doc-length = 72
