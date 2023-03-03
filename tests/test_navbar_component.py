@@ -1,9 +1,13 @@
+import multiprocessing
+import time
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 
+from dashboard import main
 from dashboard.components.navbar_component import navbar_items
 
 TIMEOUT = 3
@@ -16,9 +20,21 @@ DASHBOARD_URL = f"{URL}/Dashboards"
 SHARED_DASHBOARDS_URL = f"{URL}/Shared%20Dashboards"
 
 
+def server(host, port):
+    main.app.run(host, port)
+
+
 @pytest.mark.test_navbar_component
 class TestNavbarComponent:
-    @pytest.fixture(scope="session")
+    @pytest.fixture()
+    def start_server(self):
+        p = multiprocessing.Process(target=server, args=(HOST, PORT))
+        p.start()
+        time.sleep(1)
+        yield p
+        p.terminate()
+
+    @pytest.fixture(autouse=True, scope="session")
     def speed_mult(self, request):
         self.spd_mult = float(request.config.option.speedmult)
 
@@ -47,6 +63,7 @@ class TestNavbarComponent:
         driver.close()
 
     @pytest.mark.usefixtures("browser_driver")
+    @pytest.mark.usefixtures("start_server")
     def test_find_navbar(self, browser_driver: webdriver) -> None:
         """
         Test that a navbar element exists on the page
@@ -59,9 +76,10 @@ class TestNavbarComponent:
 
         navbar = browser_driver.find_element(By.ID, "main-navbar")
 
-        assert navbar
+        assert navbar, "Navbar could not be found"
 
     @pytest.mark.usefixtures("browser_driver")
+    @pytest.mark.usefixtures("start_server")
     def test_find_buttons(self, browser_driver: webdriver) -> None:
         """
         Test that the navbar items exist on the page
@@ -76,9 +94,10 @@ class TestNavbarComponent:
             "a",
         )
 
-        assert len(navbar) == navbar_count
+        assert len(navbar) == navbar_count, "Navbar items do not exist"
 
     @pytest.mark.usefixtures("browser_driver")
+    @pytest.mark.usefixtures("start_server")
     def test_redirect_home(self, browser_driver: webdriver) -> None:
         """
         Test that the Home item redirects to the correct page
@@ -92,9 +111,12 @@ class TestNavbarComponent:
 
         assert link.text == "Home"
         link.click()
-        assert browser_driver.current_url == HOME_URL
+        assert (
+            browser_driver.current_url == HOME_URL
+        ), "Page did not redirect to the correct home page"
 
     @pytest.mark.usefixtures("browser_driver")
+    @pytest.mark.usefixtures("start_server")
     def test_redirect_dashboards(self, browser_driver: webdriver) -> None:
         """
         Test that the Dashboards item redirects to the correct page
@@ -109,9 +131,12 @@ class TestNavbarComponent:
         link = browser_driver.find_element(By.LINK_TEXT, "Dashboards")
 
         link.click()
-        assert browser_driver.current_url == DASHBOARD_URL
+        assert (
+            browser_driver.current_url == DASHBOARD_URL
+        ), "Page did not redirect tot the correct dashboards page"
 
     @pytest.mark.usefixtures("browser_driver")
+    @pytest.mark.usefixtures("start_server")
     def test_redirect_shared_dashboards(self, browser_driver: webdriver) -> None:
         """
         Test that the Shared Dashboards item redirects
