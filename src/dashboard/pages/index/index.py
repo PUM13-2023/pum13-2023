@@ -12,5 +12,5 @@ def layout() -> Component:
         className="flex flex-inline",
         children=[
             navbar_component("Home"),
-        ]
+        ],
     )
