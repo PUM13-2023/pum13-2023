@@ -1,8 +1,6 @@
 import multiprocessing
 from time import sleep
-from typing import Any
 
-from dash import html
 import pytest
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
@@ -10,45 +8,35 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
+from dash import html
 
 from src.dashboard import main
 
-TIMEOUT = 3
+TIMEOUT = 1.5
 PORT = 8000
 HOST = "127.0.0.1"
 URL = f"http://{HOST}:{str(PORT)}"
 
 USERNAME = "cooluser"
 
-# Constants used in search bar
+# Constants for search bar
 SEARCH_BAR_ID = "search-bar"
 
-# Constants used in welcome message
+# Constants for welcome message
 WELCOME_ID = "home-welcome-user"
-WELCOME_MESSAGE = f"Welcome back {USERNAME}"
+welcome_message = f"Welcome back {USERNAME}"
 
+# Constants for create dashboard button
+CREATE_DASHBOARD_ID = "create-dashboard"
+CREATE_DASHBOARD_POPUP_ID = "create-dashboard-menu"
+
+# Constants for latest opened dashboards container
+LATEST_OPENED_CONTAINER_ID = "latest-opened-container"
+LATEST_OPENED_TEXT = "Latest opened dashboards"
+LATEST_OPENED_DASHBOARD_BOX1_ID = ""
 
 def server(host, port):
     main.app.run(host, port)
-
-
-def find_element(browser_driver: webdriver, find_by: By, text: str) -> bool | WebElement:
-    """
-    Returns the requested element if found else False
-
-    args
-    browser_driver: The in use webdriver
-    find_by: The find by tag ex. By.ID
-    text: The text to search for in the specified tag
-    """
-    try:
-        WebDriverWait(browser_driver, TIMEOUT).until(
-            ec.presence_of_element_located((find_by, text))
-        )
-        return browser_driver.find_element(find_by, text)
-    
-    except TimeoutException:
-        return False
 
 
 @pytest.mark.test_home_page
@@ -117,5 +105,42 @@ class TestHomePage:
 
         assert welcome_text, "Welcome message not found on page"
         assert (
-            welcome_text.text == WELCOME_MESSAGE
-        ), f"Welcome message does not match: {WELCOME_MESSAGE}"
+            welcome_text.text == welcome_message
+        ), f"Welcome message does not match: {welcome_message}"
+
+    def test_create_dashboard(self, browser_driver: webdriver) -> None:
+        """
+        Tests that the create dashboard button exists on the page
+        and that the button opens the new dashboard pop-up menu
+        """
+        try:
+            WebDriverWait(browser_driver, TIMEOUT).until(
+                ec.presence_of_element_located((By.ID, CREATE_DASHBOARD_ID))
+            )
+            create_dashboard = browser_driver.find_element(By.ID, CREATE_DASHBOARD_ID)
+        except TimeoutException:
+            create_dashboard = False
+
+        assert create_dashboard, "Create dashboard button not found on page"
+        create_dashboard.click()
+        create_dashboard_menu = self.find_create_dashboard_menu(browser_driver)
+        assert create_dashboard_menu, "Create dashboard menu did not pop up"
+
+    def find_create_dashboard_menu(self, browser_driver) -> WebElement | bool:
+        """
+        Returns the create dashboard menu element if found else
+        returns False
+        """
+        try:
+            return browser_driver.find_element(By.ID, CREATE_DASHBOARD_POPUP_ID)
+        except NoSuchElementException:
+            return False
+
+    def test_latest_opened_dashboards(self, browser_driver: webdriver) -> None:
+        try:
+            WebDriverWait(browser_driver, TIMEOUT).until(
+                ec.presence_of_element_located((By.ID, ))
+            )
+            create_dashboard = browser_driver.find_element(By.ID, CREATE_DASHBOARD_ID)
+        except TimeoutException:
+            create_dashboard = False
