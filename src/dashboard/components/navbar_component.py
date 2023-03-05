@@ -24,7 +24,7 @@ def generate_navbar_items(item_to_highlight: str = "") -> list[html.A]:
         className = ""
         if item["name"] == item_to_highlight:
             className = "border-r-4 border-r-white text-white bg-[#777DF2]"
-        
+
         navbar_list.append(html.A(item["name"], className=className, href=item["path"]))
 
     return navbar_list
