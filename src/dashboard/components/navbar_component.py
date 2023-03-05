@@ -1,3 +1,4 @@
+import dash
 from dash import html
 from dash.dependencies import Component
 
@@ -16,15 +17,15 @@ def generate_navbar_items(item_to_highlight: str = "") -> list[html.A]:
     """
     navbar_list: list[html.A] = []
 
-    if item_to_highlight == "Logout" or item_to_highlight not in navbar_items:
+    if item_to_highlight == "Logout":
         return []
 
-    for item in navbar_items:
-        if item == item_to_highlight:
-            navbar_list.append(highlight_item(item))
-
-        else:
-            navbar_list.append(html.A(item, href=f"/{item}"))
+    for item in dash.page_registry.values():
+        className = ""
+        if item["name"] == item_to_highlight:
+            className = "border-r-4 border-r-white text-white bg-[#777DF2]"
+        
+        navbar_list.append(html.A(item["name"], className=className, href=item["path"]))
 
     return navbar_list
 
