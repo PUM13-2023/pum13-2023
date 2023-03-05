@@ -80,7 +80,7 @@ to update the previous commit with the fix. This can also be used to address
 errors made in the commit message. Like with any commits, the changes must be
 staged with `git add` first.
 
-## Using `git rebase -i HEAD~<n>`
+### Using `git rebase -i HEAD~<n>`
 If you need to edit commits further back in history, use
 ```bash
 git rebase -i HEAD~<n>
