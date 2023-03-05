@@ -15,9 +15,9 @@ PORT = 3030
 HOST = "127.0.0.1"
 URL = f"http://{HOST}:{str(PORT)}"
 navbar_count = len(navbar_items)
-HOME_URL = f"{URL}/Home"
-DASHBOARD_URL = f"{URL}/Dashboards"
-SHARED_DASHBOARDS_URL = f"{URL}/Shared%20Dashboards"
+HOME_URL = f"{URL}/"
+DASHBOARD_URL = f"{URL}/dashboards"
+SHARED_DASHBOARDS_URL = f"{URL}/shared-dashboards"
 
 
 def server(host, port):
@@ -128,7 +128,7 @@ class TestNavbarComponent:
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
 
-        link = browser_driver.find_element(By.LINK_TEXT, "Dashboards")
+        link = browser_driver.find_element(By.LINK_TEXT, "dashboards")
 
         link.click()
         assert (
@@ -149,7 +149,7 @@ class TestNavbarComponent:
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
 
-        link = browser_driver.find_element(By.LINK_TEXT, "Shared Dashboards")
+        link = browser_driver.find_element(By.LINK_TEXT, "shared-dashboards")
 
         link.click()
         assert browser_driver.current_url == SHARED_DASHBOARDS_URL
