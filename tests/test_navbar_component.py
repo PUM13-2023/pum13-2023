@@ -8,13 +8,12 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 
 from dashboard import main
-from dashboard.components.navbar_component import navbar_items
 
 TIMEOUT = 3
 PORT = 3030
 HOST = "127.0.0.1"
 URL = f"http://{HOST}:{str(PORT)}"
-navbar_count = len(navbar_items)
+navbar_count = 3
 HOME_URL = f"{URL}/"
 DASHBOARD_URL = f"{URL}/dashboards"
 SHARED_DASHBOARDS_URL = f"{URL}/shared-dashboards"
@@ -128,7 +127,7 @@ class TestNavbarComponent:
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
 
-        link = browser_driver.find_element(By.LINK_TEXT, "dashboards")
+        link = browser_driver.find_element(By.LINK_TEXT, "Dashboards")
 
         link.click()
         assert (
@@ -149,7 +148,7 @@ class TestNavbarComponent:
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
 
-        link = browser_driver.find_element(By.LINK_TEXT, "shared-dashboards")
+        link = browser_driver.find_element(By.LINK_TEXT, "Shared dashboards")
 
         link.click()
         assert browser_driver.current_url == SHARED_DASHBOARDS_URL
