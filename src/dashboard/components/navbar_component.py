@@ -1,4 +1,4 @@
-from typing import OrderedDict
+from typing import Dict, OrderedDict
 
 import dash
 from dash import html
@@ -6,7 +6,7 @@ from dash.dependencies import Component
 
 
 def generate_navbar_items(
-    page_registry: OrderedDict[str, str], item_to_highlight: str = ""
+    page_registry: OrderedDict[str, Dict[str, str]], item_to_highlight: str = ""
 ) -> list[html.A]:
     """
     Returns a list of navbar items with a
