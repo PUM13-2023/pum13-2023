@@ -35,6 +35,7 @@ LATEST_OPENED_CONTAINER_ID = "latest-opened-container"
 LATEST_OPENED_TEXT = "Latest opened dashboards"
 LATEST_OPENED_DASHBOARD_BOX1_ID = ""
 
+
 def server(host, port):
     main.app.run(host, port)
 
@@ -137,10 +138,12 @@ class TestHomePage:
             return False
 
     def test_latest_opened_dashboards(self, browser_driver: webdriver) -> None:
+        """
+        Test that the view of the latest opened dashboards exists and
+        displays properly
+        """
         try:
-            WebDriverWait(browser_driver, TIMEOUT).until(
-                ec.presence_of_element_located((By.ID, ))
-            )
+            WebDriverWait(browser_driver, TIMEOUT).until(ec.presence_of_element_located((By.ID,)))
             create_dashboard = browser_driver.find_element(By.ID, CREATE_DASHBOARD_ID)
         except TimeoutException:
             create_dashboard = False
