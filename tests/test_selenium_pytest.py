@@ -43,7 +43,7 @@ class TestSeleniumPytest:
 
         search_bar: WebElement = browser_driver.find_elements(By.XPATH, '//input[@id="search"]')[0]
         search_bar.clear()
-        search_bar.send_keys("Rick Astley - Never Gonna Give You Up (Official Music Video)")
+        search_bar.send_keys("Rick Astley - " "Never Gonna Give You Up (Official Music Video)")
         sleep(1)
 
         search_button: WebElement = browser_driver.find_elements(

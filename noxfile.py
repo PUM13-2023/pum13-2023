@@ -7,11 +7,15 @@ def fmt_check(s: nox.Session) -> None:
     s.run("black", "--check", ".")
 
 
+@nox.session(tags=["fmt"], venv_backend="none")
+def fmt(s: nox.Session) -> None:
+    s.run("isort", ".")
+    s.run("black", ".")
+
+
 @nox.session(tags=["lint"], venv_backend="none")
 def lint(s: nox.Session) -> None:
-    s.run(
-        "pflake8", "--color", "always", "--per-file-ignores", "*__init__.py:F401", "src", "tests"
-    )
+    s.run("pflake8", "--color", "always")
 
 
 @nox.session(tags=["lint"], venv_backend="none")
