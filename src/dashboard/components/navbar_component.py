@@ -1,11 +1,13 @@
+from typing import OrderedDict
+
 import dash
 from dash import html
 from dash.dependencies import Component
 
-navbar_items = ["Home", "Dashboards", "Shared Dashboards", "Logout"]
 
-
-def generate_navbar_items(item_to_highlight: str = "") -> list[html.A]:
+def generate_navbar_items(
+    page_registry: OrderedDict[str, str], item_to_highlight: str = ""
+) -> list[html.A]:
     """
     Returns a list of navbar items with a
     specified name to highlight in the navbar.
@@ -14,16 +16,20 @@ def generate_navbar_items(item_to_highlight: str = "") -> list[html.A]:
     item_to_highlight: Name of the item to mark as highlighted
     """
     navbar_list: list[html.A] = []
+    wrong_item = True
 
-    if item_to_highlight == "Logout":
-        return []
+    for item in page_registry.values():
+        if item_to_highlight == "Logout" or item["name"] == item_to_highlight:
+            wrong_item = False
 
-    for item in dash.page_registry.values():
         class_name = ""
         if item["name"] == item_to_highlight:
             class_name = "border-r-4 border-r-white text-white bg-[#777DF2]"
 
         navbar_list.append(html.A(item["name"], className=class_name, href=item["path"]))
+
+    if wrong_item:
+        return []
 
     return navbar_list
 
@@ -39,6 +45,7 @@ def navbar_component(page_name: str = "") -> Component:
     args
     page_name: Name of the item to be highlighted in the navbar
     """
+
     return html.Div(
         id="main-navbar",
         className="bg-[#636AF2] justify-center text-left",
@@ -47,7 +54,7 @@ def navbar_component(page_name: str = "") -> Component:
                 className="inline-block flex-col space-y-2 w-max "
                 "[&>a]:px-10 [&>a]:py-5 mt-[3.5rem] "
                 "text-white/75 [&>a]:block",
-                children=generate_navbar_items(page_name),
+                children=generate_navbar_items(dash.page_registry, page_name),
             ),
         ],
     )
