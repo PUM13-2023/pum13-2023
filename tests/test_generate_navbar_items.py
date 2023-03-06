@@ -1,10 +1,14 @@
 import pytest
 
-from dashboard.components.navbar_component import generate_navbar_items, navbar_items
+from dashboard.components.navbar_component import generate_navbar_items
 
-ITEM_EXIST = "Dashboards"
+ITEM_EXIST = "Home"
 ITEM_NOT_EXIST = "😂😂😂"
-navbar_items_count = len(navbar_items)
+navbar_items_count = 1
+
+# This dict is supposed to simulate the dash.page_registry dict
+# Add the name of the page and the paths here in order to test them
+navbar_items = {"page_home": {"name": "Home", "path": "/"}}
 
 
 @pytest.mark.test_generate_navbar_items
@@ -14,7 +18,7 @@ class TestGenerateNavbarItems:
         Test that you cannot generate a list with tags when trying to
         highlight an item that does not exist in the navbar
         """
-        navbar_list = generate_navbar_items(ITEM_NOT_EXIST)
+        navbar_list = generate_navbar_items(navbar_items, ITEM_NOT_EXIST)
         assert not navbar_list
 
     def test_item_exist(self) -> None:
@@ -22,7 +26,7 @@ class TestGenerateNavbarItems:
         Test that a list is generated when a correct
         item to highlight exists
         """
-        navbar_list = generate_navbar_items(ITEM_EXIST)
+        navbar_list = generate_navbar_items(navbar_items, ITEM_EXIST)
         assert navbar_list
 
     def test_correct_number_items(self) -> None:
@@ -30,7 +34,7 @@ class TestGenerateNavbarItems:
         Test that the generated list has the same
         amount of items to the original navbar list
         """
-        navbar_list = generate_navbar_items(ITEM_EXIST)
+        navbar_list = generate_navbar_items(navbar_items, ITEM_EXIST)
         assert len(navbar_list) == navbar_items_count
 
     def test_incorrect_number_items(self) -> None:
@@ -38,7 +42,7 @@ class TestGenerateNavbarItems:
         Test that a generated list with items that do not exist will
         not be the same length as the original navbar list
         """
-        navbar_list = generate_navbar_items(ITEM_NOT_EXIST)
+        navbar_list = generate_navbar_items(navbar_items, ITEM_NOT_EXIST)
         assert len(navbar_list) != navbar_items_count
 
     def test_no_highlighted_exist(self) -> None:
@@ -46,7 +50,7 @@ class TestGenerateNavbarItems:
         Test that it is possible to generate a list
         without any highlighted items
         """
-        navbar_list = generate_navbar_items()
+        navbar_list = generate_navbar_items(navbar_items)
         assert all(item.className == "" for item in navbar_list)
 
     def test_highlighted_exist(self) -> None:
@@ -54,7 +58,7 @@ class TestGenerateNavbarItems:
         Test that it is possible to
         generate a list with a highlighted item
         """
-        navbar_list = generate_navbar_items(ITEM_EXIST)
+        navbar_list = generate_navbar_items(navbar_items, ITEM_EXIST)
         found_class = False
 
         for item in navbar_list:
@@ -68,7 +72,7 @@ class TestGenerateNavbarItems:
         """
         Test that the generated list highlights the correct item
         """
-        navbar_list = generate_navbar_items(ITEM_EXIST)
+        navbar_list = generate_navbar_items(navbar_items, ITEM_EXIST)
         requested_class = False
         for item in navbar_list:
             if hasattr(item, "className") and item.children == ITEM_EXIST:
