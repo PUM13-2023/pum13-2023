@@ -11,7 +11,8 @@ ADDRESS = "127.0.0.1"
 import dash
 from dash import Dash, dcc, html
 from dash.dependencies import Component, Input, Output
-import dash_bootstrap_components as dbc
+
+# import dash_bootstrap_components as dbc
 import plotly.express as px
 
 dash.register_page(__name__, path="/login")
@@ -38,40 +39,42 @@ allowed_input = (
 
 
 def layout() -> Component:
-    return html.Div(
-        className=f'bg-[{colors["background"]}] flex h-full w-full justify-center items-center',
+    return html.Div(  # h-full should be used but, h-screen gives a full but scrollable background
+        className=f'bg-[{colors["background"]}] flex h-screen w-full justify-center items-center',
         children=[
             # Layout for the login meny
             # main rectangle
             html.Div(
-                className="flex h-[30%] w-[60%]",
+                className="flex h-[30%] w-[60%]  ",
                 children=[
                     # left rectangle
                     html.Div(
-                        className=f'bg-[{colors["meny_back"]}] h-full w-[50%]',
+                        className=f'bg-[{colors["meny_back"]}] flex flex-col items-center justify-center w-[50%] rounded-l-lg',
                         children=[
                             # input fields
-                            # username field, input is not taken
-                            html.Div(
-                                dcc.Input(
-                                    id="userid",
-                                    type="text",
-                                    placeholder="username",
-                                )
+                            dcc.Input(
+                                className="w-[60%] mb-5 px-3 py-1 rounded-full",
+                                id="userid",
+                                type="text",
+                                placeholder="username",
                             ),
                             # password field, input is not aken
-                            html.Div(
-                                dcc.Input(
-                                    id="password",
-                                    type="text",
-                                    placeholder="password",
-                                )
+                            dcc.Input(
+                                className="w-[60%] mb-5 px-3 py-1 rounded-full",
+                                id="password",
+                                type="text",
+                                placeholder="password",
                             ),
                             # Login button, input not taken
                             html.Button(
-                                className=f'bg-[{colors["dark_purp"]}]',
+                                className=f'bg-[{colors["dark_purp"]}] pd-4 w-[30%] rounded-full',
                                 children=[
-                                    html.P("Login"),
+                                    html.Div(
+                                        className=f'bg-[{colors["white"]}',
+                                        children=[
+                                            html.P("Login", style={"color": colors["white"]}),
+                                        ],
+                                    )
                                 ],
                                 id="verify",
                                 n_clicks=0,
@@ -81,10 +84,13 @@ def layout() -> Component:
                     ),
                     # right rectangle
                     html.Div(
-                        className=f'bg-[{colors["white"]}] h-full w-[50%]',
+                        className=f'bg-[{colors["white"]}] flex flex-col items-center justify-center w-[50%] rounded-r-lg',
                         children=[
                             html.H1(
-                                "Welcome to GraphIt",
+                                className=f" mt-4",
+                                children=[
+                                    "Welcome to GraphIt",
+                                ],
                             ),
                             # product logo
                             html.Img(
