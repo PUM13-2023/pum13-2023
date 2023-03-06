@@ -2,8 +2,6 @@ import dash
 from dash import html
 from dash.dependencies import Component
 
-from dashboard.components.highlight_item import highlight_item
-
 navbar_items = ["Home", "Dashboards", "Shared Dashboards", "Logout"]
 
 
@@ -21,11 +19,11 @@ def generate_navbar_items(item_to_highlight: str = "") -> list[html.A]:
         return []
 
     for item in dash.page_registry.values():
-        className = ""
+        class_name = ""
         if item["name"] == item_to_highlight:
-            className = "border-r-4 border-r-white text-white bg-[#777DF2]"
+            class_name = "border-r-4 border-r-white text-white bg-[#777DF2]"
 
-        navbar_list.append(html.A(item["name"], className=className, href=item["path"]))
+        navbar_list.append(html.A(item["name"], className=class_name, href=item["path"]))
 
     return navbar_list
 
