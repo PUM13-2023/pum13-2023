@@ -18,10 +18,9 @@ PORT = 8000
 HOST = "127.0.0.1"
 URL = f"http://{HOST}:{str(PORT)}"
 
-USERNAME = "cooluser"
 
-# Constants for search bar
-SEARCH_BAR_ID = "search-bar"
+USERNAME = "cooluser"
+SHARED_LINK_POPUP_ID = "add-shared-link"
 
 # Constants for welcome message
 WELCOME_ID = "home-welcome-user"
@@ -54,6 +53,16 @@ def find_create_dashboard_menu(browser_driver, create_dashboard_id) -> WebElemen
     """
     try:
         return browser_driver.find_element(By.ID, create_dashboard_id)
+    except NoSuchElementException:
+        return False
+
+
+def try_open_add_shared(browser_driver: webdriver) -> WebElement | bool:
+    """
+    Try to open the add shared link menu
+    """
+    try:
+        return browser_driver.find_element(By.ID, SHARED_LINK_POPUP_ID)
     except NoSuchElementException:
         return False
 
@@ -190,16 +199,8 @@ class TestHomePage:
         assert container_text, "Title of latest shared dashboards view is wrong"
         assert shared_children, "Latest shared dashboards view is empty"
         create_dashboard.click()
-        assert find_create_dashboard_menu(
-            browser_driver, CREATE_DASHBOARD_POPUP_ID
-        ), "Create dashboard menu did not pop-up"
 
-    def try_create_dashboard(self, browser_driver: webdriver) -> WebElement | bool:
-        """
-        Try to open the create dashboard menu from
-        the latest opened dashboards view
-        """
-        pass
+        assert try_open_add_shared(browser_driver), "Add shared link menu did not pop-up"
 
     def test_display_callback(self):
         """
