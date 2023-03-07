@@ -3,7 +3,7 @@ import pytest
 from dashboard.components.navbar_component import generate_navbar_items
 
 ITEM_EXIST = "Home"
-ITEM_NOT_EXIST = "😂😂😂"
+ITEM_NOT_EXIST = "Item_x"
 navbar_items_count = 1
 
 # This dict is supposed to simulate the dash.page_registry dict

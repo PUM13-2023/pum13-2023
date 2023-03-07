@@ -87,13 +87,13 @@ class TestNavbarComponent:
         WebDriverWait(browser_driver, TIMEOUT).until(
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
-
-        navbar = browser_driver.find_elements(
+        navbar = browser_driver.find_element(By.ID, "main-navbar")
+        navbar_items = navbar.find_elements(
             By.TAG_NAME,
             "a",
         )
 
-        assert len(navbar) == navbar_count, "Navbar items do not exist"
+        assert len(navbar_items) == navbar_count, "Navbar items do not exist"
 
     @pytest.mark.usefixtures("browser_driver")
     @pytest.mark.usefixtures("start_server")
@@ -132,7 +132,7 @@ class TestNavbarComponent:
         link.click()
         assert (
             browser_driver.current_url == DASHBOARD_URL
-        ), "Page did not redirect tot the correct dashboards page"
+        ), "Page did not redirect to the correct dashboards page"
 
     @pytest.mark.usefixtures("browser_driver")
     @pytest.mark.usefixtures("start_server")
