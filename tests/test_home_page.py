@@ -8,9 +8,14 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
-from dash import html
 
 from src.dashboard import main
+
+"""
+TODO:
+Implement callback testing using dash.test and
+finish the rest of the front-end tests
+"""
 
 TIMEOUT = 1.5
 PORT = 8000
@@ -144,6 +149,14 @@ class TestHomePage:
         """
         try:
             WebDriverWait(browser_driver, TIMEOUT).until(ec.presence_of_element_located((By.ID,)))
-            create_dashboard = browser_driver.find_element(By.ID, CREATE_DASHBOARD_ID)
+            latest_dashboards_container = browser_driver.find_element(By.ID, CREATE_DASHBOARD_ID)
+            dashboard_children = latest_dashboards_container.find_elements(By.TAG_NAME, "div")
         except TimeoutException:
-            create_dashboard = False
+            dashboard_children = False
+            latest_dashboards_container = False
+
+        assert latest_dashboards_container, "Latest opened dashboards view not found on page"
+        assert dashboard_children, "Something"
+    def test_display_callback(self):
+        pass
+

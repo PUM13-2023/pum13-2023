@@ -14,4 +14,4 @@ def page_container() -> Component:
 app.layout = page_container
 
 if __name__ == "__main__":
-    app.run("127.0.0.1", PORT)
+    app.run("127.0.0.1", PORT, debug=True)
