@@ -1,4 +1,4 @@
-from dashboard.models import db, user
+from dashboard.models import db
 
 
 def test_data_db_connection() -> None:
