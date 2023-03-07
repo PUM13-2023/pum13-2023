@@ -12,9 +12,6 @@ import dash
 from dash import Dash, dcc, html
 from dash.dependencies import Component, Input, Output
 
-# import dash_bootstrap_components as dbc
-import plotly.express as px
-
 dash.register_page(__name__, path="/login")
 
 image_path = "assets/logoTransparent.png"
