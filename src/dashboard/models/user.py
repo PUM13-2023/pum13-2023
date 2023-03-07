@@ -6,9 +6,8 @@ from mongoengine import (
     EmbeddedDocument,
     EmbeddedDocumentListField,
     ListField,
-    ObjectIdField,
+    ReferenceField,
     StringField,
-    ReferenceField
 )
 
 
@@ -25,6 +24,7 @@ class Diagram(EmbeddedDocument):
         data (DBRef): A DBRef to the data object which contains the
             data to be plotted.
     """
+
     data = ReferenceField("data", dbref=True)
 
 
@@ -40,6 +40,7 @@ class Dashboard(EmbeddedDocument):
         diagrams (list[Diagram]): the diagrams which the dashboard
             consists of.
     """
+
     authorized_users = ListField(ReferenceField("User"))
     diagrams = EmbeddedDocumentListField(Diagram)
 
@@ -55,6 +56,7 @@ class User(Document):
         dashboards (list[Dashboard]): list of embedded dashboard
             documents.
     """
+
     username = StringField()
     dashboards = EmbeddedDocumentListField(Dashboard)
 

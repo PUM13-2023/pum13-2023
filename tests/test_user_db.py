@@ -6,7 +6,7 @@ from dashboard.models import db, user
 
 @pytest.fixture
 def connection(autouse=True):
-    server_url, _ = get_connection_params("USER_DB_URL", "USER_DB_NAME")
+    server_url, _ = db.get_connection_params("USER_DB_URL", "USER_DB_NAME")
     conn = mongoengine.connect(server_url, "dashboard_test")
 
     return conn
