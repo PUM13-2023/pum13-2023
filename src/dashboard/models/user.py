@@ -62,8 +62,42 @@ class User(Document):
 
 
 def register_user(username: str) -> User:
-    pass
+    """Register a new user.
+
+    Creates a new user with a given username.
+
+    Args:
+        username (str): the username of the new user.
+
+    Returns:
+        A User object returning the newly created user.
+
+    Raises:
+        ValueError: a user with the specified username already exists.
+    """
+    if User.objects(username=username):
+        raise ValueError("Can't register username. Already exists.")
+
+    user = User(username=username)
+    user.save()
+
+    return user
 
 
 def login_user(username: str) -> User:
-    pass
+    """Login as a user.
+
+    Logins as a user, creating the user if it does not exists.
+
+    Args:
+        username (str): the username of the user to login as.
+
+    Returns:
+        A User object representing the logged in user.
+    """
+    try:
+        user: User = User.objects(username=username)[0]
+    except IndexError:
+        user = register_user(username)
+
+    return user
