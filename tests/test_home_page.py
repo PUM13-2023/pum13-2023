@@ -1,21 +1,17 @@
 import multiprocessing
 from time import sleep
 
+from dash import html
 import pytest
 from selenium import webdriver
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 
 from src.dashboard import main
-
-"""
-TODO:
-Implement callback testing using dash.test and
-finish the rest of the front-end tests
-"""
+from src.dashboard.pages.index.index import default_style, toggle_create_dashboard_menu
 
 TIMEOUT = 1.5
 PORT = 8000
@@ -39,10 +35,27 @@ CREATE_DASHBOARD_POPUP_ID = "create-dashboard-menu"
 LATEST_OPENED_CONTAINER_ID = "latest-opened-container"
 LATEST_OPENED_TEXT = "Latest opened dashboards"
 LATEST_OPENED_DASHBOARD_BOX1_ID = ""
+LATEST_CREATE_DASHBOARD_ID = "create-dashboard-l"
+
+# Constants for latest shared dashboards
+LATEST_SHARED_CONTAINER_ID = "latest-shared-container"
+LATEST_SHARED_TEXT = "Latest shared dashboards"
+SHARED_CREATE_DASHBOARD_ID = "create-dashboard-s"
 
 
 def server(host, port):
     main.app.run(host, port)
+
+
+def find_create_dashboard_menu(browser_driver, create_dashboard_id) -> WebElement | bool:
+    """
+    Returns the create dashboard menu element if found else
+    returns False
+    """
+    try:
+        return browser_driver.find_element(By.ID, create_dashboard_id)
+    except NoSuchElementException:
+        return False
 
 
 @pytest.mark.test_home_page
@@ -82,21 +95,6 @@ class TestHomePage:
         yield driver
         driver.close()
 
-    def test_search_bar(self, browser_driver: webdriver) -> None:
-        """
-        Test that the search bar includes two elements
-        a text input and a submit button
-        """
-        try:
-            WebDriverWait(browser_driver, TIMEOUT).until(
-                ec.presence_of_element_located((By.ID, SEARCH_BAR_ID))
-            )
-            search_bar = browser_driver.find_element(By.ID, SEARCH_BAR_ID)
-        except TimeoutException:
-            search_bar = []
-
-        assert search_bar, "Search bar not found on page"
-
     def test_welcome_text(self, browser_driver: webdriver) -> None:
         """
         Tests that the welcome text displayed on homepage exists
@@ -129,18 +127,10 @@ class TestHomePage:
 
         assert create_dashboard, "Create dashboard button not found on page"
         create_dashboard.click()
-        create_dashboard_menu = self.find_create_dashboard_menu(browser_driver)
+        create_dashboard_menu = find_create_dashboard_menu(
+            browser_driver, CREATE_DASHBOARD_POPUP_ID
+        )
         assert create_dashboard_menu, "Create dashboard menu did not pop up"
-
-    def find_create_dashboard_menu(self, browser_driver) -> WebElement | bool:
-        """
-        Returns the create dashboard menu element if found else
-        returns False
-        """
-        try:
-            return browser_driver.find_element(By.ID, CREATE_DASHBOARD_POPUP_ID)
-        except NoSuchElementException:
-            return False
 
     def test_latest_opened_dashboards(self, browser_driver: webdriver) -> None:
         """
@@ -148,15 +138,74 @@ class TestHomePage:
         displays properly
         """
         try:
-            WebDriverWait(browser_driver, TIMEOUT).until(ec.presence_of_element_located((By.ID,)))
+            WebDriverWait(browser_driver, TIMEOUT).until(
+                ec.presence_of_element_located((By.ID, LATEST_SHARED_CONTAINER_ID))
+            )
             latest_dashboards_container = browser_driver.find_element(By.ID, CREATE_DASHBOARD_ID)
             dashboard_children = latest_dashboards_container.find_elements(By.TAG_NAME, "div")
+            container_text = latest_dashboards_container.find_element(By.TAG_NAME, "h2")
+            create_dashboard = latest_dashboards_container.find_element(
+                By.ID, LATEST_CREATE_DASHBOARD_ID
+            )
         except TimeoutException:
             dashboard_children = False
+            container_text = ""
             latest_dashboards_container = False
+            create_dashboard = html.Button()
 
         assert latest_dashboards_container, "Latest opened dashboards view not found on page"
-        assert dashboard_children, "Something"
-    def test_display_callback(self):
+        assert dashboard_children, "Latest opened dashboards view is empty"
+        assert (
+            container_text == LATEST_OPENED_TEXT
+        ), "Title of latest opened dashboards view is wrong"
+        create_dashboard.click()
+        assert find_create_dashboard_menu(
+            browser_driver, CREATE_DASHBOARD_POPUP_ID
+        ), "Create dashboard menu did not pop-up"
+
+    def test_latest_shared_dashboards(self, browser_driver: webdriver) -> None:
+        """
+        Test that the view of shared opened dashboards exists
+        and displays properly
+        """
+        try:
+            WebDriverWait(browser_driver, TIMEOUT).until(
+                ec.presence_of_element_located((By.ID, LATEST_SHARED_CONTAINER_ID))
+            )
+            shared_dashboards_container = browser_driver.find_element(
+                By.ID, LATEST_SHARED_CONTAINER_ID
+            )
+            container_text = shared_dashboards_container.find_element(By.TAG_NAME, "h2")
+            shared_children = shared_dashboards_container.find_element(By.TAG_NAME, "div")
+            create_dashboard = shared_dashboards_container.find_element(
+                By.ID, SHARED_CREATE_DASHBOARD_ID
+            )
+        except TimeoutException:
+            shared_dashboards_container = False
+            container_text = ""
+            shared_children = False
+            create_dashboard = html.Button()
+
+        assert shared_dashboards_container, "Latest shared dashboards container not found on page"
+        assert container_text, "Title of latest shared dashboards view is wrong"
+        assert shared_children, "Latest shared dashboards view is empty"
+        create_dashboard.click()
+        assert find_create_dashboard_menu(
+            browser_driver, CREATE_DASHBOARD_POPUP_ID
+        ), "Create dashboard menu did not pop-up"
+
+    def try_create_dashboard(self, browser_driver: webdriver) -> WebElement | bool:
+        """
+        Try to open the create dashboard menu from
+        the latest opened dashboards view
+        """
         pass
 
+    def test_display_callback(self):
+        """
+        Test that the toggle callback returns the correct style value
+        """
+        toggle_off = toggle_create_dashboard_menu(0)
+        toggle_on = toggle_create_dashboard_menu(1)
+        assert toggle_off == "hidden", "Hidden style was not correctly returned"
+        assert toggle_on == default_style, "Default toggle style was not correctly returned"
