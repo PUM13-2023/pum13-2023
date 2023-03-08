@@ -2,8 +2,8 @@ import pytest
 
 from dashboard.components.navbar_component import HIGHLIGHT_STYLE, generate_navbar_items
 
-ITEM_EXIST = "Home"
-ITEM_NOT_EXIST = "Item_x"
+ITEM_EXIST = "/"
+ITEM_NOT_EXIST = "/this-path-does-not-exist"
 navbar_items_count = 1
 
 # This dict is supposed to simulate the dash.page_registry dict
@@ -35,7 +35,7 @@ class TestGenerateNavbarItems:
         amount of items to the original navbar list
         """
         navbar_list = generate_navbar_items(navbar_items, ITEM_EXIST)
-        assert len(navbar_list) == navbar_items_count
+        assert len(navbar_list) == len(navbar_items)
 
     def test_incorrect_number_items(self) -> None:
         """
@@ -73,10 +73,7 @@ class TestGenerateNavbarItems:
         Test that the generated list highlights the correct item
         """
         navbar_list = generate_navbar_items(navbar_items, ITEM_EXIST)
-        requested_class = False
-        for item in navbar_list:
-            if hasattr(item, "className") and item.children == ITEM_EXIST:
-                requested_class = True
-                break
 
-        assert requested_class
+        assert any(
+            item.href == ITEM_EXIST and item.className == HIGHLIGHT_STYLE for item in navbar_list
+        )
