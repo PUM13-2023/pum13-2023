@@ -9,7 +9,7 @@ HIGHLIGHT_STYLE = "border-r-4 border-r-white text-white bg-[#777DF2]"
 
 def generate_navbar_items(
     page_registry: OrderedDict[str, Dict[str, str]], item_to_highlight: str = ""
-) -> list[html.A]:
+) -> list[dcc.Link]:
     """
     Returns a list of navbar items with a
     specified name to highlight in the navbar.
@@ -17,12 +17,12 @@ def generate_navbar_items(
     args
     item_to_highlight: Name of the item to mark as highlighted
     """
-    navbar_list: list[html.A] = []
-    wrong_item = True
+    navbar_list: list[dcc.Link] = []
+    found_highlight_item = False
 
     for item in page_registry.values():
         if item_to_highlight == "Logout" or item["name"] == item_to_highlight:
-            wrong_item = False
+            found_highlight_item = True
 
         class_name = ""
         if item["name"] == item_to_highlight:
@@ -32,7 +32,7 @@ def generate_navbar_items(
             dcc.Link(className=class_name, href=item["path"], children=item["name"])
         )
 
-    if wrong_item:
+    if not found_highlight_item:
         return []
 
     return navbar_list
