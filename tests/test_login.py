@@ -37,8 +37,8 @@ class TestLogin:
         self.check_login_error_pop_up(browser_driver)
 
     @pytest.mark.test_successful_login
-    @pytest.mark.usefixtures("browser_driver")
-    def test_successful_login(self, browser_driver: webdriver):
+    @pytest.mark.usefixtures("browser_driver", "speed_mult")
+    def test_successfull_login(self, browser_driver: webdriver, speed_mult: float):
         browser_driver.get(settings.START_PAGE_URL)
         helper.try_login(settings.USERS_USERNAME, settings.USERS_PASSWORD, browser_driver, float)
         # Check that we are still in the homepage after login in
