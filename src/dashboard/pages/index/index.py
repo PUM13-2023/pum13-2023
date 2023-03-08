@@ -2,10 +2,8 @@ import dash
 from dash import html
 from dash.dependencies import Component
 
-from dashboard.components import experimental_component
-
-dash.register_page(__name__, path="/")
+dash.register_page(__name__, path="/", name="Home", order=0, visible_in_nav=True)
 
 
 def layout() -> Component:
-    return html.Div(children=[html.H1(children="Index page!"), experimental_component()])
+    return html.Div(children=[html.P("Welcome to index")])
