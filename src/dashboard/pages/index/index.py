@@ -2,7 +2,8 @@ import dash
 from dash import html
 from dash.dependencies import Component, Output, Input
 
-dash.register_page(__name__, path="/")
+
+dash.register_page(__name__, path="/", name="Home", order=0, visible_in_nav=True)
 
 default_style = "bg-[#d2d2d2] transition duration-500 ease-in-out"
 
