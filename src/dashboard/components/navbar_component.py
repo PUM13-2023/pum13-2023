@@ -1,7 +1,7 @@
 from typing import Dict, OrderedDict
 
 import dash
-from dash import dcc, html
+from dash import Input, Output, callback, dcc, html
 from dash.dependencies import Component
 
 HIGHLIGHT_STYLE = "border-r-4 border-r-white text-white bg-[#777DF2]"
@@ -21,11 +21,11 @@ def generate_navbar_items(
     found_highlight_item = False
 
     for item in page_registry.values():
-        if item_to_highlight == "Logout" or item["name"] == item_to_highlight:
+        if item_to_highlight == "Logout" or item["path"] == item_to_highlight:
             found_highlight_item = True
 
         class_name = ""
-        if item["name"] == item_to_highlight:
+        if item["path"] == item_to_highlight:
             class_name = HIGHLIGHT_STYLE
 
         navbar_list.append(
@@ -54,7 +54,9 @@ def navbar_component(page_name: str = "") -> Component:
         id="main-navbar",
         className="bg-[#636AF2] justify-center text-left",
         children=[
+            dcc.Location(id="url", refresh=False),
             html.Div(
+                id="main-navbar-container",
                 className="inline-block flex-col space-y-2 w-max "
                 "[&>a]:px-10 [&>a]:py-5 mt-[3.5rem] "
                 "text-white/75 [&>a]:block",
@@ -62,3 +64,8 @@ def navbar_component(page_name: str = "") -> Component:
             ),
         ],
     )
+
+
+@callback(Output("main-navbar-container", "children"), Input("url", "pathname"))
+def update_navbar(path_name: str) -> list[Component]:
+    return generate_navbar_items(dash.page_registry, path_name)

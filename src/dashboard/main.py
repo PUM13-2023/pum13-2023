@@ -16,7 +16,11 @@ def page_container() -> Component:
     dash.page_container.className = "grow"
 
     return html.Div(
-        className="flex", children=[navbar_component(PLACEHOLDER), dash.page_container]
+        className="flex",
+        children=[
+            navbar_component(PLACEHOLDER),
+            dash.page_container,
+        ],
     )
 
 
