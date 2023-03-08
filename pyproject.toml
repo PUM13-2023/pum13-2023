@@ -30,6 +30,9 @@ dev = [
   "pytest-cov == 4.0.0",
   "selenium == 4.8.2",
 ]
+prod = [
+  "gunicorn == 20.1.0",
+]
 
 [tool.mypy]
 disable_error_code = "misc"

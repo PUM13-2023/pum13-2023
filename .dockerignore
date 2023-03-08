@@ -1,0 +1,10 @@
+#Removing test files from Docker
+#*/tests*
+.git
+.gitignore
+LICENSE
+README.md
+Changelog.md
+Makefile
+docker-compose.yml
+extra_addons/*
