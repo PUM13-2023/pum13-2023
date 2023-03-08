@@ -1,7 +1,7 @@
 from typing import Dict, OrderedDict
 
 import dash
-from dash import html
+from dash import dcc, html
 from dash.dependencies import Component
 
 HIGHLIGHT_STYLE = "border-r-4 border-r-white text-white bg-[#777DF2]"
@@ -28,7 +28,9 @@ def generate_navbar_items(
         if item["name"] == item_to_highlight:
             class_name = HIGHLIGHT_STYLE
 
-        navbar_list.append(html.A(item["name"], className=class_name, href=item["path"]))
+        navbar_list.append(
+            dcc.Link(className=class_name, href=item["path"], children=item["name"])
+        )
 
     if wrong_item:
         return []
