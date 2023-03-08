@@ -1,16 +1,14 @@
-from time import sleep
-
 from _pytest.fixtures import FixtureRequest
 import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.wait import WebDriverWait
 
 from . import settings
 
-SLEEP_TIME_USERNAME_FIELD = 1
-SLEEP_TIME_PASSWORD_FIELD = 1
-
+TIMEOUT_LOGIN_BUTTON = 2
 
 NAME_USERNAME_ELEMENT = "username"
 NAME_PASSWORD_ELEMENT = "password"
@@ -26,11 +24,6 @@ ID_LOGOUT_ELEMENT = "logout_element"
 # The name used for the username text field
 # The id used for the login button
 ID_LOGIN_ELEMENT = "login_button"
-
-
-@pytest.fixture(scope="session")
-def speed_mult(request):
-    return float(request.config.option.speedmult)
 
 
 @pytest.fixture(scope="class")
@@ -76,7 +69,7 @@ def is_in_home_page(driver: webdriver) -> None:
     assert len(logout_buttons) > 1, "Multiple log out buttons were found"
 
 
-def try_login(username: str, password: str, driver: webdriver, spd_mult: float) -> None:
+def try_login(username: str, password: str, driver: webdriver) -> None:
     # Check if we are in the login screen
     is_in_login_screen(driver)
 
@@ -84,13 +77,11 @@ def try_login(username: str, password: str, driver: webdriver, spd_mult: float) 
     username_text_field: WebElement = get_username_field(driver)
     username_text_field.clear()
     username_text_field.send_keys(username)
-    sleep(spd_mult * SLEEP_TIME_USERNAME_FIELD)
 
     # Find the password text field and right the password there and wait.
     password_text_field: WebElement = get_password_field(driver)
     password_text_field.clear()
     password_text_field.send_keys(password)
-    sleep(spd_mult * SLEEP_TIME_PASSWORD_FIELD)
 
     # Find the login button and wait.
     login_button = get_login_button(driver)
@@ -116,6 +107,10 @@ def get_password_field(driver: webdriver) -> WebElement:
 
 
 def get_login_button(driver: webdriver) -> WebElement:
+    # Wait until we found a login button
+    WebDriverWait(driver, timeout=TIMEOUT_LOGIN_BUTTON).until(
+        ec.presence_of_element_located(By.ID, ID_LOGIN_ELEMENT)
+    )
     # Finding the login button and click it!
     login_buttons: WebElement = driver.find_elements(By.NAME, ID_LOGIN_ELEMENT)
     assert not len(login_buttons) == 0, "0 login button"
