@@ -14,8 +14,8 @@ from mongoengine import (
 class Diagram(EmbeddedDocument):
     """Diagram database mode.
 
-    A diagram stores all the information needed to reconstruct a Dast
-    diagram.
+    A diagram stores all the information needed to reconstruct a
+    dashboard diagram.
 
     The current implementation is a stub, which will need to be
     extended to store various metadata about the diagram.
@@ -41,6 +41,8 @@ class Dashboard(EmbeddedDocument):
             consists of.
     """
 
+    name = StringField()
+    description = StringField()
     authorized_users = ListField(ReferenceField("User"))
     diagrams = EmbeddedDocumentListField(Diagram)
 
