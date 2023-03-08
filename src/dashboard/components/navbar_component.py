@@ -4,6 +4,8 @@ import dash
 from dash import html
 from dash.dependencies import Component
 
+HIGHLIGHT_STYLE = "border-r-4 border-r-white text-white bg-[#777DF2]"
+
 
 def generate_navbar_items(
     page_registry: OrderedDict[str, Dict[str, str]], item_to_highlight: str = ""
@@ -24,7 +26,7 @@ def generate_navbar_items(
 
         class_name = ""
         if item["name"] == item_to_highlight:
-            class_name = "border-r-4 border-r-white text-white bg-[#777DF2]"
+            class_name = HIGHLIGHT_STYLE
 
         navbar_list.append(html.A(item["name"], className=class_name, href=item["path"]))
 
