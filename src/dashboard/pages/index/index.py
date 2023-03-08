@@ -2,7 +2,6 @@ import dash
 from dash import html
 from dash.dependencies import Component, Output, Input
 
-
 dash.register_page(__name__, path="/", name="Home", order=0, visible_in_nav=True)
 
 default_style = "bg-[#d2d2d2] transition duration-500 ease-in-out"
@@ -12,14 +11,12 @@ username = "cooluser"
 LATEST_CONTAINER = "Latest opened dashboards"
 SHARED_CONTAINER = "Shared dashboards"
 
-def generate_carousel_items() -> dict[str: any]:
-    pass
-
 
 def carousel_layout(container_title: str) -> html.Div:
-    empty_dashboard = ""
     if container_title == LATEST_CONTAINER:
-        pass
+        empty_dashboard_text = "Create dashboard"
+    else:
+        empty_dashboard_text = "Add dashboard from link"
 
     return html.Div(
         className="flex flex-col w-full h-full",
@@ -28,10 +25,15 @@ def carousel_layout(container_title: str) -> html.Div:
             html.Div(
                 className="flex w-full h-full",
                 children=[
-                    html.Div(
-                        className="bg-white w-[17%] h-[80%] flex justify-center items-center",
+                    html.Button(
+                        className="bg-white transition duration-300 drop-shadow-md w-[17%] h-[80%] flex "
+                                  "justify-center items-center items-baseline flex-col rounded-[2px] "
+                                  "hover:drop-shadow-[2px_4px_10px_rgba(0,0,0,0.20)] p-5",
                         children=[
-                            html.P("Create dashboard")
+                            html.Div(
+                                className="bg-[#dcdcdc]/70 h-full w-full",
+                            ),
+                            html.P(className="text-md my-3", children=empty_dashboard_text)
                         ]
                     )
                 ]
@@ -42,17 +44,20 @@ def carousel_layout(container_title: str) -> html.Div:
 
 def layout() -> Component:
     return html.Div(
-        className="flex flex-col w-full h-screen justify-center items-center bg-[#e9e9f2] p-5",
+        # Welcome text and create button
+        className="flex flex-col h-screen justify-center items-center bg-[#e9e9f2] p-10 pb-0",
         children=[
             html.Div(
-                className="block w-full text-xl",
+                className="block w-full text-3xl",
                 children=[
                     html.H1(f'Welcome back {username}'),
                     # Add searchbar here?
                 ]
             ),
             html.Button(
-                className="bg-[#d2d2d2] w-[50%] h-full flex justify-center items-center rounded-[10px]",
+                className="bg-white w-[40%] h-full transition-all duration-300 [&>p]:text-xl shadow-sm "
+                          "hover:shadow-lg h-full flex justify-center "
+                          "items-center rounded-[10px]",
                 children=[
                     html.P(className="text-base", children="Create dashboard")
                 ],
