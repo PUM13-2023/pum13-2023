@@ -1,6 +1,6 @@
 import pytest
 
-from dashboard.components.navbar_component import generate_navbar_items
+from dashboard.components.navbar_component import HIGHLIGHT_STYLE, generate_navbar_items
 
 ITEM_EXIST = "Home"
 ITEM_NOT_EXIST = "Item_x"
@@ -51,7 +51,7 @@ class TestGenerateNavbarItems:
         without any highlighted items
         """
         navbar_list = generate_navbar_items(navbar_items)
-        assert all(item.className == "" for item in navbar_list)
+        assert all(item.className != HIGHLIGHT_STYLE for item in navbar_list)
 
     def test_highlighted_exist(self) -> None:
         """
@@ -62,7 +62,7 @@ class TestGenerateNavbarItems:
         found_class = False
 
         for item in navbar_list:
-            if hasattr(item, "className"):
+            if hasattr(item, "className") and item.className == HIGHLIGHT_STYLE:
                 found_class = True
                 break
 
