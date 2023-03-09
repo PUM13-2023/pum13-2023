@@ -1,4 +1,4 @@
-from typing import Dict, OrderedDict
+from typing import Dict, Optional, OrderedDict
 
 import dash
 from dash import Input, Output, callback, dcc, html
@@ -7,8 +7,15 @@ from dash.dependencies import Component
 HIGHLIGHT_STYLE = "border-r-4 border-r-white text-white bg-[#777DF2]"
 
 
+def is_registry_item_visible(item):
+    try:
+        return item["nav_item"]
+    except KeyError:
+        return False
+
+
 def generate_navbar_items(
-    page_registry: OrderedDict[str, Dict[str, str]], item_to_highlight: str = ""
+    page_registry: OrderedDict[str, Dict[str, str]], item_to_highlight: Optional[str] = None
 ) -> list[dcc.Link]:
     """
     Returns a list of navbar items with a
@@ -18,22 +25,16 @@ def generate_navbar_items(
     item_to_highlight: Name of the item to mark as highlighted
     """
     navbar_list: list[dcc.Link] = []
-    found_highlight_item = False
 
     for item in page_registry.values():
-        if item_to_highlight == "Logout" or item["path"] == item_to_highlight:
-            found_highlight_item = True
+        if not is_registry_item_visible(item):
+            continue
 
-        class_name = ""
+        kwargs = {}
         if item["path"] == item_to_highlight:
-            class_name = HIGHLIGHT_STYLE
+            kwargs["className"] = HIGHLIGHT_STYLE
 
-        navbar_list.append(
-            dcc.Link(className=class_name, href=item["path"], children=item["name"])
-        )
-
-    if not found_highlight_item:
-        return []
+        navbar_list.append(dcc.Link(href=item["path"], children=item["name"], **kwargs))
 
     return navbar_list
 
