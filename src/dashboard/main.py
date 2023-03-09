@@ -5,8 +5,8 @@ from flask import Flask
 
 external_scripts = ["https://tailwindcss.com/", {"src": "https://cdn.tailwindcss.com"}]
 
-# server = Flask(__name__)
-app = Dash(__name__, server := Flask(__name__), use_pages=True, external_scripts=external_scripts)
+server = Flask(__name__)
+app = Dash(__name__, server=server, use_pages=True, external_scripts=external_scripts)
 
 
 def page_container() -> Component:
