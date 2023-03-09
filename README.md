@@ -41,6 +41,26 @@ pip install -e '.[dev]'
 > package refers to the project source directory. Omiting this flag results in
 > hard-to-find bugs as changes to the code are not applied as expected.
 
+## Deployment
+This section will describe how you deploy the GraphIt dashboard locally on your own computer or containerized using Docker and Nginx.
+
+### Locally
+Follow the installation guide for your system then run the main python file located in src/dashboard/. This can be done with the command below while in your virtual environment.
+```bash
+python src/dashboard/main.py
+```
+
+### Docker containerized
+
+To run the GraphIt dashboard application using Docker, Gunicorn and Nginx. Start the Docker daemon and go to the root directory and use the command below. 
+
+```bash
+docker compose up --build
+```
+
+This command will create two separate Docker containers, one for the dashboard and one for Nginx and run it on your machine.
+
+
 ## Contributing
 For information on how to contribute, see [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 
