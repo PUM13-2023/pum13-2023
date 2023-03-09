@@ -5,12 +5,10 @@ services:
   dashboard:
     container_name: dashboard
     restart: always
-    build:
-      context: ./
-      dockerfile: Dockerfile
+    build: ./
     ports:
       - "8000:8000"
-    command: gunicorn --workers=3 --threads=1 -b :8000 dashboard.main:server
+    command: gunicorn --workers=3 -b :8000 dashboard.main:server
 
 
   nginx:

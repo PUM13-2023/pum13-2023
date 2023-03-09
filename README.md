@@ -7,6 +7,7 @@ Dash framework.
 ## Table of Contents
 
 - [Installation](#installation)
+- [Deployment](#deployment)
 - [Contributing](#contributing)
 - [Project structure](#project-structure)
 - [Enforcing Code Quality](#enforcing-code-quality)
@@ -47,7 +48,7 @@ This section will describe how you deploy the GraphIt dashboard locally on your 
 ### Locally
 Follow the installation guide for your system then run the main python file located in src/dashboard/. This can be done with the command below while in your virtual environment.
 ```bash
-python src/dashboard/main.py
+python -m dashboard.main
 ```
 
 ### Docker containerized
