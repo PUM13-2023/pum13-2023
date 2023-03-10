@@ -23,12 +23,13 @@ def carousel_layout(container_title: str) -> html.Div:
         children=[
             html.H2(container_title),
             html.Div(
-                className="flex w-full h-full",
+                className="flex w-full h-full mb-[3rem]",
                 children=[
                     html.Button(
-                        className="bg-white transition duration-300 drop-shadow-md w-[17%] h-[80%] flex "
+                        className="bg-white transition duration-500 drop-shadow-md w-[20rem] h-[17rem] "
+                                  "flex border-b-4 hover:border-b-indigo-500 "
                                   "justify-center items-center items-baseline flex-col rounded-[2px] "
-                                  "hover:drop-shadow-[2px_4px_10px_rgba(0,0,0,0.20)] p-5",
+                                  "hover:drop-shadow-[2px_4px_10px_rgba(0,0,0,0.20)] p-5 ",
                         children=[
                             html.Div(
                                 className="bg-[#dcdcdc]/70 h-full w-full",
@@ -45,7 +46,7 @@ def carousel_layout(container_title: str) -> html.Div:
 def layout() -> Component:
     return html.Div(
         # Welcome text and create button
-        className="flex flex-col h-screen justify-center items-center bg-[#e9e9f2] p-10 pb-0",
+        className="flex flex-col justify-center items-center bg-[#e9e9f2] p-10 pb-0",
         children=[
             html.Div(
                 className="block w-full text-3xl",
@@ -54,19 +55,28 @@ def layout() -> Component:
                     # Add searchbar here?
                 ]
             ),
-            html.Button(
-                className="bg-white w-[40%] h-full transition-all duration-300 [&>p]:text-xl shadow-sm "
-                          "hover:shadow-lg h-full flex justify-center "
-                          "items-center rounded-[10px]",
+            html.Div(
+                className="flex justify-center w-full",
                 children=[
-                    html.P(className="text-base", children="Create dashboard")
-                ],
-                id="create-dashboard"
+                    html.Button(
+                        className="bg-white w-[40rem] h-[25rem] transition-all duration-300 [&>p]:text-2xl shadow-sm "
+                                  "hover:shadow-lg flex justify-center "
+                                  "items-center rounded-[10px] drop-shadow-[0px_0px_2px_rgba(0,0,0,0.20)] ",
+                        children=[
+                            html.P(className="text-black/60", children="Create dashboard")
+                        ],
+                        id="create-dashboard"
+                    )
+                ]
             ),
 
-            carousel_layout("Latest opened dashboards"),
-            carousel_layout("Shared dashboards")
-
+            html.Div(
+                className="flex-col flex w-full h-full",
+                children=[
+                    carousel_layout("Latest opened dashboards"),
+                    carousel_layout("Shared dashboards")
+                ]
+            )
         ]
     )
 
