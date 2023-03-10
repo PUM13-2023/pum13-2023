@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 
 from src.dashboard import main
-from src.dashboard.pages.index.index import default_style, toggle_create_dashboard_menu
+from src.dashboard.pages.index.index import default_style
 
 TIMEOUT = 1.5
 PORT = 8000
