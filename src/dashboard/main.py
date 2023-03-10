@@ -13,10 +13,10 @@ PLACEHOLDER = "Home"
 
 
 def page_container() -> Component:
-    dash.page_container.className = "grow"
+    dash.page_container.className = "grow overflow-auto"
 
     return html.Div(
-        className="flex",
+        className="flex h-screen",
         children=[
             navbar_component(PLACEHOLDER),
             dash.page_container,
