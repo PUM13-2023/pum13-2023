@@ -75,9 +75,12 @@ class TestLogin:
 
     def error_pop_up_exist(self, driver: webdriver) -> bool:
         # Wait until we found a the element with the pop up id.
-        WebDriverWait(driver, timeout=TIMEOUT_POPUP).until(
-            ec.presence_of_element_located(By.ID, ID_POP_UP_ELEMENT)
-        )
+        try:
+            WebDriverWait(driver, timeout=TIMEOUT_POPUP).until(
+                ec.presence_of_element_located((By.ID, ID_POP_UP_ELEMENT))
+            )
+        except:
+            return False
 
         # Find and return the element
         pop_up_element: WebElement = driver.find_element(By.ID, ID_POP_UP_ELEMENT)
