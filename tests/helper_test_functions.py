@@ -1,10 +1,9 @@
-from _pytest.fixtures import FixtureRequest
-import pytest
+"""Helper functions for test."""
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.wait import TimeoutException, WebDriverWait
+from selenium.webdriver.support.wait import WebDriverWait
 
 from . import settings
 
@@ -23,63 +22,71 @@ ID_LOGIN_BUTTON_ELEMENT = "login_button"
 ID_LOGOUT_ELEMENT = "logout_element"
 
 
-@pytest.fixture(scope="class")
-def browser_driver(request: FixtureRequest):
-    driver: webdriver
-    match request.config.option.browser:
-        case "chrome":
-            options = webdriver.ChromeOptions()
-            if request.config.option.head == "1":
-                options.add_argument("--headless")
-            driver = webdriver.Chrome(options=options)
-        case "edge":
-            options = webdriver.EdgeOptions()
-            if request.config.option.head == "1":
-                options.add_argument("--headless")
-            driver = webdriver.Edge(options=options)
-        case "chromium":
-            options = webdriver.ChromeOptions()
-            if request.config.option.head == "1":
-                options.add_argument("--headless")
-            driver = webdriver.ChromiumEdge(options=options)
-        case _:
-            options = webdriver.FirefoxOptions()
-            print(request.config.option.headless)
-            if request.config.option.head == "1":
-                options.add_argument("--headless")
-            driver = webdriver.Firefox(options=options)
-    yield driver
-    driver.close()
-
-
 def is_in_login_screen(driver: webdriver) -> None:
+    """Check if the driver is currently at the login screen.
+
+    This functions checks if the driver is in the login screen
+    by checking if elements specific exist in the login screen.
+
+    Args:
+        driver (webdriver): The webdriver that would be checked.
+    """
     msg = "It is not in the login screen"
-    assert get_element_by_id(ID_USERNAME_ELEMENT, driver) is not None, msg
-    assert get_element_by_id(ID_PASSWORD_ELEMENT, driver) is not None, msg
+    assert get_element_by_id(driver, ID_USERNAME_ELEMENT) is not None, msg
+    assert get_element_by_id(driver, ID_PASSWORD_ELEMENT) is not None, msg
 
 
 def is_in_home_page(driver: webdriver) -> None:
-    # Check if there is a log out button
-    assert get_element_by_id(ID_LOGOUT_ELEMENT, driver) is not None
+    """Check if the driver is currently at the home page.
+
+    This functions checks if the driver is in the home page
+    by checking if specific elements exist in the login
+    screen.
+
+    Args:
+        driver (webdriver): The webdriver that would be checked.
+    """
+    assert get_element_by_id(driver, ID_LOGOUT_ELEMENT) is not None
 
 
-def try_login(username: str, password: str, driver: webdriver) -> None:
-    # Find the username text field and right the username there and wait.
-    username_text_field: WebElement = get_element_by_id(ID_USERNAME_ELEMENT, driver)
+def try_login(driver: webdriver, username: str, password: str) -> None:
+    """Try to login to the homepage.
+
+    This functions tries to login to the home page.
+
+    Args:
+        username (str): The username of the user.
+        password (str): The password of the user.
+        driver (webdriver): The webdriver that would be used.
+    """
+    # Find the username text field and right the username
+    # there and wait.
+    username_text_field: WebElement = get_element_by_id(driver, ID_USERNAME_ELEMENT)
     username_text_field.clear()
     username_text_field.send_keys(username)
 
-    # Find the password text field and right the password there and wait.
-    password_text_field: WebElement = get_element_by_id(ID_PASSWORD_ELEMENT, driver)
+    # Find the password text field and right the password
+    # there and wait.
+    password_text_field: WebElement = get_element_by_id(driver, ID_PASSWORD_ELEMENT)
     password_text_field.clear()
     password_text_field.send_keys(password)
 
     # Find the login button and wait.
-    login_button = get_element_by_id(ID_LOGIN_BUTTON_ELEMENT, driver)
+    login_button = get_element_by_id(driver, ID_LOGIN_BUTTON_ELEMENT)
     login_button.click()
 
 
-def get_element_by_id(element_id: str, driver: webdriver) -> WebElement:
+def get_element_by_id(driver: webdriver, element_id: str) -> WebElement:
+    """Get element by their id.
+
+    This function would try to get the element by id. If the
+    element does now show up after settings.NORMAL_TIMEOUT
+    it will raise an error.
+
+    Args:
+        element_id (str): The element id.
+        driver (webdriver): The driver that would be used.
+    """
     msg_not_found = "The element with the element id {" + element_id + "} was not found"
     msg_found_multiple = "There was multiple element with the id {" + element_id + "} found."
 
