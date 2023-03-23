@@ -2,6 +2,8 @@
 import dash
 from dash import html
 
+from dashboard.components import dashboards_list_component
+
 dash.register_page(
     __name__, path="/dashboards", name="Dashboards", order=1, nav_item=True, icon_name="dashboard"
 )
@@ -9,7 +11,7 @@ dash.register_page(
 
 def layout() -> html.Div:
     return html.Div(
-        className="flex flex-col mx-4",
+        className="flex flex-col mx-4 max-h-screen",
         children=[
             html.H1(className="text-3xl my-8", children="Dashboards"),
             html.Div(
@@ -23,32 +25,14 @@ def layout() -> html.Div:
                     html.Button(className="bg-white", children="Add Dashboard"),
                 ],
             ),
-            html.Div(
-                className="bg-white",
-                children=[
-                    html.Div(
-                        className="[&>span]:flex-1 [&>span]:border-r-2 [&>span]:ml-2 flex justify-start border-b-2 border-black text-lg",
-                        children=[
-                            html.Span("Title", className="pl-6"),
-                            html.Span("Last edited at"),
-                            html.Span("Created at"),
-                        ],
-                    ),
-                    html.Div(
-                        className="[&>span]:flex-1 [&>span]:border-r-2  [&>span]:ml-2 flex justify-start items-center border-b-2 border-gray-400 text-base",
-                        children=[
-                            html.I("analytics", className="material-symbols-rounded"),
-                            html.Span(
-                                className="flex items-center",
-                                children=[
-                                    "Dashboard 1",
-                                ],
-                            ),
-                            html.Span("Today"),
-                            html.Span("Yesterday"),
-                        ],
-                    ),
-                ],
+            dashboards_list_component(
+                ["Title", "Last edited at", "Created at"],
+                [
+                    ["Dashboard 1", "Today", "Yesterday"],
+                    ["Dashboard 2", "3 days ago", "2 days ago"],
+                    ["Dashboard 2", "1 year ago", "5 years ago"],
+                ]
+                * 15,
             ),
         ],
     )
