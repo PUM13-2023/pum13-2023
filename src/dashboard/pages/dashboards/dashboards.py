@@ -3,6 +3,9 @@ import dash
 from dash import html
 
 from dashboard.components import dashboards_list_component
+from dashboard.pages.dashboards.controller import (
+    dashboards_list_row_clicked as dashboards_list_row_clicked,
+)
 
 dash.register_page(
     __name__, path="/dashboards", name="Dashboards", order=1, nav_item=True, icon_name="dashboard"
