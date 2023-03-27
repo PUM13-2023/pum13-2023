@@ -2,81 +2,116 @@ import pytest
 
 from dashboard.components.navbar_component import HIGHLIGHT_STYLE, generate_navbar_items
 
-ITEM_EXIST = "Home"
-ITEM_NOT_EXIST = "Item_x"
-navbar_items_count = 1
+ITEM_EXIST = "/"
+ITEM_NOT_EXIST = "/this-path-does-not-exist"
 
 # This dict is supposed to simulate the dash.page_registry dict
 # Add the name of the page and the paths here in order to test them
-navbar_items = {"page_home": {"name": "Home", "path": "/"}}
+PAGE_REGISTRY = {
+    "page_home": {"name": "Home", "path": "/", "nav_item": True},
+    "page_first": {"name": "First", "path": "/first", "order": 1, "nav_item": True},
+    "page_second": {"name": "Second", "path": "/second", "order": 2, "nav_item": True},
+    "page_hidden": {"name": "Hidden", "path": "/hidden", "nav_item": False},
+    "page_hidden_implicit": {"name": "Hidden Implicit", "path": "/hidden-implicit"},
+}
+
+NAVBAR_VISIBLE = ["/", "/first", "/second"]
+NAVBAR_HIDDEN_EXPLICIT = "/hidden"
+NAVBAR_HIDDEN_IMPLICIT = "/hidden-default"
+NAVBAR_HIDDEN = {NAVBAR_HIDDEN_EXPLICIT, NAVBAR_HIDDEN_IMPLICIT}
 
 
-@pytest.mark.test_generate_navbar_items
+@pytest.fixture
+def navbar_list():
+    return generate_navbar_items(PAGE_REGISTRY)
+
+
+@pytest.fixture
+def navbar_urls(navbar_list):
+    return {item.href for item in navbar_list}
+
+
 class TestGenerateNavbarItems:
-    def test_item_not_exist(self) -> None:
-        """
-        Test that you cannot generate a list with tags when trying to
-        highlight an item that does not exist in the navbar
-        """
-        navbar_list = generate_navbar_items(navbar_items, ITEM_NOT_EXIST)
-        assert not navbar_list
+    def test_includes_visible_items(self, navbar_urls) -> None:
+        """Test visible items are included.
 
-    def test_item_exist(self) -> None:
+        Test items marked nav_item=True are included in the
+        generated component list. This is tested by checking that the
+        set of visible urls is a subset of the set of urls included in
+        the navbar list.
         """
-        Test that a list is generated when a correct
-        item to highlight exists
-        """
-        navbar_list = generate_navbar_items(navbar_items, ITEM_EXIST)
-        assert navbar_list
+        assert set(NAVBAR_VISIBLE) <= navbar_urls
 
-    def test_correct_number_items(self) -> None:
-        """
-        Test that the generated list has the same
-        amount of items to the original navbar list
-        """
-        navbar_list = generate_navbar_items(navbar_items, ITEM_EXIST)
-        assert len(navbar_list) == navbar_items_count
+    def test_excludes_item_hidden_explicit(self, navbar_urls) -> None:
+        """Test explicitly hidden items are hidden.
 
-    def test_incorrect_number_items(self) -> None:
+        Test items marked nav_item=False are not included in
+        the generated component list.
         """
-        Test that a generated list with items that do not exist will
-        not be the same length as the original navbar list
-        """
-        navbar_list = generate_navbar_items(navbar_items, ITEM_NOT_EXIST)
-        assert len(navbar_list) != navbar_items_count
+        assert NAVBAR_HIDDEN_EXPLICIT not in navbar_urls
 
-    def test_no_highlighted_exist(self) -> None:
-        """
-        Test that it is possible to generate a list
-        without any highlighted items
-        """
-        navbar_list = generate_navbar_items(navbar_items)
-        assert all(item.className != HIGHLIGHT_STYLE for item in navbar_list)
+    def test_excludes_item_hidden_implicit(self, navbar_urls) -> None:
+        """Test explicitly hidden items are hidden.
 
-    def test_highlighted_exist(self) -> None:
+        Test items that do not have a nav_itembar key are not
+        included in the generated component list.
         """
-        Test that it is possible to
-        generate a list with a highlighted item
-        """
-        navbar_list = generate_navbar_items(navbar_items, ITEM_EXIST)
-        found_class = False
+        assert NAVBAR_HIDDEN_IMPLICIT not in navbar_urls
 
+    def test_navbar_item_order(self, navbar_list):
+        """Test url items are listed in correct order.
+
+        Since this test should not fail unnecessarily, the navbar list
+        is filtered so that the order is only checked on items that are
+        supposed to be included.
+        """
+        navbar_urls_filtered = [item.href for item in navbar_list if item.href in NAVBAR_VISIBLE]
+
+        assert navbar_urls_filtered == NAVBAR_VISIBLE
+
+    def test_navbar_highlight_correct_item(self):
+        """Test that the item that should be highlighted is so.
+
+        Testing all urls is probably unnecessary, but should catch some
+        possible incorrect implementations.
+        """
+        for highlight_url in NAVBAR_VISIBLE:
+            navbar_items = generate_navbar_items(PAGE_REGISTRY, highlight_url)
+
+            # Find the first item with the highlighted url.
+            should_be_highlighted = next(
+                item for item in navbar_items if item.href == highlight_url
+            )
+
+            assert HIGHLIGHT_STYLE in should_be_highlighted.className
+
+    def test_navbar_no_highlight_other(self):
+        """Test that no other item is highlighted.
+
+        Test that no item other than the highlighted item is
+        highlighted when a highlight_url is specified.
+        """
+        highlight_url = NAVBAR_VISIBLE[0]
+
+        navbar_items = generate_navbar_items(PAGE_REGISTRY, highlight_url)
+
+        for item in navbar_items:
+            if item.href == highlight_url:
+                continue
+
+            try:
+                assert HIGHLIGHT_STYLE not in item.className
+            except AttributeError:
+                pass  # Not having a className attr is also ok.
+
+    def test_navbar_highlight_none(self, navbar_list):
+        """Test that no item is highlighted.
+
+        Test that no item is highlighted when generating a navbar item
+        list without specifying a highlight url.
+        """
         for item in navbar_list:
-            if hasattr(item, "className") and item.className == HIGHLIGHT_STYLE:
-                found_class = True
-                break
-
-        assert found_class
-
-    def test_highlighted_correct_item(self) -> None:
-        """
-        Test that the generated list highlights the correct item
-        """
-        navbar_list = generate_navbar_items(navbar_items, ITEM_EXIST)
-        requested_class = False
-        for item in navbar_list:
-            if hasattr(item, "className") and item.children == ITEM_EXIST:
-                requested_class = True
-                break
-
-        assert requested_class
+            try:
+                assert HIGHLIGHT_STYLE not in item.className
+            except AttributeError:
+                pass  # Not having a className attr is also ok.

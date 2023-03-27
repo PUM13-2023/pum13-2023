@@ -2,7 +2,7 @@ import dash
 from dash import html
 from dash.dependencies import Component
 
-dash.register_page(__name__, path="/", name="Home", order=0, visible_in_nav=True)
+dash.register_page(__name__, path="/", name="Home", order=0, nav_item=True)
 
 
 def layout() -> Component:
