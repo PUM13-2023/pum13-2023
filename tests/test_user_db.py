@@ -1,13 +1,15 @@
 import mongoengine
+import mongomock
 import pytest
 
-from dashboard.models import db, user
+from dashboard.models import user
 
 
-@pytest.fixture
-def connection(autouse=True):
-    server_url, _ = db.get_connection_params("USER_DB_URL", "USER_DB_NAME")
-    conn = mongoengine.connect(server_url, "dashboard_test")
+@pytest.fixture(autouse=True)
+def connection():
+    conn = mongoengine.connect(
+            host="mongodb://localhost", name="dashboard", mongo_client_class=mongomock.MongoClient
+    )
 
     return conn
 
