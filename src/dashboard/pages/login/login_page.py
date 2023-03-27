@@ -102,6 +102,8 @@ def layout() -> Component:
 @callback(
     Output("output1", "children"),
     Input("login_button", "n_clicks"),
+    Input("username", "n_submit"),
+    Input("password", "n_submit"),
     State("username", "value"),
     State("password", "value"),
 )
@@ -109,7 +111,7 @@ def layout() -> Component:
 
 # is the loginfunction that checks if a user can login when the login button is pressed.
 # currently username: "admin" and login: "admin"
-def update_login(n_clicks, username, password):
+def update_login(n_clicks, username_enter, password_enter, username, password):
     if username == "admin" and password == "admin":
         # return f"You selected: {input_value}"
         return dcc.Location(pathname="/main", id="id1")
