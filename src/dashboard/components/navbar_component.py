@@ -5,6 +5,7 @@ from dash import Input, Output, callback, dcc, html
 from dash.dependencies import Component
 
 HIGHLIGHT_STYLE = "border-r-4 border-r-white text-white bg-[#777DF2]"
+NON_HIGHLIGHT_STYLE = "mr-1"
 
 
 def is_registry_item_visible(item):
@@ -30,11 +31,14 @@ def generate_navbar_items(
         if not is_registry_item_visible(item):
             continue
 
-        kwargs = {}
         if item["path"] == item_to_highlight:
-            kwargs["className"] = HIGHLIGHT_STYLE
+            class_name = HIGHLIGHT_STYLE
+        else:
+            class_name = NON_HIGHLIGHT_STYLE
 
-        navbar_list.append(dcc.Link(href=item["path"], children=item["name"], **kwargs))
+        navbar_list.append(
+            dcc.Link(href=item["path"], children=item["name"], className=class_name)
+        )
 
     return navbar_list
 
