@@ -1,22 +1,27 @@
-from typing import Dict, Optional, OrderedDict
+from typing import Any, Optional, OrderedDict, TypeAlias
 
 import dash
 from dash import Input, Output, callback, dcc, html
 from dash.dependencies import Component
 
+RegistryItem: TypeAlias = dict[str, Any]
+PageRegistry: TypeAlias = OrderedDict[str, RegistryItem]
+
 HIGHLIGHT_STYLE = "border-r-4 border-r-white text-white bg-[#777DF2]"
 NON_HIGHLIGHT_STYLE = "mr-1"
 
 
-def is_registry_item_visible(item):
+def is_registry_item_visible(item: RegistryItem) -> bool:
     try:
-        return item["nav_item"]
+        visible: bool = item["nav_item"]
+
+        return visible
     except KeyError:
         return False
 
 
 def generate_navbar_items(
-    page_registry: OrderedDict[str, Dict[str, str]], item_to_highlight: Optional[str] = None
+    page_registry: PageRegistry, item_to_highlight: Optional[str] = None
 ) -> list[dcc.Link]:
     """
     Returns a list of navbar items with a
