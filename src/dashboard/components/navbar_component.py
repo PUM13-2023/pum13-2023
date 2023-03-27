@@ -43,7 +43,7 @@ def generate_navbar_items(
     return navbar_list
 
 
-def navbar_component(page_name: str = "") -> Component:
+def navbar_component() -> Component:
     """
     Returns a vertical navbar component
     with a specified highlighted item.
@@ -65,7 +65,7 @@ def navbar_component(page_name: str = "") -> Component:
                 className="inline-block flex-col space-y-2 w-max "
                 "[&>a]:px-10 [&>a]:py-5 mt-[3.5rem] "
                 "text-white/75 [&>a]:block",
-                children=generate_navbar_items(dash.page_registry, page_name),
+                children=generate_navbar_items(dash.page_registry),
             ),
         ],
     )

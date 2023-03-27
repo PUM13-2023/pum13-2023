@@ -9,7 +9,6 @@ external_scripts = ["https://tailwindcss.com/", {"src": "https://cdn.tailwindcss
 app = Dash(__name__, use_pages=True, external_scripts=external_scripts)
 
 PORT = 8000
-PLACEHOLDER = "Home"
 
 
 def page_container() -> Component:
@@ -18,7 +17,7 @@ def page_container() -> Component:
     return html.Div(
         className="flex h-screen",
         children=[
-            navbar_component(PLACEHOLDER),
+            navbar_component(),
             dash.page_container,
         ],
     )
