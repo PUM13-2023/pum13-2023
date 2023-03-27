@@ -46,13 +46,8 @@ module = "dash.*"
 ignore_missing_imports = true
 
 [tool.flake8]
-per-file-ignores = """
-  /tests/*: D100 D101 D102 D10 D104
-  __init__.py: F401
-"""
-select = ["src", "tests"]
-exclude = [".venv", "venv", ".nox", "docs", ".git", ".github"]
-extend-ignore = ["E203"]
+per-file-ignores = "__init__.py: F401"
+exclude = [".venv", "venv", ".nox", "docs", ".git", ".github", "noxfile.py"]
 extend-immutable-calls = ["Argument"]
 max-doc-length = 72
 max-line-length = 99
