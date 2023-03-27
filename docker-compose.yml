@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+
+  dashboard:
+    container_name: dashboard
+    restart: always
+    build: ./
+    ports:
+      - "8000:8000"
+    command: gunicorn --workers=3 -b :8000 dashboard.main:server
+
+
+  nginx:
+    container_name: nginx
+    restart: always
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - dashboard
