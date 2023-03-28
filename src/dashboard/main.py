@@ -1,3 +1,19 @@
+"""main module.
+
+This module defines main dash configuration and layout.
+If run as main, hosts the server locally.
+
+Running the server locally is not intended for production purposes.
+
+Examples:
+    Running locally::
+
+        $ python -m dashboard.main
+
+    Running with gunicorn::
+
+        $ gunicorn -w 4 dashboard.main:server
+"""
 import dash
 from dash import Dash, html
 from dash.dependencies import Component
@@ -14,6 +30,7 @@ PORT = 8000
 
 
 def page_container() -> Component:
+    """Main page layout containing navbar and page container."""
     dash.page_container.className = "grow overflow-auto"
 
     return html.Div(
