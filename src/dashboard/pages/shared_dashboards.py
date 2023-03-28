@@ -1,3 +1,4 @@
+"""Shared dashboards page."""
 import dash
 from dash import html
 
@@ -7,4 +8,5 @@ dash.register_page(
 
 
 def layout() -> html.Div:
+    """Stub layout for shared dashboards page."""
     return html.Div()
