@@ -36,6 +36,7 @@ def navbar_urls(navbar_list):
 
 class TestGenerateNavbarItems:
     """Class that contains tests for navbar item generation."""
+
     def test_includes_visible_items(self, navbar_urls) -> None:
         """Test visible items are included.
 

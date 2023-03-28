@@ -19,6 +19,7 @@ YOUTUBE = "https://www.youtube.com/"
 
 class TestSeleniumPytest:
     """Class that runs selenium and pytest test."""
+
     @pytest.fixture(scope="session")
     def browser_driver(self, request):
         """Match what webdriver Selenium should use."""
