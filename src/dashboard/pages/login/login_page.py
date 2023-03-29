@@ -7,6 +7,7 @@
 
 PORT = 8000
 ADDRESS = "127.0.0.1"
+PATH = "/login"
 
 from gc import callbacks
 
@@ -14,7 +15,7 @@ import dash
 from dash import Dash, callback, dcc, html
 from dash.dependencies import Component, Input, Output, State
 
-dash.register_page(__name__, path="/login")
+dash.register_page(__name__, path=PATH, nav_item=False)
 
 
 # sets the colors of the login page
