@@ -18,7 +18,7 @@ Todo:
 from typing import Any, Optional, OrderedDict, TypeAlias
 
 import dash
-from dash import Input, Output, callback, dcc, html
+from dash import Input, Output, State, callback, dcc, html
 from dash.dependencies import Component
 
 from dashboard.components.icon import icon
@@ -180,3 +180,14 @@ def generate_navbar_contents(
 def update_navbar(path_name: str) -> list[dcc.Link]:
     """Update the selected navbar item based on the current url."""
     return generate_upper_navbar_list(dash.page_registry, path_name)
+
+
+@callback(
+    Output("main-navbar", "className"), Input("url", "pathname"), State("main-navbar", "className")
+)
+def show_navbar(path_name: str, class_name: str) -> list[Component]:
+    """Update the selected navbar item based on the current url."""
+    if path_name == "/login":
+        return class_name + (" hidden" if "hidden" not in class_name else "")
+    else:
+        return class_name.replace(" hidden", "")
