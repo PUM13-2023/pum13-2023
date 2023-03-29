@@ -39,7 +39,6 @@ def browser_driver(request: FixtureRequest):
             driver = webdriver.ChromiumEdge(options=options)
         case _:
             options = webdriver.FirefoxOptions()
-            print(request.config.option.headless)
             if request.config.option.head == "1":
                 options.add_argument("--headless")
             driver = webdriver.Firefox(options=options)
