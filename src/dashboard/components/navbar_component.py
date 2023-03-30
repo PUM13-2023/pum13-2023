@@ -12,19 +12,23 @@ Which item is highlighted is automatically updated via a callback.
 Todo:
     * Add support for a page registry option to use a different name in
       the navbar.
-"""
+    * Add logout functionality
 
+"""
 from typing import Any, Optional, OrderedDict, TypeAlias
 
 import dash
-from dash import Input, Output, callback, dcc, html
+from dash import Input, Output, callback, dcc, get_asset_url, html
+from dash.dcc import Link
 from dash.dependencies import Component
 
 RegistryItem: TypeAlias = dict[str, Any]
 PageRegistry: TypeAlias = OrderedDict[str, RegistryItem]
 
-HIGHLIGHT_STYLE = "border-r-4 border-r-white text-white bg-[#777DF2]"
-NON_HIGHLIGHT_STYLE = "mr-1"
+HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-[#777DF2] "
+NON_HIGHLIGHT_STYLE = (
+    "mr-1 mt-2 hover:text-white opacity-60 hover:opacity-90 transition ease-in-out "
+)
 
 
 def is_registry_item_visible(item: RegistryItem) -> bool:
@@ -43,11 +47,11 @@ def is_registry_item_visible(item: RegistryItem) -> bool:
 
 def generate_navbar_items(
     page_registry: PageRegistry, item_to_highlight: Optional[str] = None
-) -> list[dcc.Link]:
+) -> list[Link]:
     """Generate list of navbar item components.
 
     A navbar item can be specified by a path to highlight that item in
-    the navbar. By default no item is highlighted.
+    the navbar. By default, no item is highlighted.
 
     Args:
         page_registry (PageRegistry): Page registry dictionary.
@@ -65,7 +69,19 @@ def generate_navbar_items(
             class_name = NON_HIGHLIGHT_STYLE
 
         navbar_list.append(
-            dcc.Link(href=item["path"], children=item["name"], className=class_name)
+            dcc.Link(
+                href=item["path"],
+                className=f"{class_name}",
+                children=[
+                    html.Div(
+                        className="flex items-center space-x-4",
+                        children=[
+                            html.Img(src=get_asset_url(f'{item["name"].lower()}.svg')),
+                            html.P(item["name"]),
+                        ],
+                    )
+                ],
+            )
         )
 
     return navbar_list
@@ -81,13 +97,13 @@ def navbar_component() -> Component:
     """
     return html.Div(
         id="main-navbar",
-        className="bg-[#636AF2] justify-center text-left",
+        className="bg-[#636AF2] justify-center text-left flex",
         children=[
             dcc.Location(id="url", refresh=False),
             html.Div(
                 id="main-navbar-container",
-                className="inline-block flex-col space-y-2 w-max "
-                "[&>a]:px-10 [&>a]:py-5 mt-[3.5rem] "
+                className="inline-block flex-col w-max flex "
+                "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
                 "text-white/75 [&>a]:block",
                 children=generate_navbar_items(dash.page_registry),
             ),
