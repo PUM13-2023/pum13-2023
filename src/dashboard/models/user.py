@@ -41,10 +41,10 @@ class Dashboard(EmbeddedDocument):
             consists of.
     """
 
-    name = StringField()
-    description = StringField()
-    authorized_users = ListField(ReferenceField("User"))
-    diagrams = EmbeddedDocumentListField(Diagram)
+    name: str = StringField()
+    description: str = StringField()
+    authorized_users: list["User"] = ListField(ReferenceField("User"))
+    diagrams: list[Diagram] = EmbeddedDocumentListField(Diagram)
 
 
 class User(Document):
@@ -59,8 +59,8 @@ class User(Document):
             documents.
     """
 
-    username = StringField()
-    dashboards = EmbeddedDocumentListField(Dashboard)
+    username: str = StringField()
+    dashboards: list[Dashboard] = EmbeddedDocumentListField(Dashboard)
 
 
 def register_user(username: str) -> User:
