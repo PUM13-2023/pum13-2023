@@ -26,10 +26,12 @@ def carousel_layout(container_title: str) -> html.Div:
                 className="flex w-full h-full mb-[3rem]",
                 children=[
                     html.Button(
-                        className="bg-white transition duration-500 drop-shadow-md w-[20rem] h-[17rem] "
+                        className="bg-white transition-all transition duration-500 drop-shadow-md w-[20rem] h-[17rem] "
                                   "flex border-b-4 hover:border-b-indigo-500 "
                                   "justify-center items-center items-baseline flex-col rounded-[2px] "
-                                  "hover:drop-shadow-[2px_4px_10px_rgba(0,0,0,0.20)] p-5 ",
+                                  "hover:drop-shadow-[2px_4px_10px_rgba(0,0,0,0.20)] p-5 " 
+                                  "hover:rounded-t-xl"
+                                  ,
                         children=[
                             html.Div(
                                 className="bg-[#dcdcdc]/70 h-full w-full",
@@ -61,7 +63,9 @@ def layout() -> Component:
                     html.Button(
                         className="bg-white w-[40rem] h-[25rem] transition-all duration-300 [&>p]:text-2xl shadow-sm "
                                   "hover:shadow-lg flex justify-center "
-                                  "items-center rounded-[10px] drop-shadow-[0px_0px_2px_rgba(0,0,0,0.20)] ",
+                                  "items-center rounded-[10px] drop-shadow-[0px_0px_2px_rgba(0,0,0,0.20)] "
+                                  "hover:w-[42rem]"
+                                  ,
                         children=[
                             html.P(className="text-black/60", children="Create dashboard")
                         ],
