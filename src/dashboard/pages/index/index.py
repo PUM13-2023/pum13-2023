@@ -1,3 +1,4 @@
+"""Index page module."""
 import dash
 from dash import html
 from dash.dependencies import Component, Output, Input

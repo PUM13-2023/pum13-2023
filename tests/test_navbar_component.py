@@ -1,3 +1,4 @@
+"""Test for navbar functionality."""
 import multiprocessing
 import time
 
@@ -13,60 +14,33 @@ TIMEOUT = 3
 PORT = 3030
 HOST = "127.0.0.1"
 URL = f"http://{HOST}:{str(PORT)}"
-navbar_count = 3
+NAVBAR_COUNT = 3
 HOME_URL = f"{URL}/"
 DASHBOARD_URL = f"{URL}/dashboards"
 SHARED_DASHBOARDS_URL = f"{URL}/shared-dashboards"
 
 
 def server(host, port):
+    """Start the graphit application."""
     main.app.run(host, port)
 
 
 @pytest.mark.test_navbar_component
 class TestNavbarComponent:
+    """Class that tests the Navbar component."""
+
     @pytest.fixture()
     def start_server(self):
+        """Start a local server on a different process."""
         p = multiprocessing.Process(target=server, args=(HOST, PORT))
         p.start()
         time.sleep(1)
         yield p
         p.terminate()
 
-    @pytest.fixture(autouse=True, scope="session")
-    def speed_mult(self, request):
-        self.spd_mult = float(request.config.option.speedmult)
-
-    @pytest.fixture(scope="session")
-    def browser_driver(self, request):
-        driver: webdriver
-        match request.config.option.browser:
-            case "chrome":
-                options = webdriver.ChromeOptions()
-                options.add_argument("--headless")
-                driver = webdriver.Chrome(options=options)
-            case "safari":
-                # Headless not possible yet?
-                driver = webdriver.Safari()
-            case "edge":
-                options = webdriver.EdgeOptions()
-                options.add_argument("--headless")
-                driver = webdriver.Edge(options=options)
-            case "chromium":
-                driver = webdriver.ChromiumEdge().create_options().add_argument("--headless")
-            case _:
-                options = webdriver.FirefoxOptions()
-                options.add_argument("--headless")
-                driver = webdriver.Firefox(options=options)
-        yield driver
-        driver.close()
-
-    @pytest.mark.usefixtures("browser_driver")
     @pytest.mark.usefixtures("start_server")
     def test_find_navbar(self, browser_driver: webdriver) -> None:
-        """
-        Test that a navbar element exists on the page
-        """
+        """Test that a navbar element exists on the page."""
         browser_driver.get(URL)
 
         WebDriverWait(browser_driver, TIMEOUT).until(
@@ -77,12 +51,9 @@ class TestNavbarComponent:
 
         assert navbar, "Navbar could not be found"
 
-    @pytest.mark.usefixtures("browser_driver")
     @pytest.mark.usefixtures("start_server")
     def test_find_buttons(self, browser_driver: webdriver) -> None:
-        """
-        Test that the navbar items exist on the page
-        """
+        """Test that the navbar items exist on the page."""
         browser_driver.get(URL)
         WebDriverWait(browser_driver, TIMEOUT).until(
             ec.presence_of_element_located((By.ID, "main-navbar"))
@@ -93,14 +64,11 @@ class TestNavbarComponent:
             "a",
         )
 
-        assert len(navbar_items) == navbar_count, "Navbar items do not exist"
+        assert len(navbar_items) == NAVBAR_COUNT, "Navbar items do not exist"
 
-    @pytest.mark.usefixtures("browser_driver")
     @pytest.mark.usefixtures("start_server")
     def test_redirect_home(self, browser_driver: webdriver) -> None:
-        """
-        Test that the Home item redirects to the correct page
-        """
+        """Test that the Home item redirects to the correct page."""
         browser_driver.get(URL)
         WebDriverWait(browser_driver, TIMEOUT).until(
             ec.presence_of_element_located((By.ID, "main-navbar"))
@@ -114,12 +82,9 @@ class TestNavbarComponent:
             browser_driver.current_url == HOME_URL
         ), "Page did not redirect to the correct home page"
 
-    @pytest.mark.usefixtures("browser_driver")
     @pytest.mark.usefixtures("start_server")
     def test_redirect_dashboards(self, browser_driver: webdriver) -> None:
-        """
-        Test that the Dashboards item redirects to the correct page
-        """
+        """Test so Dashboards item redirects to correct page."""
         browser_driver.back()
         browser_driver.get(URL)
 
@@ -134,13 +99,9 @@ class TestNavbarComponent:
             browser_driver.current_url == DASHBOARD_URL
         ), "Page did not redirect to the correct dashboards page"
 
-    @pytest.mark.usefixtures("browser_driver")
     @pytest.mark.usefixtures("start_server")
     def test_redirect_shared_dashboards(self, browser_driver: webdriver) -> None:
-        """
-        Test that the Shared Dashboards item redirects
-        to the correct page
-        """
+        """Test so Shared Dashboards item redirects to correct page."""
         browser_driver.back()
         browser_driver.get(URL)
 

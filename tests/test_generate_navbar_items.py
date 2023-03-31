@@ -1,3 +1,4 @@
+"""Test navbar item generation."""
 import pytest
 
 from dashboard.components.navbar_component import HIGHLIGHT_STYLE, generate_navbar_items
@@ -23,15 +24,19 @@ NAVBAR_HIDDEN = {NAVBAR_HIDDEN_EXPLICIT, NAVBAR_HIDDEN_IMPLICIT}
 
 @pytest.fixture
 def navbar_list():
+    """Return a list of generated navbar items."""
     return generate_navbar_items(PAGE_REGISTRY)
 
 
 @pytest.fixture
 def navbar_urls(navbar_list):
+    """Return the set of urls included in the generated navbar items."""
     return {item.href for item in navbar_list}
 
 
 class TestGenerateNavbarItems:
+    """Class that contains tests for navbar item generation."""
+
     def test_includes_visible_items(self, navbar_urls) -> None:
         """Test visible items are included.
 

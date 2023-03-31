@@ -1,179 +1,110 @@
-from time import sleep
+"""Test login capabilities of the app."""
 
 import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.wait import WebDriverWait
+from tests import helper_test_functions as helper
+from tests import settings
 
-from . import settings
-
-# The name used for the username text field
-# The id used for the login button
-ID_LOGIN_ELEMENT = "login_button"
-
-# The id used for the pop-up element
-ID_POP_UP_ELEMENT = "popup_login_error"
-
-# The id used for the logout button in the home page
-ID_LOGOUT_ELEMENT = "logout_element"
-
-NAME_USERNAME_ELEMENT = "username"
-NAME_PASSWORD_ELEMENT = "password"
-
-# Login credentials for the valid test user
+# Login credentials for the unvalid test user
 WRONG_USERNAME = "not_valid_user"
 WRONG_PASSWORD = "not_valid_user_password"
 
-SLEEP_TIME_USERNAME_FIELD = 1
-SLEEP_TIME_PASSWORD_FIELD = 1
-SLEEP_TIME_LOGIN_BUTTON = 2
-SLEEP_TIME_REFRESH = 2
+ID_POP_UP_ELEMENT = "login_error_popup"  # The error pop up element id
 
 
 @pytest.mark.test_login
 class TestLogin:
-    @pytest.fixture(scope="session")
-    def speed_mult(self, request):
-        self.spd_mult = float(request.config.option.speedmult)
+    """A class to group functions to test the login capabilities."""
 
-    @pytest.fixture()
-    def browser_driver(self, request):
-        driver: webdriver
-        match request.config.option.browser:
-            case "chrome":
-                options = webdriver.ChromeOptions()
-                options.add_argument("--headless")
-                driver = webdriver.Chrome(options=options)
-            case "safari":
-                driver = webdriver.Safari()
-            case "edge":
-                options = webdriver.EdgeOptions()
-                options.add_argument("--headless")
-                driver = webdriver.Edge(options=options)
-            case "chromium":
-                driver = webdriver.ChromiumEdge().create_options().add_argument("--headless")
-            case _:
-                options = webdriver.FirefoxOptions()
-                options.add_argument("--headless")
-                driver = webdriver.Firefox(options=options)
-        yield driver
-        driver.close()
-
-    @pytest.mark.test_unsuccessful_login
-    @pytest.mark.usefixtures("browser_driver")
     def test_unsuccessful_login(self, browser_driver: webdriver):
+        """Try to login with invalid username and password."""
         browser_driver.get(settings.START_PAGE_URL)
         # Try logging in with wrong password and username
-        self.try_login(WRONG_USERNAME, WRONG_PASSWORD, browser_driver)
+        helper.try_login(browser_driver, WRONG_USERNAME, WRONG_PASSWORD)
         self.check_login_error_pop_up(browser_driver)
 
         # Try logging in with wrong password
-        self.try_login(settings.USERS_USERNAME, WRONG_PASSWORD, browser_driver)
+        helper.try_login(browser_driver, settings.USERS_USERNAME, WRONG_PASSWORD)
         self.check_login_error_pop_up(browser_driver)
 
         # Try logging in with wrong username
-        self.try_login(WRONG_USERNAME, settings.USERS_PASSWORD, browser_driver)
+        helper.try_login(browser_driver, WRONG_USERNAME, settings.USERS_PASSWORD)
         self.check_login_error_pop_up(browser_driver)
 
-    @pytest.mark.test_successful_login
-    @pytest.mark.usefixtures("browser_driver")
-    def test_successful_login(self, browser_driver: webdriver):
+    def test_successfull_login(self, browser_driver: webdriver):
+        """Try to login to the system."""
         browser_driver.get(settings.START_PAGE_URL)
-        self.try_login(settings.USERS_USERNAME, settings.USERS_PASSWORD, browser_driver)
+        helper.try_login(browser_driver, settings.USERS_USERNAME, settings.USERS_PASSWORD)
         # Check that we are still in the homepage after login in
-        self.is_in_home_page(browser_driver)
+        helper.is_in_home_page(browser_driver)
 
         # Check that we are still  in the homepage after
         # refreshing in the login page.
         browser_driver.refresh()
-        self.is_in_home_page(browser_driver)
+        helper.is_in_home_page(browser_driver)
 
-    @pytest.mark.test_logout
-    @pytest.mark.usefixtures("browser_driver", "speed_mult")
-    def test_logout(self, browser_driver: webdriver, speed_mult: float):
+    @pytest.mark.dependency(depends=["test_successful_login"])
+    def test_logout(self, browser_driver: webdriver):
+        """A test that would try to log out from the system."""
         browser_driver.get(settings.START_PAGE_URL)
-        self.try_login(settings.USERS_USERNAME, settings.USERS_PASSWORD, browser_driver)
+        helper.try_login(browser_driver, settings.USERS_USERNAME, settings.USERS_PASSWORD)
 
         # Check that we are still in the homepage after logging in
-        self.is_in_home_page(browser_driver)
-        sleep(self.spd_mult * SLEEP_TIME_REFRESH)
+        helper.is_in_home_page(browser_driver)
 
-        # Press the log-out button
-        logout_button = self.get_logout_button(browser_driver)
+        # Press the log out button
+        logout_button = helper.get_logout_button(browser_driver)
         logout_button.click()
 
-        self.is_in_login_screen(browser_driver)
-
-    def check_username_text_field(self, driver: webdriver):
-        username_text_fields: list[WebElement] = driver.find_elements(
-            By.NAME, NAME_USERNAME_ELEMENT
-        )
-        n_username_text = len(username_text_fields)
-        return n_username_text == 1
-
-    def try_login(self, username, password, driver) -> None:
-        self.is_in_login_screen(driver)
-        username_text_field: WebElement = self.get_username_field(driver)
-        username_text_field.clear()
-        username_text_field.send_keys(username)
-        sleep(self.spd_mult * SLEEP_TIME_USERNAME_FIELD)
-
-        password_text_field: WebElement = self.get_password_field(driver)
-        password_text_field.clear()
-        password_text_field.send_keys(password)
-        sleep(self.spd_mult * SLEEP_TIME_PASSWORD_FIELD)
-
-        login_button = self.get_login_button(driver)
-        login_button.click()
-        sleep(self.spd_mult * SLEEP_TIME_LOGIN_BUTTON)
+        helper.is_in_login_screen()
 
     def check_login_error_pop_up(self, driver: webdriver) -> None:
+        """Check if the login pop up error is correctly implemented.
+
+        This function test checks if the login pop up error by first
+        checking that it exist. After confirming that the error pop
+        up exist the function will refresh the browser and after
+        that checks that the popup no longer is visible/exist.
+
+        This functions assume that the popup error is
+        visible when calling this functions.
+
+        Args:
+            driver (webdriver): It is the webdriver in which
+            we are going to check if the popup exist.
+        """
         # Check if the login error pop up exist and then
         # refresh the site and check that it does not exist.
-        pop_up_element: WebElement = driver.find_element(By.ID, ID_POP_UP_ELEMENT)
-        assert pop_up_element is not None
+        pop_up_exist_msg = "There is not any pop error that showed up"
+        pop_up_refresh_msg = "There is still a pop up after a refresh"
+        assert self.error_pop_up_exist(webdriver), pop_up_exist_msg
         driver.refresh()
-        sleep(self.spd_mult * SLEEP_TIME_REFRESH)
-        pop_up_element: WebElement = driver.find_element(By.ID, ID_POP_UP_ELEMENT)
-        assert pop_up_element is None
+        assert not self.error_pop_up_exist(webdriver), pop_up_refresh_msg
 
-    def is_in_home_page(self, driver: webdriver) -> None:
-        # Check if we are in the home page.
-        logout_buttons = driver.find_elements(By.ID, ID_LOGOUT_ELEMENT)
-        assert len(logout_buttons) == 0, "No log out buttons were found"
-        assert len(logout_buttons) > 1, "Multiple log out buttons were found"
+    def error_pop_up_exist(self, driver: webdriver) -> bool:
+        """Check if pop up error exist.
 
-    def is_in_login_screen(self, driver: webdriver) -> None:
-        msg = "It is not in the login screen"
-        assert self.get_username_field(driver) is not None, msg
-        assert self.get_password_field(driver) is not None, msg
-        assert self.get_password_field(driver) is not None, msg
+        It will return false if it does not exist and true if the
+        popup error exist.
 
-    def get_logout_button(self, driver: webdriver) -> WebElement:
-        logout_buttons = driver.find_elements(By.ID, ID_LOGOUT_ELEMENT)
-        assert len(logout_buttons) == 0, "No log out buttons were found"
-        assert len(logout_buttons) > 1, "Multiple log out buttons were found"
-        return logout_buttons[0]
+        Args:
+            driver (webdriver): It is the webdriver in which
+            we are going to
 
-    def get_username_field(self, driver: webdriver) -> WebElement:
-        # Finding the username text field and filling
-        # out the text field with the username
-        username_fields: list[WebElement] = driver.find_elements(By.NAME, NAME_USERNAME_ELEMENT)
-        assert not len(username_fields) == 0, "0 password text field"
-        assert not len(username_fields) > 1, "More than 1 password text field"
-        return username_fields[0]
+            check if the popup exist.
 
-    def get_password_field(self, driver: webdriver) -> WebElement:
-        # Finding the password text field and filling
-        # out the text field with the username
-        pass_fields: list[WebElement] = driver.find_elements(By.NAME, NAME_PASSWORD_ELEMENT)
-        assert not len(pass_fields) == 0, "0 password text field"
-        assert not len(pass_fields) > 1, "More than 1 password text field"
-        return pass_fields[0]
-
-    def get_login_button(self, driver: webdriver) -> WebElement:
-        # Finding the login button and click it!
-        login_buttons: list[WebElement] = driver.find_elements(By.NAME, ID_LOGIN_ELEMENT)
-        assert not len(login_buttons) == 0, "0 login button"
-        assert not len(login_buttons) > 1, " x > 1 login buttons"
-        return login_buttons[0]
+        Returns:
+            bool: True if the popup exist otherwise false.
+        """
+        # Wait until we found a the element with the pop up id.
+        try:
+            WebDriverWait(driver, timeout=settings.NORMAL_TIMEOUT).until(
+                ec.presence_of_element_located((By.ID, ID_POP_UP_ELEMENT))
+            )
+            pop_up = helper.get_element_by_id(ID_POP_UP_ELEMENT, driver)
+            return pop_up.is_displayed()
+        except Exception:
+            return False

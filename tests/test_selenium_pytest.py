@@ -1,3 +1,11 @@
+"""Test for selenium and pytest compatability.
+
+This module is for testing that Selenium and pytest works on your
+system.
+
+This module is run using:
+pytest -k youtube
+"""
 from time import sleep
 
 import pytest
@@ -10,8 +18,11 @@ YOUTUBE = "https://www.youtube.com/"
 
 
 class TestSeleniumPytest:
+    """Class that runs selenium and pytest test."""
+
     @pytest.fixture(scope="session")
     def browser_driver(self, request):
+        """Match what webdriver Selenium should use."""
         match request.config.option.browser:
             case "chrome":
                 driver = webdriver.Chrome()
@@ -29,6 +40,7 @@ class TestSeleniumPytest:
     @pytest.mark.youtube
     @pytest.mark.usefixtures("browser_driver")
     def test_play_youtube_video(self, browser_driver):
+        """Plays a youtube video testing Selenium functions."""
         browser_driver.get(YOUTUBE)
         sleep(1)
         accept_all_button = browser_driver.find_elements(
