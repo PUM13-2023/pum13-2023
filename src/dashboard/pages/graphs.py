@@ -1,7 +1,8 @@
 from collections import OrderedDict
 
 import dash
-from dash import get_asset_url, html
+from dash import dcc, html
+import plotly.express as px
 
 from dashboard.components.icon import icon
 
@@ -28,8 +29,16 @@ def add_buttons(button_names: OrderedDict[str, str]) -> list[html.Button]:
     return buttons
 
 
+def create_graph():
+    pass
+
+
 def layout(dashboard_id=None):
+    df = px.data.iris()
+    fig = px.scatter(df, x="sepal_length", y="sepal_width")
     dashboard_name = f"Dashboard {dashboard_id}"
+    graph = dcc.Graph(className="", figure=fig)
+
     """
     TODO
         Use the dashboard_id to query
@@ -37,14 +46,18 @@ def layout(dashboard_id=None):
     """
 
     return html.Div(
-        className="flex",
+        className="flex flex-col",
         children=[
             html.Div(
-                className="flex w-screen p-5 items-center",
+                className="flex p-5 items-center",
                 children=[
                     html.H1(className="text-3xl", children=[dashboard_name]),
                     html.Div(className="flex ml-auto", children=add_buttons(buttons)),
                 ],
-            )
+            ),
+            html.Div(
+                # Put a list of the given dashboard's graphs here
+                children=graph
+            ),
         ],
     )
