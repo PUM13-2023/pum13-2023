@@ -17,6 +17,9 @@ branches. When adding a new feature branch, a feature branch is created with
 from `dev`. After the release is finalized, the release branch is merged with
 `main` and a release tag is created.
 
+Branches use the `kebab-case` naming convention, where lowercase words are
+separated by dashes.
+
 ## Commit Messages
 Commit messages begin with a short title, summarizing the changes made. The
 title should be capitalized and use the imperative mood. For example, use "fix"
