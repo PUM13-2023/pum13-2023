@@ -10,8 +10,8 @@ import io
 import dash
 from dash import Dash, callback, dash_table, dcc, html
 from dash.dependencies import Component, Input, Output, State
-import pandas as pd
 import plotly.express as px
+import polars as pl
 
 dash.register_page(__name__, path=PATH, nav_item=False)
 
@@ -24,57 +24,137 @@ colors = {
     "white": "#FFFFFF",
     "dark_purp": "#2F3273",
     "black": "#00000",
+    "temp": "#ffc0cb",
 }
 
 
-# the main graphical component for the entire login page
+# the main graphical component for the entire csv graph create page page
 def layout() -> Component:
+    # main background element
     return html.Div(
-        className=f'bg-[{colors["background"]}] flex h-screen w-full justify-center items-center',
+        className=f'bg-[{colors["background"]}] flex h-screen w-full items-center',
+        children=[left_setting_bar(), graph_window(), right_settings_bar()],
+    )
+
+
+# left side settings bar
+def left_setting_bar():
+    # import button, and settings to the left
+    return html.Div(
+        className=f'bg-[{colors["temp"]}] flex flex-col items-center ml-5 px-5 h-[80%] w-[20%]   ',
         children=[
-            dcc.Upload(
-                id="upload-data",
-                children=html.Div(["Drag and Drop or ", html.A("Select Files")]),
-                style={
-                    "width": "100%",
-                    "height": "60px",
-                    "lineHeight": "60px",
-                    "borderWidth": "1px",
-                    "borderStyle": "dashed",
-                    "borderRadius": "5px",
-                    "textAlign": "center",
-                    "margin": "10px",
-                },
-                # Allow multiple files to be uploaded
-                multiple=True,
-            ),
-            html.Div(id="output-data-upload"),
+            # buttons for import and get from database
+            html.Div(
+                className=f'bg-[{colors["background"]}] flex flex-row mt-10 h-[9%] w-[100%]',
+                children=[
+                    # left button
+                    csv_button(),
+                    html.Div(id="csv_uploaded_data"),
+                    # right button for getting data from the database
+                    db_button(),
+                    html.Div(id="output1"),
+                ],
+            )
         ],
     )
 
 
-# def parse_contents(contents, filename, date):
+# button to upload a csv file
+def csv_button():
+    return dcc.Upload(
+        className=f"bg-[{colors['meny_back']}] grow h-[100%] flex flex-col px-4 justify-center"
+        " border-2 border-black",
+        id="uploaded_data",
+        children=html.Div(
+            html.A("Import a CSV file"),
+        ),
+        # false so multiple files cant be uploaded
+        multiple=False,
+    )
+
+
+# button to get data from a database
+def db_button():
+    return html.Button(
+        className=f"bg-[{colors['meny_back']}] grow h-[100%] flex flex-col px-4 justify-center"
+        " border-2 border-black",
+        children=[
+            html.Div(
+                # className=f'bg-[{colors["background"]}',
+                children=[
+                    html.P(
+                        "Get from database",
+                        style={"color": colors["black"]},
+                    ),
+                ],
+            )
+        ],
+        id="database_button",
+        n_clicks=0,
+    )
+
+
+# window to show the created graph
+def graph_window():
+    return html.Div(
+        className=f"bg-[{colors['temp']}] flex justify-center mx-4 h-[62%] w-[55%]",
+        children=html.Div(id="graph_output"),
+    )
+
+
+# creates a specific
+# def display_graph(df, graph_type):
+def display_graph(df):
+    #    if(graph_type == "line"):
+    # fig = px.line(df, x="x", y="y", title="Test graph from csv file")
+    fig = px.line(df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file")
+    # if graph_type == "scatter":
+    #   fig = px.scatter(df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file")
+    return dcc.Graph(figure=fig)
+
+
+# right settings bar, choose what kind of a plot
+def right_settings_bar():
+    return html.Div(
+        className=f"bg-[{colors['temp']}] flex flex-row items-center justify-center"
+        " h-[80%] w-[20%]",
+        children=html.Div(choose_plot()),
+    )
+
+
+# buttons to choose a plot
+def choose_plot():
+    return html.Div(plot_buttons("scatter", "scatter_button_id"))
+
+
+def plot_buttons(button_text, button_id):
+    return html.Button(
+        className=f"bg-[{colors['meny_back']}] grow h-[100%] flex flex-col px-4 justify-center"
+        " border-2 border-black",
+        children=[
+            html.Div(
+                children=[
+                    html.P(
+                        button_text,
+                        style={"color": colors["black"]},
+                    ),
+                ],
+            )
+        ],
+        id=button_id,
+        n_clicks=0,
+    )
+
+
+# parses the contents of the inputed csv file using polars
 def parse_contents(contents, filename):
     content_type, content_string = contents.split(",")
-
-    # define data frame as global
-    # global df
-    # global dict_col
     decoded = base64.b64decode(content_string)
+
     try:
         if "csv" in filename:
-            # byt till polars
-            df = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
-
-            # ======== can draw a simple graph based on a csv file, but in a new window
-            # fig = px.line(df, x="x", y="y", title="Test graph from csv file")
-            # fig.show()
-
-            # ===try to get it to open in the same window
-            fig = px.line(df, x="x", y="y", title="Test graph from csv file")
-            # fig.show()
-
-            return dcc.Graph(figure=fig)
+            df = pl.read_csv(io.StringIO(decoded.decode("utf-8")))
+            return df
 
     except Exception as e:
         print(e)
@@ -82,18 +162,16 @@ def parse_contents(contents, filename):
 
 
 @callback(
-    Output("output-data-upload", "children"),
-    Input("upload-data", "contents"),
-    State("upload-data", "filename"),
-    # State("upload-data", "last_modified"),
+    Output("graph_output", "children"),
+    # input("output_scatter", "sca"),
+    Input("uploaded_data", "contents"),
+    State("uploaded_data", "filename"),
 )
-# def update_output(list_of_contents, list_of_names, list_of_dates):
-def update_output(list_of_contents, list_of_names):
-    if list_of_contents is not None:
-        children = [
-            # parse_contents(c, n, d)
-            parse_contents(c, n)
-            # for c, n, d in zip(list_of_contents, list_of_names, list_of_dates)
-            for c, n in zip(list_of_contents, list_of_names)
-        ]
-        return children
+
+# def update_output(content, filename, sca):
+def update_output(content, filename):
+    df = parse_contents(content, filename)
+    print(df)
+    # loc_graph = display_graph(df, sca)
+    loc_graph = display_graph(df)
+    return loc_graph
