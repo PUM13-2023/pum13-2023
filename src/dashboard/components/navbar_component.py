@@ -158,16 +158,20 @@ def generate_navbar_contents(
     upper_navbar_div = html.Div(
         id="upper-navbar-container",
         children=generate_upper_navbar_list(page_registry, item_to_highlight),
-        className="inline-block flex-col w-max flex "
-        "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
-        "text-white/75 [&>a]:block",
+        className=(
+            "inline-block flex-col w-max flex "
+            "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
+            "text-white/75 [&>a]:block"
+        ),
     )
     lower_navbar_div = html.Div(
         id="lower-navbar-container",
         children=generate_lower_navbar_list(),
-        className="inline-block flex-col w-max flex "
-        "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
-        "text-white/75 [&>a]:block",
+        className=(
+            "inline-block flex-col w-max flex "
+            "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
+            "text-white/75 [&>a]:block"
+        ),
     )
     return [upper_navbar_div, lower_navbar_div]
 

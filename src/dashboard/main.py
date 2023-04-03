@@ -49,7 +49,7 @@ def page_container() -> Component:
     dash.page_container.className = "grow overflow-auto"
     return html.Div(
         id="main",
-        className="flex h-screen overflow-x-hidden",
+        className="flex bg-[#E9E9F2] h-screen overflow-x-hidden",
         children=[
             dcc.Location(id="main-url", refresh=False),
             navbar_component(),
@@ -62,4 +62,4 @@ app.layout = page_container
 
 
 if __name__ == "__main__":
-    app.run("127.0.0.1", PORT, debug=True)
+    app.run("0.0.0.0", PORT, debug=True)

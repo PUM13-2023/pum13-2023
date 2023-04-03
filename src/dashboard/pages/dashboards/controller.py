@@ -9,7 +9,9 @@ from dash.dependencies import Component
     Input({"type": "dashboards-list-row", "index": ALL}, "n_clicks"),
     State({"type": "dashboards-list-row", "index": ALL}, "children"),
 )
-def dashboards_list_row_clicked(n_clicks: int, children: List[Component]) -> Component:
+def dashboards_list_row_clicked(n_clicks: List[int], children: List[List[Component]]) -> Component:
     if not ctx.triggered_id:
         return no_update
-    return children[ctx.triggered_id["index"]][1]["props"]["children"]
+
+    row_index = ctx.triggered_id["index"]
+    return f'{children[row_index][1]["props"]["children"]} clicked {n_clicks[row_index]} times'

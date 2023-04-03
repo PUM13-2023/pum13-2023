@@ -13,19 +13,15 @@ dash.register_page(
 
 
 def layout() -> html.Div:
-    dashboards_list_rows = [
-        ["Dashboard 1", "Today", "Yesterday"],
-        ["Dashboard 2", "3 days ago", "2 days ago"],
-        ["Dashboard 2", "1 year ago", "5 years ago"],
-    ] * 15
-
     return html.Div(
         className="flex flex-col mx-4 max-h-screen",
         children=[
             html.H1(className="text-3xl my-8", children="Dashboards"),
             html.Div(
                 id="search-placeholder",
-                className="bg-white rounded-full min-h-[40px] flex items-center pl-8 text-gray-600",
+                className=(
+                    "bg-white rounded-full min-h-[40px] flex items-center pl-8 text-gray-600"
+                ),
                 children="Search placeholder...",
             ),
             html.Div(
@@ -36,7 +32,13 @@ def layout() -> html.Div:
                 ],
             ),
             dashboards_list_component(
-                ["Title", "Last edited at", "Created at"], dashboards_list_rows
+                ["Title", "Last edited at", "Created at"],
+                [
+                    ["Dashboard 1", "Today", "Yesterday"],
+                    ["Dashboard 2", "3 days ago", "2 days ago"],
+                    ["Dashboard 2", "1 year ago", "5 years ago"],
+                ]
+                * 15,
             ),
         ],
     )
