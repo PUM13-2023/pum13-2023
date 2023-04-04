@@ -14,7 +14,7 @@ TIMEOUT = 3
 PORT = 3030
 HOST = "127.0.0.1"
 URL = f"http://{HOST}:{str(PORT)}"
-NAVBAR_COUNT = 3
+NAVBAR_COUNT = 4
 HOME_URL = f"{URL}/"
 DASHBOARD_URL = f"{URL}/dashboards"
 SHARED_DASHBOARDS_URL = f"{URL}/shared-dashboards"
@@ -71,12 +71,13 @@ class TestNavbarComponent:
         """Test that the Home item redirects to the correct page."""
         browser_driver.get(URL)
         WebDriverWait(browser_driver, TIMEOUT).until(
-            ec.presence_of_element_located((By.ID, "main-navbar"))
+            ec.presence_of_element_located((By.ID, "upper-navbar-container"))
         )
 
-        link = browser_driver.find_element(By.LINK_TEXT, "Home")
+        link = browser_driver.find_element(By.ID, "Home-button-navbar")
 
-        assert link.text == "Home"
+        assert link.text == "home\nHome"
+
         link.click()
         assert (
             browser_driver.current_url == HOME_URL
@@ -92,7 +93,7 @@ class TestNavbarComponent:
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
 
-        link = browser_driver.find_element(By.LINK_TEXT, "Dashboards")
+        link = browser_driver.find_element(By.ID, "Dashboards-button-navbar")
 
         link.click()
         assert (
@@ -109,7 +110,7 @@ class TestNavbarComponent:
             ec.presence_of_element_located((By.ID, "main-navbar"))
         )
 
-        link = browser_driver.find_element(By.LINK_TEXT, "Shared dashboards")
+        link = browser_driver.find_element(By.ID, "Shared dashboards-button-navbar")
 
         link.click()
         assert browser_driver.current_url == SHARED_DASHBOARDS_URL
