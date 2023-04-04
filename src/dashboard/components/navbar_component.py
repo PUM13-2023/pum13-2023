@@ -26,7 +26,7 @@ from dashboard.components.icon import icon
 RegistryItem: TypeAlias = dict[str, Any]
 PageRegistry: TypeAlias = OrderedDict[str, RegistryItem]
 
-HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-[#5B60A8] "
+HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-[#777df2]/30 "
 NON_HIGHLIGHT_STYLE = (
     "mr-1 mt-2 hover:text-white opacity-80 hover:opacity-90 transition ease-in-out"
 )
