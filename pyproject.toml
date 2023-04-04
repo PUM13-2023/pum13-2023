@@ -84,6 +84,7 @@ markers = [
     "test_creating_dashboard_page: A test that would try to create a dashboard from the dashboard page.",
     "test_navbar_component: A test that test navbar component.",
     "test_utilities: A test that test utility functions.",
+    "test_modal: A test that test modals.",
     "dependency",
 ]
 

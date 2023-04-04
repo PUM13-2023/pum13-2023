@@ -6,7 +6,7 @@ from dash import html
 
 from dashboard.components.icon import icon
 
-dash.register_page(__name__, path="/", name="Home", order=0, nav_item=True, icon_name="home")
+dash.register_page(__name__, path="/", name="Home", order=0, visible_in_nav=True)
 
 # This username will be replaced later
 username = "cooluser"
