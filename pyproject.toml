@@ -94,6 +94,7 @@ markers = [
     "test_data_db: Test db models for that measurement data part of the db",
     "test_user_db: Test user db models",
     "test_utilities: A test that test utility functions.",
+    "test_modal: A test that test modals.",
     "dependency",
 ]
 
