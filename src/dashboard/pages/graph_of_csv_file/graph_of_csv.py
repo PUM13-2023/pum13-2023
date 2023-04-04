@@ -30,6 +30,9 @@ event = {"event": "click", "props": ["scatter", "line"]}
 def layout() -> Component:
     """
     Main layout component that is parent to all other components
+
+    Returns:
+        A html.div component with all other components
     """
     # main background element
     return html.Div(
@@ -40,11 +43,15 @@ def layout() -> Component:
 
 def left_setting_bar() -> Component:
     """
-    Left settings bar contaning buttons for uploading a csv-file
+    Left settings bar contaning
+
+    Returns:
+        A component containing the csv_button and db_button
     """
     # import button, and settings to the left
     return html.Div(  # change back to temp for debugging
-        className=f'bg-[{colors["background"]}] flex flex-col items-center ml-5 px-5 h-[80%] w-[20%]   ',
+        className=f"bg-[{colors['background']}] flex flex-col items-center ml-5 px-5 h-[80%]"
+        "w-[20%]",
         children=[
             # buttons for import and get from database
             html.Div(
@@ -64,7 +71,10 @@ def left_setting_bar() -> Component:
 
 def csv_button() -> Component:
     """
-    button to upload a csv file
+    Button to upload a csv file
+
+    Returns:
+        A dcc.upload containg a csv-file
     """
     return dcc.Upload(
         className=f"bg-[{colors['meny_back']}] grow h-[100%] flex flex-col px-4 justify-center"
@@ -103,7 +113,10 @@ def db_button() -> Component:
 
 def graph_window() -> Component:
     """
-    A parent window used to display the graph
+    A window used to display the created graph
+
+    Returns:
+        A html.div containing the created graph
     """
     return html.Div(  # change back to temp for debugging
         className=f"bg-[{colors['background']}] flex justify-center mx-4 h-[62%] w-[55%]",
@@ -114,6 +127,12 @@ def graph_window() -> Component:
 def display_graph(df: pl.DataFrame, graph_type: str) -> Component:
     """
     Displays a graph based in the chosen type by the user
+
+    Args:
+        df: a dataframe containg used for creating the graph
+        graph_type: a string used to check what type of graph
+        to draw.
+
     """
     if df is not None:
         # print("graph_type ", graph_type)
@@ -130,7 +149,10 @@ def display_graph(df: pl.DataFrame, graph_type: str) -> Component:
 
 def right_settings_bar() -> Component:
     """
-    right settings bar, containing the different types graphs that can be chosen for display
+    right settings bar
+
+    Returns:
+        A html.div containing all the settings components
     """
     return html.Div(  # change back to temp for debugging
         className=f"bg-[{colors['background']}] flex flex-col items-center justify-center"
@@ -151,7 +173,15 @@ def right_settings_bar() -> Component:
 
 def parse_contents(contents: str, filename: str) -> pl.DataFrame:
     """
-    Parses the input from a csv-file and returns it in the form of a polars dataframe
+    Parses the input from a csv-file
+
+    Args:
+        contents: the csv-file content
+        filename: the csv-file name
+
+    Returns:
+        A parsed and read version of the csv-file
+
     """
     content_type, content_string = contents.split(",")
     decoded = base64.b64decode(content_string)
@@ -167,8 +197,16 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
 )
 def update_output(content: str, filename: str, value: str) -> Component:
     """
-    Uses parse_contents to the input from a csv file into a dataframe. Takes that data frame and
-    creates a graph of it based in the chosen graph type
+    Update_output takes input, creates a dataframe and creates a graph
+
+    Args:
+        content: csv-file content
+        filename: csv-file name
+        value: chosen graph type (linear, scatter etc.)
+
+    Returns:
+        A graph in the form of a plotly figure
+
     """
     if content is None:
         raise PreventUpdate
