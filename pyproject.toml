@@ -46,7 +46,7 @@ strict = true
 
 
 [[tool.mypy.overrides]]
-module = "dash.*"
+module = ["dash.*", "plotly.*"]
 ignore_missing_imports = true
 
 [tool.flake8]
