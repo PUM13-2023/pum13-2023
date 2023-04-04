@@ -156,9 +156,7 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
     content_type, content_string = contents.split(",")
     decoded = base64.b64decode(content_string)
 
-    if "csv" in filename:
-        df = pl.read_csv(io.StringIO(decoded.decode("utf-8")))
-        return df
+    return pl.read_csv(io.StringIO(decoded.decode("utf-8")))
 
 
 @callback(
@@ -175,7 +173,10 @@ def update_output(content: str, filename: str, value: str) -> Component:
     if content is None:
         raise PreventUpdate
 
-    # print(f"{value=}")
-    df = parse_contents(content, filename)
+    try:
+        df = parse_contents(content, filename)
+    except ValueError:
+        raise PreventUpdate
+
     loc_graph = display_graph(df, value)
     return loc_graph
