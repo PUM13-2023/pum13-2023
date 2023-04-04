@@ -4,7 +4,7 @@ from dash import html
 
 from dashboard.components.icon import icon
 
-dash.register_page(__name__, path="/", name="Home", order=0, nav_item=True)
+dash.register_page(__name__, path="/", name="Home", order=0, nav_item=True, icon_name="home")
 
 default_style = "bg-[#d2d2d2] transition duration-500 ease-in-out"
 

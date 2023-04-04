@@ -1,7 +1,7 @@
 """Test navbar item generation."""
 import pytest
 
-from dashboard.components.navbar_component import HIGHLIGHT_STYLE, generate_upper_navbar_div
+from dashboard.components.navbar_component import HIGHLIGHT_STYLE, generate_upper_navbar_list
 
 ITEM_EXIST = "/"
 ITEM_NOT_EXIST = "/this-path-does-not-exist"
@@ -9,12 +9,36 @@ ITEM_NOT_EXIST = "/this-path-does-not-exist"
 # This dict is supposed to simulate the dash.page_registry dict
 # Add the name of the page and the paths here in order to test them
 PAGE_REGISTRY = {
-    "page_home": {"name": "Home", "path": "/", "nav_item": True, "icon":"home"},
-    "page_top_first": {"name": "First", "path": "/first_top", "order": 1, "nav_item": True, "icon":"home"},
-    "page_top_second": {"name": "Second", "path": "/second_top", "order": 2, "nav_item": True, "icon":"home"},
-    "page_bottom_first": {"name": "First", "path": "/first_bottom", "order": 1, "nav_item": True, "icon":"home"},
-    "page_bottom_second": {"name": "Second", "path": "/second_bottom", "order": 2, "nav_item": True, "icon":"home"},
-    "page_hidden": {"name": "Hidden", "path": "/hidden", "nav_item": False, "icon":"home"},
+    "page_home": {"name": "Home", "path": "/", "nav_item": True, "icon_name": "home"},
+    "page_top_first": {
+        "name": "First",
+        "path": "/first_top",
+        "order": 1,
+        "nav_item": True,
+        "icon_name": "home",
+    },
+    "page_top_second": {
+        "name": "Second",
+        "path": "/second_top",
+        "order": 2,
+        "nav_item": True,
+        "icon_name": "home",
+    },
+    "page_bottom_first": {
+        "name": "First",
+        "path": "/first_bottom",
+        "order": 1,
+        "nav_item": True,
+        "icon_name": "home",
+    },
+    "page_bottom_second": {
+        "name": "Second",
+        "path": "/second_bottom",
+        "order": 2,
+        "nav_item": True,
+        "icon_name": "home",
+    },
+    "page_hidden": {"name": "Hidden", "path": "/hidden", "nav_item": False, "icon_name": "home"},
     "page_hidden_implicit": {"name": "Hidden Implicit", "path": "/hidden-implicit"},
 }
 
@@ -27,7 +51,7 @@ NAVBAR_HIDDEN = {NAVBAR_HIDDEN_EXPLICIT, NAVBAR_HIDDEN_IMPLICIT}
 @pytest.fixture
 def navbar_list():
     """Return a list of generated navbar items."""
-    return generate_upper_navbar_div(PAGE_REGISTRY).children
+    return generate_upper_navbar_list(PAGE_REGISTRY)
 
 
 @pytest.fixture
@@ -83,7 +107,7 @@ class TestGenerateNavbarItems:
         possible incorrect implementations.
         """
         for highlight_url in NAVBAR_VISIBLE:
-            navbar_items = generate_upper_navbar_div(PAGE_REGISTRY, highlight_url).children
+            navbar_items = generate_upper_navbar_list(PAGE_REGISTRY, highlight_url)
 
             # Find the first item with the highlighted url.
             should_be_highlighted = next(
@@ -100,7 +124,7 @@ class TestGenerateNavbarItems:
         """
         highlight_url = NAVBAR_VISIBLE[0]
 
-        navbar_items = generate_upper_navbar_div(PAGE_REGISTRY, highlight_url).children
+        navbar_items = generate_upper_navbar_list(PAGE_REGISTRY, highlight_url)
         print(navbar_items)
         for item in navbar_items:
             if item.href == highlight_url:

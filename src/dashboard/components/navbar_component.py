@@ -18,10 +18,10 @@ Todo:
 from typing import Any, Optional, OrderedDict, TypeAlias
 
 import dash
-from dash import Input, Output, callback, dcc, get_asset_url, html
-from dash.dcc import Link
+from dash import Input, Output, callback, dcc, html
 from dash.dependencies import Component
-from dashboard.components import icon
+
+from dashboard.components.icon import icon
 
 RegistryItem: TypeAlias = dict[str, Any]
 PageRegistry: TypeAlias = OrderedDict[str, RegistryItem]
@@ -30,6 +30,8 @@ HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-[#5B60A8] "
 NON_HIGHLIGHT_STYLE = (
     "mr-1 mt-2 hover:text-white opacity-80 hover:opacity-95 transition ease-in-out "
 )
+NAVBAR_ICON_SIZE: str = "text-[40px]"
+
 
 
 def is_registry_item_visible(item: RegistryItem) -> bool:
@@ -46,13 +48,15 @@ def is_registry_item_visible(item: RegistryItem) -> bool:
         return False
 
 
-def generate_navbar_page_items(
+def generate_upper_navbar_list(
     page_registry: PageRegistry, item_to_highlight: Optional[str] = None
-) -> html.Div:
-    """Generate Div of navbar item components based on pages.
+) -> list[dcc.Link]:
+    """Generate list of navbar item components based on pages.
 
-    A navbar item can be specified by a path to highlight that item in
-    the navbar. By default, no item is highlighted.
+    This list is used on the upper part of the navbar. A navbar item can
+    be specified by a path to highlight that item in the navbar. By
+    default, no item is highlighted. This is implemented in an upper_
+    navbar_div
 
     Args:
         page_registry (PageRegistry): Page registry dictionary.
@@ -70,57 +74,51 @@ def generate_navbar_page_items(
             class_name = NON_HIGHLIGHT_STYLE
 
         upper_navbar_list.append(
-            dcc.Link(
-                href=item["path"],
-                className=f"{class_name}",
-                children=[
-                    html.Div(
-                        className="flex items-center space-x-4",
-                        children=[
-                            html.Img(src=get_asset_url(f'{item["name"].lower()}.svg')),
-                            html.P(item["name"]),
-                        ],
-                    )
-                ],
-            )
+            generate_navbar_link(item["path"], item["name"], class_name, item["icon_name"])
         )
-    upper_navbar_div = html.Div(children=upper_navbar_list, className="inline-block flex-col w-max flex"
-                "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
-                "text-white/75 [&>a]:block",)
-    return upper_navbar_div
 
-def generate_lower_navbar_div():
-    """Generates div for the lower part of the navbar
-    
-    This function generates the lower part of the navbar, this is a div containing
-    a list of the diffrent components. Currently a log out button.
+    return upper_navbar_list
+
+
+def generate_navbar_link(path: str, name: str, class_name: str, icon_name: str) -> dcc.Link:
+    """Generate a dcc.Link.
+
+    Helper function to generate a navbar link.
+
+    Args:
+        path (str): Used to set where the link should direct you to.
+        name (str): Used to set text visible on website
+        class_name (str): Tailwind CSS for the link.
+        icon_name (str): What google font icon should be used.
     """
-    lower_navbar_list: list[dcc.Link] = []
-
-    lower_navbar_list.append(
-        dcc.Link(
-                href="/login",
-                className=NON_HIGHLIGHT_STYLE,
+    return dcc.Link(
+        id=f"{name}-button-navbar",
+        href=path,
+        className=class_name,
+        children=[
+            html.Div(
+                className="flex items-center space-x-4",
                 children=[
-                    html.Div(
-                        className="flex items-center space-x-4",
-                        children=[
-                            icon("logout"), #TODO fix font size
-                            html.P("Logout"),
-                        ],
-                    )
+                    icon(icon_name, className=NAVBAR_ICON_SIZE),
+                    html.P(name),
                 ],
             )
+        ],
     )
-    lower_navbar_div = html.Div(children=lower_navbar_list, className="inline-block flex-col w-max flex "
-                "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
-                "text-white/75 [&>a]:block",)
-    return lower_navbar_div
-    
-    
-#TODO fix 2 diffrent fuctions. one for page items and one for whacky other stuff
-#TODO they should both return 1 div.
-#TODO fix all docstrings
+
+
+def generate_lower_navbar_list() -> list[dcc.Link]:
+    """Generates list for the lower part of the navbar.
+
+    This function generates the lower part of the navbar, this is a list
+    to be used in the lower navbar div.
+    """
+    lower_navbar_list: list[dcc.Link] = [
+        generate_navbar_link("/login", "Logout", NON_HIGHLIGHT_STYLE, "logout")
+    ]
+
+    return lower_navbar_list
+
 
 def navbar_component() -> Component:
     """Return a vertical navbar component.
@@ -131,7 +129,7 @@ def navbar_component() -> Component:
     ``is_registry_item_visible``.
     """
     return html.Div(
-        id="main-navbar",     
+        id="main-navbar",
         className="bg-[#4D549B] justify-center text-left flex shadow-md",
         children=[
             dcc.Location(id="url", refresh=False),
@@ -143,22 +141,43 @@ def navbar_component() -> Component:
         ],
     )
 
-def generate_navbar_contents(page_registry: PageRegistry, item_to_highlight: Optional[str] = None
-) -> list[html.Div]:
-    """Generate a list containing two divs. First div contains links to all 
-    pages, second div contains buttons and toggles.
 
-    Read docstring for generate_navbar_page_items for first div. And #TODO second name
+def generate_navbar_contents(
+    page_registry: PageRegistry, item_to_highlight: Optional[str] = None
+) -> list[html.Div]:
+    """Generate a list containing two divs.
+
+    First div contains links to all pages, second div contains logout
+    button and will in future conatin settings etc.
+    Read docstring for generate_upper_navbar_list for first div and read
+    generate_lower_navbar_list for the second div.
 
     Args:
         page_registry (PageRegistry): Page registry dictionary.
         item_to_highlight (Optional[str]): Path of highlighted item.
     """
-    return [generate_navbar_page_items(page_registry, item_to_highlight),
-            generate_lower_navbar_div()] #TODO fix this to button generator
-            
+    upper_navbar_div = html.Div(
+        id="upper-navbar-container",
+        children=generate_upper_navbar_list(page_registry, item_to_highlight),
+        className="inline-block flex-col w-max flex "
+        "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
+        "text-white/75 [&>a]:block",
+    )
+    lower_navbar_div = html.Div(
+        id="lower-navbar-container",
+        children=generate_lower_navbar_list(),
+        className="inline-block flex-col w-max flex "
+        "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
+        "text-white/75 [&>a]:block",
+    )
+    return [upper_navbar_div, lower_navbar_div]
 
-@callback(Output("main-navbar-container", "children"), Input("url", "pathname"),prevent_initial_call=True)
-def update_navbar(path_name: str) -> list[Component]:
+
+@callback(
+    Output("upper-navbar-container", "children"),
+    Input("url", "pathname"),
+    prevent_initial_call=True,
+)
+def update_navbar(path_name: str) -> list[dcc.Link]:
     """Update the selected navbar item based on the current url."""
-    return generate_navbar_contents(dash.page_registry, path_name)
+    return generate_upper_navbar_list(dash.page_registry, path_name)
