@@ -8,8 +8,10 @@ from gc import callbacks
 import io
 
 import dash
-from dash import Dash, callback, dash_table, dcc, html
+from dash import Dash, callback, ctx, dash_table, dcc, html
 from dash.dependencies import Component, Input, Output, State
+from dash.exceptions import PreventUpdate
+from dash_extensions import EventListener
 import plotly.express as px
 import polars as pl
 
@@ -26,6 +28,8 @@ colors = {
     "black": "#00000",
     "temp": "#ffc0cb",
 }
+
+event = {"event": "click", "props": ["scatter", "line"]}
 
 
 # the main graphical component for the entire csv graph create page page
@@ -52,7 +56,7 @@ def left_setting_bar():
                     html.Div(id="csv_uploaded_data"),
                     # right button for getting data from the database
                     db_button(),
-                    html.Div(id="output1"),
+                    html.Div(id="output_left_setting_bar"),
                 ],
             )
         ],
@@ -102,15 +106,32 @@ def graph_window():
     )
 
 
+# @callback(Output)
+
+
 # creates a specific
-# def display_graph(df, graph_type):
-def display_graph(df):
-    #    if(graph_type == "line"):
-    # fig = px.line(df, x="x", y="y", title="Test graph from csv file")
-    fig = px.line(df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file")
-    # if graph_type == "scatter":
-    #   fig = px.scatter(df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file")
-    return dcc.Graph(figure=fig)
+def display_graph(df, graph_type):
+    # def display_graph(df):
+    # old
+    # if df is not None:
+    #     fig = px.line(df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file")
+    #     return dcc.Graph(figure=fig)
+    print("graph_type ", graph_type)
+    if df is not None:
+        print("graph_type ", graph_type)
+        if graph_type == "scatter":
+            fig = px.scatter(
+                df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file"
+            )
+            # return dcc.Graph(figure=fig)
+
+        if graph_type == "line":
+            fig = px.line(df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file")
+            # return dcc.Graph(figure=fig)
+        if graph_type == "histo":
+            fig = px.histogram(df, x=list(df["x"]), title="Test graph from csv file")
+            # return dcc.Graph(figure=fig)
+        return dcc.Graph(figure=fig)
 
 
 # right settings bar, choose what kind of a plot
@@ -118,18 +139,100 @@ def right_settings_bar():
     return html.Div(
         className=f"bg-[{colors['temp']}] flex flex-row items-center justify-center"
         " h-[80%] w-[20%]",
-        children=html.Div(choose_plot()),
+        children=[choose_plot()],
     )
+
+
+# # buttons to choose a plot
+# def choose_plot():
+#     return html.Div(
+#         [
+#             EventListener(
+#                 plot_buttons("scatter"),
+#                 # plot_buttons("line", "line_button"),
+#                 events=[event],
+#                 logging=True,
+#                 id="b1",
+#             ),
+#             EventListener(
+#                 plot_buttons("line"),
+#                 # plot_buttons("line", "line_button"),
+#                 events=[event],
+#                 logging=True,
+#                 id="b2",
+#             ),
+#             # html.Div(id="output_b2"),
+#             html.Div(id="output_b1"),
+#         ]
+#     )
+
+
+# @callback(
+#     Output("output_b1", "children"),
+#     # Output("output_b2", "children")
+#     Input("b1", "n_events"),
+#     Input("b2", "n_events"),
+#     State("b1", "event"),
+#     State("b2", "event"),
+# )
+# def click_event(n_events1, n_events2, e1, e2):
+#     # print("n_events ", n_events, " e = ", e)
+
+#     if (e1 and e2) is None:
+#         raise PreventUpdate()
+#     # print(output_b1)
+#     if n_events1:
+#         print("debug 1 scatter")
+#         logging = False
+#     if n_events2:
+#         print("debug 2 line")
+#         logging = False
+#     # for prop in event["props"]:
+#     #   if prop == "scatter":
+#     #      print("scatter")
+#     # if prop == "line":
+#     #    print("line")
+#     # loc_graph = display_graph(df, prop)
+#     # return "test1"
 
 
 # buttons to choose a plot
 def choose_plot():
-    return html.Div(plot_buttons("scatter", "scatter_button_id"))
+    return html.Div(
+        [
+            plot_buttons("scatter", "scatter_button"),
+            plot_buttons("line", "line_button"),
+            plot_buttons("histogram", "histo_button"),
+            html.Div(id="graph_buttons"),
+        ]
+    )
 
 
+@callback(
+    Output("graph_buttons", "children"),
+    Input("scatter_button", "n_clicks"),
+    Input("line_button", "n_clicks"),
+    Input("histo_button", "n_clicks"),
+)
+def return_graph_type(scatter_button, line_button, histo_button):
+    # NOT A GOOD SOLUTION
+    # global msg
+    msg = ""
+    if "scatter_button" == ctx.triggered_id:
+        msg = "scatter"
+    if "line_button" == ctx.triggered_id:
+        msg = "line"
+    if "histo_button" == ctx.triggered_id:
+        msg = "histo"
+    # return msg
+    dcc.Store(id="graph_type_msg", data=msg, storage_type="memory")
+    # return msg
+
+
+# def plot_buttons(button_text):
 def plot_buttons(button_text, button_id):
     return html.Button(
-        className=f"bg-[{colors['meny_back']}] grow h-[100%] flex flex-col px-4 justify-center"
+        className=f"bg-[{colors['meny_back']}] grow flex flex-col px-4 justify-center"
         " border-2 border-black",
         children=[
             html.Div(
@@ -142,15 +245,19 @@ def plot_buttons(button_text, button_id):
             )
         ],
         id=button_id,
-        n_clicks=0,
+        # n_clicks=0,
     )
 
 
 # parses the contents of the inputed csv file using polars
 def parse_contents(contents, filename):
-    content_type, content_string = contents.split(",")
-    decoded = base64.b64decode(content_string)
-
+    # content_type, content_string = contents.split(",")
+    # decoded = base64.b64decode(content_string)
+    if contents is not None:
+        content_type, content_string = contents.split(",")
+        decoded = base64.b64decode(content_string)
+    else:
+        return
     try:
         if "csv" in filename:
             df = pl.read_csv(io.StringIO(decoded.decode("utf-8")))
@@ -163,15 +270,24 @@ def parse_contents(contents, filename):
 
 @callback(
     Output("graph_output", "children"),
-    # input("output_scatter", "sca"),
+    # Output("output_b1", "children"),
     Input("uploaded_data", "contents"),
+    Input("msg_id", "contents"),
+    # Input("b1", "n_events"),
     State("uploaded_data", "filename"),
 )
-
-# def update_output(content, filename, sca):
-def update_output(content, filename):
+def update_output(content, filename, msg_id):
+    # def update_output(content, filename, n_events, e):
     df = parse_contents(content, filename)
-    print(df)
-    # loc_graph = display_graph(df, sca)
-    loc_graph = display_graph(df)
+    # print(df)
+    # if (e) is None:
+    #     raise PreventUpdate()
+    # for prop in event["props"]:
+    #     if prop == "scatter":
+    #         print("test")
+    #         loc_graph = display_graph(df, prop)
+    # # print(output_b1)
+
+    loc_graph = display_graph(df, msg_id)
+    # loc_graph = display_graph(df)
     return loc_graph
