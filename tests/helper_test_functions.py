@@ -1,4 +1,5 @@
 """Helper functions for test."""
+
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
@@ -11,8 +12,8 @@ from . import settings
 TIMEOUT_BUTTON = 2
 TIMEOUT_TEXTFIELD = 2
 
-ID_USERNAME_ELEMENT = "username_textfield"
-ID_PASSWORD_ELEMENT = "password_textfield"
+ID_USERNAME_ELEMENT = "username"
+ID_PASSWORD_ELEMENT = "password"
 
 
 # The name used for the username text field
@@ -47,7 +48,9 @@ def is_in_home_page(driver: webdriver) -> None:
     Args:
         driver (webdriver): The webdriver that would be checked.
     """
-    assert get_element_by_id(driver, ID_LOGOUT_ELEMENT) is not None
+    print(driver.current_url)
+    assert driver.current_url == settings.HOME_PAGE_URL
+    # assert get_element_by_id(driver, ID_LOGOUT_ELEMENT) is not None
 
 
 def try_login(driver: webdriver, username: str, password: str) -> None:
