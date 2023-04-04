@@ -1,3 +1,8 @@
+"""Graph display module.
+
+This module displays different types of graphs based on input,
+from either a csv-file or from a database.
+"""
 import base64
 import io
 
@@ -28,11 +33,10 @@ event = {"event": "click", "props": ["scatter", "line"]}
 
 # the main graphical component for the entire csv graph create page page
 def layout() -> Component:
-    """
-    Main layout component that is parent to all other components
+    """Main layout component that is parent to all other components.
 
     Returns:
-        A html.div component with all other components
+        A html.div component with all other components.
     """
     # main background element
     return html.Div(
@@ -42,11 +46,10 @@ def layout() -> Component:
 
 
 def left_setting_bar() -> Component:
-    """
-    Left settings bar contaning
+    """Left settings bar contaning.
 
     Returns:
-        A component containing the csv_button and db_button
+        A component containing the csv_button and db_button.
     """
     # import button, and settings to the left
     return html.Div(  # change back to temp for debugging
@@ -70,11 +73,10 @@ def left_setting_bar() -> Component:
 
 
 def csv_button() -> Component:
-    """
-    Button to upload a csv file
+    """Button to upload a csv file.
 
     Returns:
-        A dcc.upload containg a csv-file
+        A dcc.upload containg a csv-file.
     """
     return dcc.Upload(
         className=f"bg-[{colors['meny_back']}] grow h-[100%] flex flex-col px-4 justify-center"
@@ -89,9 +91,7 @@ def csv_button() -> Component:
 
 
 def db_button() -> Component:
-    """
-    NOT IN USE: button to get data from a database
-    """
+    """NOT IN USE: button to get data from a database."""
     return html.Button(
         className=f"bg-[{colors['meny_back']}] grow h-[100%] flex flex-col px-4 justify-center"
         " border-2 border-black",
@@ -112,11 +112,10 @@ def db_button() -> Component:
 
 
 def graph_window() -> Component:
-    """
-    A window used to display the created graph
+    """A window used to display the created graph.
 
     Returns:
-        A html.div containing the created graph
+        A html.div containing the created graph.
     """
     return html.Div(  # change back to temp for debugging
         className=f"bg-[{colors['background']}] flex justify-center mx-4 h-[62%] w-[55%]",
@@ -125,11 +124,10 @@ def graph_window() -> Component:
 
 
 def display_graph(df: pl.DataFrame, graph_type: str) -> Component:
-    """
-    Displays a graph based in the chosen type by the user
+    """Displays a graph based in the chosen type by the user.
 
     Args:
-        df: a dataframe containg used for creating the graph
+        df: a dataframe containg used for creating the graph.
         graph_type: a string used to check what type of graph
         to draw.
 
@@ -148,11 +146,10 @@ def display_graph(df: pl.DataFrame, graph_type: str) -> Component:
 
 
 def right_settings_bar() -> Component:
-    """
-    right settings bar
+    """Right settings bar.
 
     Returns:
-        A html.div containing all the settings components
+        A html.div containing all the settings components.
     """
     return html.Div(  # change back to temp for debugging
         className=f"bg-[{colors['background']}] flex flex-col items-center justify-center"
@@ -172,15 +169,14 @@ def right_settings_bar() -> Component:
 
 
 def parse_contents(contents: str, filename: str) -> pl.DataFrame:
-    """
-    Parses the input from a csv-file
+    """Parses the input from a csv-file.
 
     Args:
-        contents: the csv-file content
-        filename: the csv-file name
+        contents: the csv-file content.
+        filename: the csv-file name.
 
     Returns:
-        A parsed and read version of the csv-file
+        A parsed and read version of the csv-file.
 
     """
     content_type, content_string = contents.split(",")
@@ -196,16 +192,15 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
     State("choose_graph_type", "value"),
 )
 def update_output(content: str, filename: str, value: str) -> Component:
-    """
-    Update_output takes input, creates a dataframe and creates a graph
+    """Update_output takes input creates graph from a dataframe.
 
     Args:
-        content: csv-file content
-        filename: csv-file name
-        value: chosen graph type (linear, scatter etc.)
+        content: csv-file content.
+        filename: csv-file name.
+        value: chosen graph type (linear, scatter etc.).
 
     Returns:
-        A graph in the form of a plotly figure
+        A graph in the form of a plotly figure.
 
     """
     if content is None:
