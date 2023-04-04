@@ -1,4 +1,5 @@
 """Helper functions for test."""
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -10,8 +11,8 @@ from . import settings
 TIMEOUT_BUTTON = 2
 TIMEOUT_TEXTFIELD = 2
 
-ID_USERNAME_ELEMENT = "username_textfield"
-ID_PASSWORD_ELEMENT = "password_textfield"
+ID_USERNAME_ELEMENT = "username"
+ID_PASSWORD_ELEMENT = "password"
 
 
 # The name used for the username text field
@@ -46,7 +47,9 @@ def is_in_home_page(driver: webdriver) -> None:
     Args:
         driver (webdriver): The webdriver that would be checked.
     """
-    assert get_element_by_id(driver, ID_LOGOUT_ELEMENT) is not None
+    print(driver.current_url)
+    assert driver.current_url == settings.HOME_PAGE_URL
+    # assert get_element_by_id(driver, ID_LOGOUT_ELEMENT) is not None
 
 
 def try_login(driver: webdriver, username: str, password: str) -> None:
@@ -87,16 +90,11 @@ def get_element_by_id(driver: webdriver, element_id: str) -> WebElement:
         element_id (str): The element id.
         driver (webdriver): The driver that would be used.
     """
-    msg_not_found = "The element with the element id {" + element_id + "} was not found"
-    msg_found_multiple = "There was multiple element with the id {" + element_id + "} found."
-
     # Wait until we found a button with the given id
     WebDriverWait(driver, timeout=settings.NORMAL_TIMEOUT).until(
         ec.presence_of_element_located((By.ID, element_id))
     )
 
     # Finding the button, check that we only found one and click it!
-    elements: WebElement = driver.find_elements(By.NAME, element_id)
-    assert not len(elements) == 0, msg_not_found
-    assert not len(elements) > 1, msg_found_multiple
-    return elements[0]
+    element: WebElement = driver.find_element(By.ID, element_id)
+    return element

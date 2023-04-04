@@ -1,13 +1,34 @@
 """Conftest file for pytest."""
+import multiprocessing
+import time
+
 from _pytest.fixtures import FixtureRequest
 import pytest
 from selenium import webdriver
+from tests import settings
+
+from dashboard import main
 
 
 def pytest_addoption(parser):
     """Pytest function that would addoption."""
     parser.addoption("--browser", action="store", default="")
     parser.addoption("--head", action="store", default="1")
+
+
+def server(host, port):
+    """Start the graphit application."""
+    main.app.run(host, port)
+
+
+@pytest.fixture(scope="session")
+def start_server():
+    """Start a local server on a different process."""
+    p = multiprocessing.Process(target=server, args=(settings.HOST, settings.PORT))
+    p.start()
+    time.sleep(settings.SERVER_STARTUP_WAIT)
+    yield p
+    p.terminate()
 
 
 @pytest.fixture(scope="class")
