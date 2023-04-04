@@ -15,7 +15,7 @@ Examples:
         $ gunicorn -w 4 dashboard.main:server
 """
 import dash
-from dash import Dash, html, dcc, callback, Input, Output
+from dash import Dash, dcc, html
 from dash.dependencies import Component
 from flask import Flask
 
