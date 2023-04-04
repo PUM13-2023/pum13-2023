@@ -13,8 +13,7 @@ from dash.exceptions import PreventUpdate
 import plotly.express as px
 import polars as pl
 
-PATH = "/graph_of_csv_file"
-dash.register_page(__name__, path=PATH, nav_item=False)
+dash.register_page(__name__, path="/create-graph", nav_item=False)
 
 
 # sets the colors of the login page
