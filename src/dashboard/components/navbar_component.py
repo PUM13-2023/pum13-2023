@@ -30,7 +30,7 @@ HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-[#777df2]/30 "
 NON_HIGHLIGHT_STYLE = (
     "mr-1 mt-2 hover:text-white opacity-80 hover:opacity-90 transition ease-in-out"
 )
-NAVBAR_ICON_SIZE: str = "text-[40px]"
+NAVBAR_ICON_SIZE: int = 40
 
 
 def is_registry_item_visible(item: RegistryItem) -> bool:
@@ -98,7 +98,7 @@ def generate_navbar_link(path: str, name: str, class_name: str, icon_name: str) 
             html.Div(
                 className="flex items-center space-x-4",
                 children=[
-                    icon(icon_name, className=NAVBAR_ICON_SIZE, fill=1),
+                    icon(icon_name, size=NAVBAR_ICON_SIZE, fill=1),
                     html.P(name),
                 ],
             )
