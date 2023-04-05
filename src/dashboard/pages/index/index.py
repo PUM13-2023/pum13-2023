@@ -15,7 +15,8 @@ SHARED_CONTAINER = "Shared dashboards"
 
 
 def carousel_layout(container_title: str, id=None) -> html.Div:
-    """Creates a carousel container of dashboards
+    """Creates a carousel container of dashboards.
+
         TODO
             Should be rewritten to generate a list
             of carousel items when DB is complete
@@ -67,6 +68,11 @@ def carousel_layout(container_title: str, id=None) -> html.Div:
 
 
 def layout() -> html.Div:
+    """Layout for home page.
+
+    Returns:
+        html.Div: Div tag with the home page layout
+    """
     return html.Div(
         className="flex flex-col bg-[#e9e9f2] p-10 pb-0",
         children=[

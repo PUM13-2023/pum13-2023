@@ -1,4 +1,4 @@
-"""Test home page"""
+"""Test home page."""
 
 import multiprocessing
 
@@ -43,7 +43,7 @@ class TestHomePage:
         p.terminate()
 
     def test_create_dashboard_button(self, browser_driver: webdriver) -> None:
-        """Check that the create dashboard button exists
+        """Check that the create dashboard button exists.
 
         Args:
             browser_driver (webdriver): webdriver used for selenium
@@ -54,7 +54,7 @@ class TestHomePage:
         assert element
 
     def test_carousel(self, browser_driver: webdriver) -> None:
-        """Check that the carousels are displayed
+        """Check that the carousels are displayed.
 
         Args:
             browser_driver (webdriver): webdriver used for selenium
