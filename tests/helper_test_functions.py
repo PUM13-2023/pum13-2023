@@ -88,8 +88,8 @@ def get_element_by_id(driver: webdriver, element_id: str) -> WebElement:
         element_id (str): The element id.
         driver (webdriver): The driver that would be used.
     """
-    msg_not_found = "The element with the element id {" + element_id + "} was not found"
-    msg_found_multiple = "There was multiple element with the id {" + element_id + "} found."
+    msg_not_found = f"The element with the element id {{{element_id}}} was not found"
+    msg_found_multiple = f"There was multiple element with the id {{{element_id}}} found."
 
     try:
         # Wait until we found a button with the given id
