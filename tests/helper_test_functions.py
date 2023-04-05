@@ -96,8 +96,8 @@ def get_element_by_id(driver: webdriver, element_id: str) -> WebElement:
         WebDriverWait(driver, timeout=settings.NORMAL_TIMEOUT).until(
             ec.presence_of_element_located((By.ID, element_id))
         )
-    except TimeoutException:
-        assert False, msg_not_found
+    except TimeoutException as exception:
+        raise AssertionError(msg_not_found) from exception
 
     # Finding the button, check that we only found one and click it!
     elements: list[WebElement] = driver.find_elements(By.ID, element_id)
