@@ -1,6 +1,8 @@
 """Test login capabilities of the app."""
 import pytest
 from selenium import webdriver
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.wait import WebDriverWait
 from tests import helper_test_functions as helper
 from tests import settings
 
@@ -57,6 +59,10 @@ class TestLogin:
 
         # Press the log out button
         logout_button = helper.get_element_by_id(browser_driver, LOGOUT_BUTTON_ID)
+        WebDriverWait(browser_driver, timeout=settings.NORMAL_TIMEOUT).until(
+            ec.visibility_of(logout_button)
+        )
+
         logout_button.click()
 
         helper.is_in_login_screen(browser_driver)
