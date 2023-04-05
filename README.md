@@ -1,25 +1,17 @@
-# Python Template
+# GraphIt Dashboard
 
-Python Template is a customizable starting point for your next project, fully
-equipped with a robust CI/CD pipeline. The project includes automated checks for
-code formatting, style, and types, as well as comprehensive unit testing, making
-it the perfect choice for any Python developer looking to streamline their
-workflow and ensure code quality.
-
-The given Python template contains an example of a class named `Calculator` that
-is overly documented, specifically in the form of the docstrings for each method
-and class level, and a detailed explanation of the class's purpose and the
-arguments that the class accepts. It is important to realize that if you are not
-generating code using sphinx or similiar, overly documenting code is not a good 
-idea. With good variable, function, and class names, comments and long docstring 
-are seldom needed.
+GraphIt Dashboard is a data visualization platform developed for a bachelor
+project in software engineering. The project is written in Python using the
+Dash framework.
 
 ## Table of Contents
 
 - [Installation](#installation)
-- [Documentation](#documentation)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
 - [Project structure](#project-structure)
 - [Enforcing Code Quality](#enforcing-code-quality)
+- [Dependencies](#dependencies)
 
 ## Installation
 
@@ -43,25 +35,76 @@ pip install -e .[dev]
 ```bash
 python -m venv venv --upgrade-deps
 source venv/bin/activate
-pip install -e .[dev]
+pip install -e '.[dev]'
 ```
+
+> Note: The `-e` flag installs the project in *edit* mode, meaning that the installed
+> package refers to the project source directory. Omiting this flag results in
+> hard-to-find bugs as changes to the code are not applied as expected.
+
+## Deployment
+This section will describe how you deploy the GraphIt dashboard locally on your own computer or containerized using Docker and Nginx.
+
+### Locally
+Follow the installation guide for your system then run the main python file located in src/dashboard/. This can be done with the command below while in your virtual environment.
+```bash
+python -m dashboard.main
+```
+
+### Docker containerized
+
+To run the GraphIt dashboard application using Docker, Gunicorn and Nginx. Start the Docker daemon and go to the root directory and use the command below. 
+
+```bash
+docker compose up --build
+```
+
+This command will create two separate Docker containers, one for the dashboard and one for Nginx and run it on your machine.
+
+
+## Contributing
+For information on how to contribute, see [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 
 ## Project structure
 
-The project should contain a `src` directory under the project root and all
-modules and packages meant for distribution are placed inside this directory.
-This layout is very handy when you wish to use automatic discovery since you
-don't have to worry about other Python files or folders in your project root
-being distributed by mistake. In some circumstances, it can be also less
-error-prone for testing or when using PEP 420-style packages.
+The dashboard source code is found in [`src/dashboard`](./src/dashboard/).
+The web dashboard uses pages, which are found in
+[`src/dashboard`](./src/dashboard/pages/). The project uses the MVC
+architecture. Each page has its view and controller in its corresponding
+directory. Each view page must register itself like following.
+```python
+dash.register_page(__name__) # or any other suitable path
+```
+For more information see [Dash documentation](https://dash.plotly.com/urls).
+
+Models are shared between pages and reside in the
+(`models`)[./src/dashboard/models] directory.
+
+Reusable components reside in the (`components`)[./src/dashboard/components]
+directory.
 
 ```
 ├── src
-│   └── calculator
-│       ├── __init__.py
-│       └── calculator.py
+│   └── dashboard
+│       ├── components
+│       │   ├── __init__.py
+│       │   └── ...
+│       ├── models
+│       │   ├── __init__.py
+│       │   └── ...
+│       ├── pages
+│       │   ├── index
+│       │   │   ├── controller.py
+│       │   │   └── index.py
+│       │   └── ...
+│       ├── static
+│       │   ├── style.css
+│       │   └── ...
+│       ├── __init__.py
+│       └── main.py
 ├── tests
-│   └── test_calculator.py
+│   ├── test_dashboard.py
+│   └── ...
 ├── README.md
 ├── noxfile.py
 └── pyproject.toml
@@ -181,6 +224,12 @@ nox -s type_check
 See also
 [awesome-python-typing](https://github.com/typeddjango/awesome-python-typing).
 
+### Nox tags
+To run linter, format check and type check run:
+```bash
+nox -t lint
+```
+
 # Dependabot
 
 Including Dependabot in our Python template means that Dependabot will
@@ -204,7 +253,7 @@ for other important tasks.
 
 ## Dependencies
 
-`pyproject.tom`l is a file used to define metadata for a Python project. It is
+`pyproject.toml` is a file used to define metadata for a Python project. It is
 used by the Python Package Index (PyPI) to distribute and manage packages. The
 file follows the TOML (Tom's Obvious, Minimal Language) format, which is a
 human-readable format for specifying configuration settings. The file contains
