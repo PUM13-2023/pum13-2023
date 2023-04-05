@@ -1,7 +1,6 @@
 """Index page module."""
 import dash
 from dash import html
-from dash.dependencies import Component, Input, Output
 
 from dashboard.components.icon import icon
 
@@ -35,7 +34,8 @@ def carousel_layout(container_title: str, id=None) -> html.Div:
         className="flex h-full mb-[3rem]",
         children=[
             html.Button(
-                className="bg-white transition-all transition duration-500 drop-shadow-md w-[20rem] h-[17rem] "
+                className="bg-white transition-all transition duration-500 "
+                "drop-shadow-md w-[20rem] h-[17rem] "
                 "flex border-b-4 hover:border-b-indigo-500 "
                 "justify-center items-center items-baseline flex-col rounded-[2px] "
                 "hover:drop-shadow-[2px_4px_10px_rgba(0,0,0,0.20)] p-5 "
@@ -82,7 +82,8 @@ def layout() -> html.Div:
                 className="flex justify-center w-full",
                 children=[
                     html.Button(
-                        className="bg-white w-[40rem] h-[25rem] duration-300 [&>p]:text-2xl shadow-sm "
+                        className="bg-white w-[40rem] h-[25rem] duration-300 "
+                        "[&>p]:text-2xl shadow-sm "
                         "hover:shadow-lg flex justify-center flex-col text-black/50 "
                         "items-center rounded-md drop-shadow-[0px_0px_2px_rgba(0,0,0,0.20)] "
                         "hover:text-black hover:rounded-[20px]",
