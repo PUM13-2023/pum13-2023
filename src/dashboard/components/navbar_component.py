@@ -187,7 +187,7 @@ def update_navbar(path_name: str) -> list[dcc.Link]:
 )
 def show_navbar(path_name: str, class_name: str) -> str:
     """Update the selected navbar item based on the current url."""
-    if path_name == "/login":
+    if path_name.startswith("/login"):
         return class_name + (" hidden" if "hidden" not in class_name else "")
     else:
         return class_name.replace(" hidden", "")
