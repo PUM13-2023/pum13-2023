@@ -79,6 +79,7 @@ markers = [
     "test_successful_login: A test that would try to login to the system.",
     "test_logout: A test that would try to log out from the system.",
     "test_create_dashboard: A group of test that will test the functionality of creating the dashboard.",
+    "test_home_page: A test that checks that the home page is displayed",
     "test_creating_home_page: A test that would try to create the dashboard from the create dashboard button in the home screen.",
     "test_creating_dashboard_page: A test that would try to create a dashboard from the dashboard page.",
     "test_navbar_component: A test that test navbar component.",
