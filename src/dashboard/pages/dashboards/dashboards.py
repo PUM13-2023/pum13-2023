@@ -1,18 +1,27 @@
-"""Dashboard page stub."""
+"""Dashboard page."""
 import dash
 from dash import html
 
 from dashboard.components import dashboards_list_component
-from dashboard.pages.dashboards.controller import (
-    dashboards_list_row_clicked as dashboards_list_row_clicked,
-)
+import dashboard.pages.dashboards.controller
+from dashboard.pages.paths import DASHBOARDS_PATH
 
 dash.register_page(
-    __name__, path="/dashboards", name="Dashboards", order=1, nav_item=True, icon_name="dashboard"
+    __name__,
+    path=DASHBOARDS_PATH,
+    name="Dashboards",
+    order=1,
+    nav_item=True,
+    icon_name="dashboard",
 )
 
 
 def layout() -> html.Div:
+    """Create the dashboards page.
+
+    Returns:
+        html.Div: The dashboards page.
+    """
     return html.Div(
         className="flex flex-col mx-4 max-h-screen",
         children=[
@@ -39,6 +48,7 @@ def layout() -> html.Div:
                     ["Dashboard 2", "1 year ago", "5 years ago"],
                 ]
                 * 15,
+                _id="dashboards-list",
             ),
         ],
     )
