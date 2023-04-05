@@ -1,5 +1,4 @@
 """Test login capabilities of the app."""
-
 import pytest
 from selenium import webdriver
 from tests import helper_test_functions as helper
@@ -10,6 +9,8 @@ WRONG_USERNAME = "not_valid_user"
 WRONG_PASSWORD = "not_valid_user_password"
 
 ID_POP_UP_ELEMENT = "error_input_message"  # The error pop up element id
+
+LOGOUT_BUTTON_ID = "Logout-button-navbar"
 
 
 @pytest.mark.test_login
@@ -46,7 +47,6 @@ class TestLogin:
         helper.is_in_home_page(browser_driver)
 
     @pytest.mark.usefixtures("start_server")
-    @pytest.mark.dependency(depends=["test_successful_login"])
     def test_logout(self, browser_driver: webdriver):
         """A test that would try to log out from the system."""
         browser_driver.get(settings.START_PAGE_URL)
@@ -56,10 +56,10 @@ class TestLogin:
         helper.is_in_home_page(browser_driver)
 
         # Press the log out button
-        logout_button = helper.get_logout_button(browser_driver)
+        logout_button = helper.get_element_by_id(browser_driver, LOGOUT_BUTTON_ID)
         logout_button.click()
 
-        helper.is_in_login_screen()
+        helper.is_in_login_screen(browser_driver)
 
     def check_login_error_pop_up(self, driver: webdriver) -> None:
         """Check if the login pop up error is correctly implemented.
@@ -102,7 +102,6 @@ class TestLogin:
         # Wait until we found a the element with the pop up id.
         try:
             pop_up = helper.get_element_by_id(driver, ID_POP_UP_ELEMENT)
-            print("Was there a pop up element")
             return pop_up.is_displayed()
         except Exception:
             return False
