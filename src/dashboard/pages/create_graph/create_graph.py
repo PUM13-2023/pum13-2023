@@ -10,6 +10,7 @@ import dash
 from dash import callback, dcc, html
 from dash.dependencies import Component, Input, Output, State
 from dash.exceptions import PreventUpdate
+import pandas as pd
 import plotly.express as px
 import polars as pl
 
@@ -32,6 +33,32 @@ def layout() -> Component:
     return html.Div(
         className="bg-background flex h-screen",
         children=[graph_window(), right_settings_bar()],
+    )
+
+
+def left_setting_bar() -> Component:
+    """Left settings bar contaning.
+
+    Returns:
+        A component containing the csv_button and db_button.
+    """
+    # import button, and settings to the left
+    return html.Div(  # change back to temp for debugging
+        className=f"bg-[{colors['temp']}] flex flex-col items-center ml-5 px-5 h-[80%]" "w-[20%]",
+        children=[
+            # buttons for import and get from database
+            html.Div(
+                className=f'bg-[{colors["background"]}] flex flex-row mt-10 h-[9%] w-[100%]',
+                children=[
+                    # left button
+                    csv_button(),
+                    html.Div(id="csv_uploaded_data"),
+                    # right button for getting data from the database
+                    db_button(),
+                    html.Div(id="output_left_setting_bar"),
+                ],
+            )
+        ],
     )
 
 
@@ -238,16 +265,39 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
     content_type, content_string = contents.split(",")
     decoded = base64.b64decode(content_string)
 
-    return pl.read_csv(io.StringIO(decoded.decode("utf-8")))
+    return pd.read_csv(io.StringIO(decoded.decode("utf-8")))
+
+
+@callback(
+    [Output("session_storage", "data")],
+    Input("uploaded_data", "contents"),
+    State("uploaded_data", "filename"),
+)
+def store_session_data(content: str, filename: str):
+    if content is None:
+        raise PreventUpdate
+
+    try:
+        df = parse_contents(content, filename)
+        print(type(df))
+    except ValueError:
+        raise PreventUpdate
+
+    # data = df.to_json()
+    # print(type(data))
+
+    return [df.reset_index().to_json(orient="split")]
 
 
 @callback(
     Output("graph_output", "children"),
-    Input("uploaded_data", "contents"),
-    State("uploaded_data", "filename"),
-    Input("choose_graph_type", "value"),
+    # Input("uploaded_data", "contents"),
+    # State("uploaded_data", "filename"),
+    Input("session_storage", "data"),
+    State("choose_graph_type", "value"),
 )
-def update_output(content: str, filename: str, value: str) -> Component:
+# def update_output(content: str, filename: str, value: str) -> Component:
+def update_output(data, value: str) -> Component:
     """Update_output takes input creates graph from a dataframe.
 
     Args:
@@ -258,13 +308,16 @@ def update_output(content: str, filename: str, value: str) -> Component:
     Returns:
         A graph in the form of a plotly figure.
     """
-    if content is None:
-        raise PreventUpdate
+    # if content is None:
+    #     raise PreventUpdate
 
-    try:
-        df = parse_contents(content, filename)
-    except ValueError:
-        raise PreventUpdate
+    # try:
+    #     df = parse_contents(content, filename)
+    # except ValueError:
+    #     raise PreventUpdate
 
+    # loc_graph = display_graph(df, value)
+    df = pd.read_json(data, orient="split")
+    print("debug update df = ", df)
     loc_graph = display_graph(df, value)
     return loc_graph
