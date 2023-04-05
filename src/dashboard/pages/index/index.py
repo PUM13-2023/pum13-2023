@@ -8,8 +8,6 @@ from dashboard.components.icon import icon
 
 dash.register_page(__name__, path="/", name="Home", order=0, nav_item=True, icon_name="home")
 
-default_style = "bg-[#d2d2d2] transition duration-500 ease-in-out"
-
 # This username will be replaced later
 username = "cooluser"
 LATEST_CONTAINER = "Latest opened dashboards"
@@ -37,7 +35,7 @@ def carousel_layout(container_title: str, id_: Optional[str] = None) -> html.Div
         className="flex h-full mb-[3rem]",
         children=[
             html.Button(
-                className="bg-white transition-all transition duration-500 "
+                className="bg-white transition-all transition duration-150 "
                 "drop-shadow-md w-[20rem] h-[17rem] "
                 "flex border-b-4 hover:border-b-indigo-500 "
                 "justify-center items-center items-baseline flex-col rounded-[2px] "
@@ -92,7 +90,7 @@ def layout() -> html.Div:
                 className="flex justify-center w-full",
                 children=[
                     html.Button(
-                        className="bg-white w-[40rem] h-[25rem] duration-300 "
+                        className="bg-white w-[40rem] h-[25rem] duration-150 "
                         "[&>p]:text-2xl shadow-sm "
                         "hover:shadow-lg flex justify-center flex-col text-black/50 "
                         "items-center rounded-md drop-shadow-[0px_0px_2px_rgba(0,0,0,0.20)] "
