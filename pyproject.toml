@@ -83,3 +83,5 @@ markers = [
     "dependency",
 ]
 
+[tool.coverage.report]
+omit=["tests/*", "/opt/*"]
