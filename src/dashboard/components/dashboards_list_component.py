@@ -39,7 +39,7 @@ def generate_list_row(list_row_data: Tuple[int, List[str]]) -> html.Div:
             "flex pl-2 justify-start items-center border-b-2 border-gray-400 text-base"
             " cursor-pointer hover:bg-gray-100"
         ),
-        children=[icon("analytics", fill=1)] + list(map(generate_row_item, list_row)),
+        children=[icon("analytics", fill=1, size=28)] + list(map(generate_row_item, list_row)),
     )
 
 
@@ -96,7 +96,7 @@ def dashboards_list_component(
         children=[
             html.Div(
                 className=(
-                    "bg-white sticky top-0 first:pl-8 flex justify-start border-b-2 border-black"
+                    "bg-white sticky top-0 first:pl-9 flex justify-start border-b-2 border-black"
                     " text-lg"
                 ),
                 children=list(map(generate_row_item, list_titles)),
