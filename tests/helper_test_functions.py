@@ -1,5 +1,6 @@
 """Helper functions for test."""
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as ec
@@ -90,13 +91,15 @@ def get_element_by_id(driver: webdriver, element_id: str) -> WebElement:
     msg_not_found = "The element with the element id {" + element_id + "} was not found"
     msg_found_multiple = "There was multiple element with the id {" + element_id + "} found."
 
-    # Wait until we found a button with the given id
-    WebDriverWait(driver, timeout=settings.NORMAL_TIMEOUT).until(
-        ec.presence_of_element_located((By.ID, element_id))
-    )
+    try:
+        # Wait until we found a button with the given id
+        WebDriverWait(driver, timeout=settings.NORMAL_TIMEOUT).until(
+            ec.presence_of_element_located((By.ID, element_id))
+        )
+    except TimeoutException:
+        assert False, msg_not_found
 
     # Finding the button, check that we only found one and click it!
-    elements: WebElement = driver.find_elements(By.NAME, element_id)
-    assert not len(elements) == 0, msg_not_found
+    elements: list[WebElement] = driver.find_elements(By.ID, element_id)
     assert not len(elements) > 1, msg_found_multiple
     return elements[0]
