@@ -129,7 +129,7 @@ def navbar_component() -> Component:
     """
     return html.Div(
         id="main-navbar",
-        className="bg-[#2f3273] justify-center text-left flex shadow-md",
+        className="bg-[#2f3273] justify-center text-left flex shadow-md hidden",
         children=[
             dcc.Location(id="url", refresh=False),
             html.Div(
@@ -185,7 +185,7 @@ def update_navbar(path_name: str) -> list[dcc.Link]:
 @callback(
     Output("main-navbar", "className"), Input("url", "pathname"), State("main-navbar", "className")
 )
-def show_navbar(path_name: str, class_name: str) -> list[Component]:
+def show_navbar(path_name: str, class_name: str) -> str:
     """Update the selected navbar item based on the current url."""
     if path_name == "/login":
         return class_name + (" hidden" if "hidden" not in class_name else "")

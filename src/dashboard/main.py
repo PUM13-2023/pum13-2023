@@ -15,7 +15,7 @@ Examples:
         $ gunicorn -w 4 dashboard.main:server
 """
 import dash
-from dash import Dash, Input, Output, callback, dcc, html
+from dash import Dash, dcc, html
 from dash.dependencies import Component
 from flask import Flask
 
@@ -48,7 +48,7 @@ def page_container() -> Component:
     dash.page_container.className = "grow overflow-auto"
     return html.Div(
         id="main",
-        className="flex h-screen",
+        className="flex h-screen overflow-x-hidden",
         children=[
             dcc.Location(id="main-url", refresh=False),
             navbar_component(),

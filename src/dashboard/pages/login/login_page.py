@@ -32,91 +32,177 @@ ERROR_FIELD_CLASS = (
 PASS_FIELD_EXTRA_CLASS = " my-4"
 
 
+def get_username_input_field() -> Component:
+    """Return a Dash Input component for entering a username.
+
+    Returns:
+        A Dash Input component with the following properties:
+        - className: That defaults to the default field class.
+        - id: The unique ID for the username field.
+        - type: Is text because it is a username field .
+        - placeholder: Is the placeholder text.
+        - autoFocus: Focus on this element after loaidng the page.
+    """
+    class_name = NORMAL_FIELD_CLASS
+    id = "username"
+    type = "text"
+    placeholder = "username"
+    auto_focus = True
+    return dcc.Input(
+        className=class_name,
+        id=id,
+        type=type,
+        placeholder=placeholder,
+        autoFocus=auto_focus,
+    )
+
+
+def get_password_input_field() -> Component:
+    """Return a Dash Input component for entering a password.
+
+    Returns:
+        A Dash Input component with the following properties:
+        - className: That defaults to the default field class.
+        - id: The unique ID for the password field.
+        - type: It is password so it hidden when writing in
+                your password
+        - placeholder: Is the placeholder text.
+    """
+    class_name = NORMAL_FIELD_CLASS + PASS_FIELD_EXTRA_CLASS
+    id = "password"
+    type = "password"
+    placeholder = "password"
+    return dcc.Input(
+        className=class_name,
+        id=id,
+        type=type,
+        placeholder=placeholder,
+    )
+
+
+def get_login_button() -> Component:
+    """Returns a Dash Button component for a login button.
+
+    Returns:
+        A Dash Button component with the following properties:
+        - className: The CSS class name for the button.
+        - children: The text element of the button.
+        - id: The unique ID for the button.
+
+    """
+    return html.Button(
+        className=(f'bg-[{colors["dark_purp"]}] w-[40%] p-[10px] ' "rounded-full"),
+        children=[
+            html.Div(
+                className=f'bg-[{colors["white"]}',
+                children=[html.P("Login", style={"color": colors["white"]})],
+            )
+        ],
+        id="login_button",
+    )
+
+
+def get_main_left_rectangle() -> Component:
+    """Returns a div component for the left of the main rectangle.
+
+    Returns:
+        A Dash Div component with the following properties:
+        - className: The CSS class name for the rectangle.
+        - children: A div component with different text field.
+    """
+    return html.Div(
+        className=f'bg-[{colors["meny_back"]}] flex flex-col items-center'
+        " justify-center w-[600px] rounded-l-lg",
+        children=[
+            html.Div(id="dcc_location_login"),
+            get_username_input_field(),
+            get_password_input_field(),
+            get_login_button(),
+        ],
+    )
+
+
+def get_main_right_rectangle() -> Component:
+    """Returns a div component for the right of the main rectangle.
+
+    Returns:
+        A Dash Div component with the following properties:
+        - className: The CSS class name for the rectangle.
+        - children: A div component with picture.
+    """
+    return html.Div(
+        className=f'bg-[{colors["white"]}] flex flex-col items-center'
+        " justify-center w-[600px] rounded-r-lg",
+        children=[
+            html.H1(
+                className=" mt-4 pd-4 ",
+                children=[
+                    "Welcome to GraphIt",
+                ],
+            ),
+            # product logo
+            html.Img(
+                src=dash.get_asset_url("logoTransparent.png"),
+            ),
+        ],
+    )
+
+
+def get_error_pop_up() -> Component:
+    """Returns a div component for the error pop up.
+
+    Returns:
+        A Dash Div component with the following properties:
+        - className: The CSS class name for the error pop up.
+        - children: A div component of the text of the error.
+    """
+    return html.Div(
+        id="error_input_message",
+        className=(
+            "hidden drop-shadow-2xl fixed bottom-[-100px] "
+            "left-1/2 transform -translate-x-1/2 h-fit w-fit "
+            "fit-content bg-red-100 border border-red-400 "
+            "text-red-700 px-4 py-3 mt-3 rounded"
+        ),
+        children=[
+            html.H2(
+                className="text-center",
+                children="Wrong username or password!",
+            ),
+        ],
+    )
+
+
+def get_main_rectangle() -> Component:
+    """Returns a div component for the main rectangle.
+
+    Returns:
+        A Dash Div component with the following properties:
+        - className: The CSS class name for the main rectangle.
+        - children: A div component of the main rectangle.
+
+    """
+    return html.Div(
+        id="login_ui",
+        className="flex h-[350px] w-[1200px] drop-shadow-lg",
+        children=[
+            get_main_left_rectangle(),
+            get_main_right_rectangle(),
+            get_error_pop_up(),
+        ],
+    )
+
+
 def layout() -> Component:
     """The layout of the login page."""
     return html.Div(
-        className=f'bg-[{colors["background"]}] flex h-screen w-full justify-center items-center',
+        className=(
+            f'bg-[{colors["background"]}] flex h-screen w-full '
+            "justify-center items-center overflow-x-hidden"
+        ),
         children=[
             # Layout for the login meny
-            # main rectangle
-            html.Div(
-                id="login_ui",
-                className="flex h-[350px] w-[1200px] drop-shadow-lg",
-                children=[
-                    # left rectangle
-                    html.Div(
-                        className=f'bg-[{colors["meny_back"]}] flex flex-col items-center'
-                        " justify-center w-[600px] rounded-l-lg",
-                        children=[
-                            html.Div(id="dcc_location_login"),
-                            # used id input field
-                            dcc.Input(
-                                className=NORMAL_FIELD_CLASS,
-                                id="username",
-                                type="text",
-                                placeholder="username",
-                                autoFocus=True,
-                            ),
-                            # password input field
-                            dcc.Input(
-                                className=NORMAL_FIELD_CLASS + PASS_FIELD_EXTRA_CLASS,
-                                id="password",
-                                type="password",
-                                placeholder="password",
-                            ),
-                            # login button
-                            html.Button(
-                                className=(
-                                    f'bg-[{colors["dark_purp"]}] w-[40%] p-[10px] ' "rounded-full"
-                                ),
-                                children=[
-                                    html.Div(
-                                        className=f'bg-[{colors["white"]}',
-                                        children=[
-                                            html.P("Login", style={"color": colors["white"]}),
-                                        ],
-                                    )
-                                ],
-                                id="login_button",
-                                n_clicks=0,
-                            ),
-                        ],
-                    ),
-                    # right rectangle
-                    html.Div(
-                        className=f'bg-[{colors["white"]}] flex flex-col items-center'
-                        " justify-center w-[600px] rounded-r-lg",
-                        children=[
-                            html.H1(
-                                className=" mt-4 pd-4 ",
-                                children=[
-                                    "Welcome to GraphIt",
-                                ],
-                            ),
-                            # product logo
-                            html.Img(
-                                src=dash.get_asset_url("logoTransparent.png"),
-                            ),
-                        ],
-                    ),
-                    # error pop-up
-                    html.Div(
-                        id="error_input_message",
-                        className=(
-                            "hidden drop-shadow-2xl fixed bottom-[-100px] "
-                            "left-1/2 transform -translate-x-1/2 h-fit w-fit "
-                            "fit-content bg-red-100 border border-red-400 "
-                            "text-red-700 px-4 py-3 mt-3 rounded"
-                        ),
-                        children=[
-                            html.H2(
-                                className="text-center",
-                                children="Wrong username or password!",
-                            ),
-                        ],
-                    ),
-                ],
-            ),
+            get_main_rectangle(),
         ],
     )
 
@@ -136,7 +222,7 @@ def layout() -> Component:
 )
 def update_login(
     error_pop_up: str, username: str, password: str, *_: int
-) -> tuple[None or dcc.Location, str, str, str]:
+) -> tuple[None | dcc.Location, str, str, str]:
     """Updates login page when inputing the password or username.
 
     This function updates the username field and password field
@@ -161,7 +247,7 @@ def update_login(
         )
     else:
         return (
-            None,
+            dash.no_update,
             error_pop_up.replace("hidden", ""),
             ERROR_FIELD_CLASS,
             ERROR_FIELD_CLASS + PASS_FIELD_EXTRA_CLASS,
