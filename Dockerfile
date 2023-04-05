@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.10-slim
 WORKDIR ./Graphit
 COPY pyproject.toml .
 COPY src src/
