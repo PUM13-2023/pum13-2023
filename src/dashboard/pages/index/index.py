@@ -1,4 +1,6 @@
 """Index page module."""
+from typing import Optional
+
 import dash
 from dash import html
 
@@ -14,7 +16,7 @@ LATEST_CONTAINER = "Latest opened dashboards"
 SHARED_CONTAINER = "Shared dashboards"
 
 
-def carousel_layout(container_title: str, id: str = None) -> html.Div:
+def carousel_layout(container_title: str, id_: Optional[str] = None) -> html.Div:
     """Creates a carousel container of dashboards.
 
         TODO
@@ -56,13 +58,15 @@ def carousel_layout(container_title: str, id: str = None) -> html.Div:
     carousel_list = [empty_dashboard_button]
 
     carousel_container = html.Div(
-        id=id,
         className="flex flex-col h-full",
         children=[
             html.H2(container_title),
             html.Div(className="flex flex-row overflow-x-scroll", children=carousel_list),
         ],
     )
+
+    if id_ is not None:
+        carousel_container.id = id_
 
     return carousel_container
 
@@ -101,8 +105,8 @@ def layout() -> html.Div:
             html.Div(
                 className="flex-col flex h-full",
                 children=[
-                    carousel_layout("Latest opened dashboards", id="latest-opened-dashboards"),
-                    carousel_layout("Shared dashboards", id="shared-dashboards"),
+                    carousel_layout("Latest opened dashboards", id_="latest-opened-dashboards"),
+                    carousel_layout("Shared dashboards", id_="shared-dashboards"),
                 ],
             ),
         ],
