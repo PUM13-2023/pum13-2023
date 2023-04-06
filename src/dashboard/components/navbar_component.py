@@ -91,7 +91,7 @@ def generate_navbar_link(path: str, name: str, class_name: str, icon_name: str) 
         icon_name (str): What google font icon should be used.
     """
     return dcc.Link(
-        id=f"{name}-button-navbar",
+        id=f"{name.replace(' ', '-').lower()}-button-navbar",
         href=path,
         className=class_name,
         children=[
