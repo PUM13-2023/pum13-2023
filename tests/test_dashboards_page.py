@@ -9,11 +9,15 @@ from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 
 from dashboard import main
-from dashboard.components.dashboards_list_component import generate_list_rows
+from dashboard.components.dashboards_list_component import (
+    dashboards_list_component,
+    generate_list_rows,
+    generate_list_titles,
+)
 from dashboard.pages.paths import DASHBOARDS_PATH
 
 from . import helper_test_functions as helper
-from . import settings
+from . import settings as settings
 
 driver_type = (
     webdriver.Chrome
@@ -24,6 +28,7 @@ driver_type = (
 )
 
 DASHBOARDS_LIST_TITLES = ["Title", "Last edited at", "Created at"]
+DASHBOARDS_LIST_TITLES_TOO_MANY = ["Title", "Last edited at", "Created at", "Another one"]
 
 DASHBOARDS_LIST_ROWS = [
     ["Dashboard 1", "Today", "Yesterday"],
@@ -32,7 +37,7 @@ DASHBOARDS_LIST_ROWS = [
 ]
 
 
-def server(host, port):
+def server(host: str, port: int) -> None:
     """Start the graphit application."""
     main.app.run(host, port)
 
@@ -40,6 +45,11 @@ def server(host, port):
 @pytest.fixture
 def dashboards_list_rows() -> List[html.Div]:
     return generate_list_rows(DASHBOARDS_LIST_ROWS)
+
+
+@pytest.fixture
+def dashboards_list_titles() -> List[html.Span]:
+    return generate_list_titles(DASHBOARDS_LIST_TITLES)
 
 
 @pytest.mark.test_dashboards_page
@@ -56,8 +66,18 @@ class TestDashboardsPage:
     @pytest.mark.usefixtures("start_server")
     @pytest.mark.usefixtures("browser_driver")
     def test_find_dashboards_list(self, browser_driver: driver_type) -> None:
-        browser_driver.get(settings.START_PAGE_URL + DASHBOARDS_PATH)
+        browser_driver.get(settings.DASHBOARDS_PAGE_URL)
         helper.get_element_by_id(browser_driver, "dashboards-list")
 
-    def test_correct_amount_of_rows_in_dashboards_list(self, dashboards_list_rows) -> None:
+    def test_correct_dashboards_list_dimensions(
+        self, dashboards_list_rows: List[html.Div], dashboards_list_titles: List[html.Span]
+    ) -> None:
         assert len(dashboards_list_rows) == len(DASHBOARDS_LIST_ROWS)
+        assert len(dashboards_list_titles) == len(DASHBOARDS_LIST_TITLES)
+
+    def test_incorrect_dashboards_list_dimensions(self) -> None:
+        try:
+            dashboards_list_component(DASHBOARDS_LIST_TITLES_TOO_MANY, DASHBOARDS_LIST_ROWS)
+            raise AssertionError("Can create dashboards_list_component of faulty dimensions")
+        except IndexError:
+            assert True

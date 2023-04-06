@@ -55,7 +55,7 @@ class TestNavbarComponent:
         self.redirect_navbar(
             browser_driver,
             DASHBOARD_BUTTON_ID,
-            settings.DASHBOARD_PAGE_URL,
+            settings.DASHBOARDS_PAGE_URL,
             "List of dashboard page",
         )
 
