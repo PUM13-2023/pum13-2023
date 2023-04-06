@@ -106,3 +106,36 @@ def get_element_by_id(driver: webdriver, element_id: str) -> WebElement:
     elements: list[WebElement] = driver.find_elements(By.ID, element_id)
     assert not len(elements) > 1, msg_found_multiple
     return elements[0]
+
+
+def get_element_by_css_selector(driver: webdriver, css_selector: str) -> WebElement:
+    """Get element using a css selector.
+
+    Args:
+        driver (webdriver): The web driver to use.
+        css_selector (str): The css slector to use. This
+        can be copied from your browser's web tools when
+        inspecting the relevant element.
+
+    Raises:
+        AssertionError: If the element could not be located
+        within a normal timeout.
+
+    Returns:
+        WebElement: The element.
+    """
+    msg_not_found = f"No elements were found using the css selector {{{css_selector}}}."
+    msg_found_multiple = f"Multiple elements were found using the css selector {{{css_selector}}}."
+
+    try:
+        # Wait until we found a button with the given id
+        WebDriverWait(driver, timeout=settings.NORMAL_TIMEOUT).until(
+            ec.presence_of_element_located((By.CSS_SELECTOR, css_selector))
+        )
+    except TimeoutException as exception:
+        raise AssertionError(msg_not_found) from exception
+
+    # Finding the button, check that we only found one and click it!
+    elements: list[WebElement] = driver.find_elements(By.CSS_SELECTOR, css_selector)
+    assert not len(elements) > 1, msg_found_multiple
+    return elements[0]

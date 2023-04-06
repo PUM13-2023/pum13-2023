@@ -1,17 +1,39 @@
+"""Dashboards controller module."""
+
 from typing import List
 
-from dash import ALL, Input, Output, State, callback, ctx, no_update
+from dash import Input, Output, State, callback
 from dash.dependencies import Component
+
+from dashboard.components.dashboards_list_component import generate_list_row
 
 
 @callback(
-    Output("search-placeholder", "children"),
-    Input({"type": "dashboards-list-row", "index": ALL}, "n_clicks"),
-    State({"type": "dashboards-list-row", "index": ALL}, "children"),
+    Output({"parent": "dashboards-list", "child": "list-rows"}, "children"),
+    State({"parent": "dashboards-list", "child": "list-rows"}, "children"),
+    Input("dashboards-add-button", "n_clicks"),
+    prevent_initial_call=True,
 )
-def dashboards_list_row_clicked(n_clicks: List[int], children: List[List[Component]]) -> Component:
-    if not ctx.triggered_id:
-        return no_update
+def dashboards_add_button_clicked(children: List[Component], n_clicks: int) -> List[Component]:
+    """Add dashboard to dashboards list.
 
-    row_index = ctx.triggered_id["index"]
-    return f'{children[row_index][1]["props"]["children"]} clicked {n_clicks[row_index]} times'
+    Args:
+        children (List[Component]): The dashboards list rows.
+        n_clicks (int): The amount of times the button was clicked.
+
+    Returns:
+        List[Component]: The dashboards list rows with one more row.
+    """
+    new_index = 0 if not children else children[-1]["props"]["id"]["index"] + 1
+    return children + [
+        generate_list_row(
+            (
+                new_index,
+                [
+                    f"Added Dashboard #{new_index + 1}",
+                    f"{new_index} days ago",
+                    f"{new_index + 1} days ago",
+                ],
+            )
+        )
+    ]
