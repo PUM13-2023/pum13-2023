@@ -20,7 +20,7 @@ colors = {
     "black": "#00000",
 }
 
-NORMAL_FIELD_CLASS = "w-[420px] p-[13px] rounded-full"
+NORMAL_FIELD_CLASS = "w-[90%] p-[13px] rounded-full"
 
 ERROR_FIELD_CLASS = (
     "w-[420px] p-[13px] bg-red-50 "
@@ -135,7 +135,7 @@ def get_main_right_rectangle() -> Component:
         " justify-center w-[600px] rounded-r-lg",
         children=[
             html.H1(
-                className=" mt-4 pd-4 ",
+                className=" mt-4 pd-4 text-2xl",
                 children=[
                     "Welcome to GraphIt",
                 ],
@@ -184,7 +184,7 @@ def get_main_rectangle() -> Component:
     """
     return html.Div(
         id="login_ui",
-        className="flex h-[350px] w-[1200px] drop-shadow-lg",
+        className="flex h-[350px] w-[600px] md:w-[700px] lg:w-[950] xl:w-[1200px] drop-shadow-lg",
         children=[
             get_main_left_rectangle(),
             get_main_right_rectangle(),
