@@ -51,7 +51,7 @@ def left_setting_bar() -> Component:
         children=[
             # buttons for import and get from database
             html.Div(
-                className=f'bg-[{colors["background"]}] flex flex-row mt-10 h-[9%] w-[100%]',
+                className=f'bg-[{colors["background"]}] flex flex-row mt-10 h-[12%] w-[100%]',
                 children=[
                     # left button
                     csv_button(),
@@ -60,7 +60,10 @@ def left_setting_bar() -> Component:
                     db_button(),
                     html.Div(id="output_left_setting_bar"),
                 ],
-            )
+            ),
+            graph_name_input(),
+            x_axis_name(),
+            y_axis_name(),
         ],
     )
 
@@ -87,6 +90,57 @@ def csv_button() -> Component:
     )
 
 
+def db_button() -> Component:
+    """NOT IN USE: button to get data from a database."""
+    return html.Button(
+        className=f"bg-[{colors['meny_back']}] flex flex-col px-4 justify-center"
+        " border-2 border-black",
+        children=[
+            html.Div(
+                # className=f'bg-[{colors["background"]}',
+                children=[
+                    html.P(
+                        "Get from database",
+                        style={"color": colors["black"]},
+                    ),
+                ],
+            )
+        ],
+        id="database_button",
+        n_clicks=0,
+    )
+
+
+def graph_name_input():
+    return dcc.Input(
+        className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 h-[30%]",
+        id="graph_name",
+        type="text",
+        debounce=True,
+        placeholder="Graph name",
+    )
+
+
+def x_axis_name():
+    return dcc.Input(
+        className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 h-[30%]",
+        id="x_axis_name",
+        type="text",
+        debounce=True,
+        placeholder="x-axis name",
+    )
+
+
+def y_axis_name():
+    return dcc.Input(
+        className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 h-[30%]",
+        id="y_axis_name",
+        type="text",
+        debounce=True,
+        placeholder="y-axis name",
+    )
+
+
 def graph_window() -> Component:
     """A window used to display the created graph.
 
@@ -99,18 +153,50 @@ def graph_window() -> Component:
     )
 
 
-def display_graph(df: pl.DataFrame, graph_type: str) -> Component:
+def display_graph(
+    df: pd.DataFrame, graph_type: str, graph_name: str, x_axis_name: str, y_axis_name: str
+) -> Component:
     """Displays a graph based in the chosen type by the user.
 
     Args:
         df: a dataframe containg used for creating the graph.
         graph_type: a string used to check what type of graph
         to draw.
+    if df is not None:
+        graph_name: user chosen name of the graph.
+        x_axis_name: user chosen name of the x-axis.
+        y_axis_name: user chosen name of y-axis
+
+
+    Returns:
+        fig: a draw graph of the users choice with chosen
+        names for the graph and axis.
+
     """
     if df is not None:
+        if debug:
+            print("debug display_graph df = ", df)
+        if graph_type == "line":
+            fig = px.line(
+                df,
+                x=list(df["x"]),
+                y=list(df["y"]),
+                labels={
+                    "x": x_axis_name,
+                    "y": y_axis_name,
+                },
+                title=graph_name,
+            )
         if graph_type == "scatter":
             fig = px.scatter(
-                df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file"
+                df,
+                x=list(df["x"]),
+                y=list(df["y"]),
+                labels={
+                    "x": x_axis_name,
+                    "y": y_axis_name,
+                },
+                title=graph_name,
             )
         if graph_type == "line":
             fig = px.line(df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file")
@@ -271,6 +357,7 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
     decoded = base64.b64decode(content_string)
 
     return pd.read_csv(io.StringIO(decoded.decode("utf-8")))
+    # return pl.read_csv(io.StringIO(decoded.decode("utf-8")))
 
 
 @callback(
@@ -278,43 +365,76 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
     Input("uploaded_data", "contents"),
     State("uploaded_data", "filename"),
 )
-def store_session_data(content: str, filename: str):
-    if content is None:
+def store_session_data(contents: str, filename: str) -> str:
+    """Stores the uploaded frame in the form of a dataframe.
+
+    Args:
+        contents: uploaded csv-file the content.
+        filename: name of the csv-file.
+
+    Returns:
+        The a json version of the dataframe from the
+        parsed csv-file.
+    """
+    if contents is None:
         raise PreventUpdate
 
     try:
-        df = parse_contents(content, filename)
+        df = parse_contents(contents, filename)
     except ValueError:
         raise PreventUpdate
 
     return [df.reset_index().to_json(orient="split")]
+    # return [df.write_json()]
 
 
 @callback(
     Output("graph_output", "children"),
-    # Input("uploaded_data", "contents"),
-    # State("uploaded_data", "filename"),
     Input("session_storage", "data"),
-    # Input()
     Input("choose_graph_type", "value"),
-    # State("choose_graph_type", "value"),
+    Input("graph_name", "value"),
+    Input("x_axis_name", "value"),
+    Input("y_axis_name", "value"),
 )
-# def update_output(content: str, filename: str, value: str) -> Component:
-def update_output(data, value: str) -> Component:
-    """Update_output takes input creates graph from a dataframe.
+def update_output(
+    session_storage, choose_graph_type: str, graph_name: str, x_axis_name: str, y_axis_name: str
+) -> Component:
+    """Update_output creates graph from a stored dataframe.
 
     Args:
-        content: csv-file content.
-        filename: csv-file name.
-        value: chosen graph type (linear, scatter etc.).
+        session_storage: the stored df frame in json format.
+        choose_graph_type: the type of graph that shall be displayed.
+        graph_name: user chosen name of the graph.
+        x_axis_name: user chosen name of the x-axis.
+        y_axis_name: user chosen name of y-axis
 
     Returns:
         A graph in the form of a plotly figure.
     """
-    if debug:
-        print("debug value = ", value)
+    if graph_name == None:
+        graph_name = "Graph name"
+    if x_axis_name == None:
+        x_axis_name = "x-axis name"
+    if y_axis_name == None:
+        y_axis_name = "y-axis name"
 
-    df = pd.read_json(data, orient="split")
-    print("debug update df = ", df)
-    loc_graph = display_graph(df, value)
+    if False:
+        print("debug value = ", choose_graph_type)
+        print(
+            "graph_name = ",
+            graph_name,
+            "x_axis_name = ",
+            x_axis_name,
+            "y_axis_name = ",
+            y_axis_name,
+        )
+
+    if session_storage is None:
+        raise PreventUpdate
+
+    df = pd.read_json(session_storage, orient="split")
+    # df = pl.read_ndjson(session_storage)
+    if debug:
+        print("df = ", df)
+    loc_graph = display_graph(df, choose_graph_type, graph_name, x_axis_name, y_axis_name)
     return loc_graph
