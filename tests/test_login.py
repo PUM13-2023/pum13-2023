@@ -12,7 +12,7 @@ WRONG_PASSWORD = "not_valid_user_password"
 
 ID_POP_UP_ELEMENT = "error_input_message"  # The error pop up element id
 
-LOGOUT_BUTTON_ID = "Logout-button-navbar"
+LOGOUT_BUTTON_ID = "logout-button-navbar"
 
 
 @pytest.mark.test_login
