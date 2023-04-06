@@ -18,6 +18,9 @@ from dashboard.components import button, icon
 
 dash.register_page(__name__, path="/create-graph", nav_item=False)
 
+# for debugging
+global debug
+debug = True
 
 event = {"event": "click", "props": ["scatter", "line"]}
 
@@ -223,6 +226,8 @@ def right_settings_bar() -> Component:
                         className="bg-[#636af2] px-5 py-3 hover:bg-[#2F3273]",
                     ),
                 ],
+                value="line",
+                id="choose_graph_type",
             ),
         ],
     )
@@ -279,12 +284,8 @@ def store_session_data(content: str, filename: str):
 
     try:
         df = parse_contents(content, filename)
-        print(type(df))
     except ValueError:
         raise PreventUpdate
-
-    # data = df.to_json()
-    # print(type(data))
 
     return [df.reset_index().to_json(orient="split")]
 
@@ -294,7 +295,9 @@ def store_session_data(content: str, filename: str):
     # Input("uploaded_data", "contents"),
     # State("uploaded_data", "filename"),
     Input("session_storage", "data"),
-    State("choose_graph_type", "value"),
+    # Input()
+    Input("choose_graph_type", "value"),
+    # State("choose_graph_type", "value"),
 )
 # def update_output(content: str, filename: str, value: str) -> Component:
 def update_output(data, value: str) -> Component:
@@ -308,15 +311,9 @@ def update_output(data, value: str) -> Component:
     Returns:
         A graph in the form of a plotly figure.
     """
-    # if content is None:
-    #     raise PreventUpdate
+    if debug:
+        print("debug value = ", value)
 
-    # try:
-    #     df = parse_contents(content, filename)
-    # except ValueError:
-    #     raise PreventUpdate
-
-    # loc_graph = display_graph(df, value)
     df = pd.read_json(data, orient="split")
     print("debug update df = ", df)
     loc_graph = display_graph(df, value)
