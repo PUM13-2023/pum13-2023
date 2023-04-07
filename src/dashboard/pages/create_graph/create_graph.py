@@ -10,8 +10,8 @@ import dash
 from dash import callback, dcc, html
 from dash.dependencies import Component, Input, Output, State
 from dash.exceptions import PreventUpdate
-import pandas as pd
 import plotly.express as px
+from plotly.io import to_image
 import polars as pl
 
 from dashboard.components import button, icon
@@ -34,8 +34,14 @@ def layout() -> Component:
     """
     # main background element
     return html.Div(
-        className="bg-background flex h-screen",
-        children=[graph_window(), right_settings_bar()],
+        className=f'bg-[{colors["background"]}] flex h-screen',
+        children=[
+            graph_window(),
+            right_settings_bar(),
+            dcc.Store(id="session_storage"),
+            dcc.Download(id="download_jpeg"),
+            left_setting_bar(),
+        ],
     )
 
 
@@ -64,6 +70,7 @@ def left_setting_bar() -> Component:
             graph_name_input(),
             x_axis_name(),
             y_axis_name(),
+            download_jpeg(),
         ],
     )
 
@@ -111,6 +118,43 @@ def db_button() -> Component:
     )
 
 
+def download_jpeg() -> Component:
+    return html.Button(
+        className=f"bg-[{colors['meny_back']}] flex flex-col mt-5 px-4 justify-center"
+        " border-2 border-black",
+        children=[
+            html.Div(
+                # className=f'bg-[{colors["background"]}',
+                children=[
+                    html.P(
+                        "Download as jpeg",
+                        style={"color": colors["black"]},
+                    ),
+                ],
+            )
+        ],
+        id="button_jpeg",
+        n_clicks=0,
+    )
+
+
+@callback(
+    Output("download_jpeg", "data"),
+    Input("button_jpeg", "n_clicks"),
+    Input("graph_figure", "figure"),
+    prevent_initial_call=True,
+)
+def func(button_jpeg, graph_figure):
+    print("type ", type(graph_figure))
+    fmt = "pdf"
+    mimetype = "application/pdf"
+    filename = "figure.%s" % fmt
+    data = base64.b64encode(to_image(graph_figure, format=fmt)).decode("utf-8")
+    pdf_string = f"data:{mimetype};base64,{data}"
+    # return dcc.send_file(graph_figure)
+    return pdf_string
+
+
 def graph_name_input():
     return dcc.Input(
         className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 h-[30%]",
@@ -149,14 +193,15 @@ def graph_window() -> Component:
     """
     return html.Div(
         className="bg-white w-full ml-[3rem] my-[3rem] rounded-md shadow-md",
-        children=html.Div(id="graph_output"),
+        children=[html.Div(id="graph_output"),
+        ],
     )
 
 
-def display_graph(
-    df: pd.DataFrame, graph_type: str, graph_name: str, x_axis_name: str, y_axis_name: str
+def create_graph(
+    df: pl.DataFrame, graph_type: str, graph_name: str, x_axis_name: str, y_axis_name: str
 ) -> Component:
-    """Displays a graph based in the chosen type by the user.
+    """Creates a graph based on the chosen type by the user.
 
     Args:
         df: a dataframe containg used for creating the graph.
@@ -174,8 +219,6 @@ def display_graph(
 
     """
     if df is not None:
-        if debug:
-            print("debug display_graph df = ", df)
         if graph_type == "line":
             fig = px.line(
                 df,
@@ -356,8 +399,7 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
     content_type, content_string = contents.split(",")
     decoded = base64.b64decode(content_string)
 
-    return pd.read_csv(io.StringIO(decoded.decode("utf-8")))
-    # return pl.read_csv(io.StringIO(decoded.decode("utf-8")))
+    return pl.read_csv(io.StringIO(decoded.decode("utf-8")))
 
 
 @callback(
@@ -376,16 +418,17 @@ def store_session_data(contents: str, filename: str) -> str:
         The a json version of the dataframe from the
         parsed csv-file.
     """
+
     if contents is None:
         raise PreventUpdate
 
     try:
         df = parse_contents(contents, filename)
+
     except ValueError:
         raise PreventUpdate
 
-    return [df.reset_index().to_json(orient="split")]
-    # return [df.write_json()]
+    return [df.write_json()]
 
 
 @callback(
@@ -418,23 +461,10 @@ def update_output(
     if y_axis_name == None:
         y_axis_name = "y-axis name"
 
-    if False:
-        print("debug value = ", choose_graph_type)
-        print(
-            "graph_name = ",
-            graph_name,
-            "x_axis_name = ",
-            x_axis_name,
-            "y_axis_name = ",
-            y_axis_name,
-        )
-
     if session_storage is None:
         raise PreventUpdate
 
-    df = pd.read_json(session_storage, orient="split")
-    # df = pl.read_ndjson(session_storage)
-    if debug:
-        print("df = ", df)
-    loc_graph = display_graph(df, choose_graph_type, graph_name, x_axis_name, y_axis_name)
+    df = pl.read_json(io.StringIO(session_storage))
+    loc_graph = create_graph(df, choose_graph_type, graph_name, x_axis_name, y_axis_name)
+
     return loc_graph
