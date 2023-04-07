@@ -39,7 +39,7 @@ def layout() -> Component:
             graph_window(),
             right_settings_bar(),
             dcc.Store(id="session_storage"),
-            dcc.Download(id="download_jpeg"),
+            # dcc.Download(id="download_pdf"),
             left_setting_bar(),
         ],
     )
@@ -70,7 +70,7 @@ def left_setting_bar() -> Component:
             graph_name_input(),
             x_axis_name(),
             y_axis_name(),
-            download_jpeg(),
+            download_as_pdf(),
         ],
     )
 
@@ -118,44 +118,52 @@ def db_button() -> Component:
     )
 
 
-def download_jpeg() -> Component:
-    return html.Button(
-        className=f"bg-[{colors['meny_back']}] flex flex-col mt-5 px-4 justify-center"
-        " border-2 border-black",
-        children=[
-            html.Div(
-                # className=f'bg-[{colors["background"]}',
-                children=[
-                    html.P(
-                        "Download as jpeg",
-                        style={"color": colors["black"]},
-                    ),
-                ],
+def download_as_pdf():
+    """Downloads the drawn graph as pdf"""
+    return dcc.Loading(
+        children=html.Div(
+            html.A(
+                className=f"bg-[{colors['meny_back']}]  flex flex-col mt-4 px-4 justify-center"
+                " border-2 border-black",
+                id="download_pdf",
+                href="",
+                children=[html.Button("Download as pdf", id="pdf_btn")],
+                target="_blank",
+                download="my_figure.pdf",
             )
-        ],
-        id="button_jpeg",
-        n_clicks=0,
+        ),
     )
 
 
 @callback(
-    Output("download_jpeg", "data"),
-    Input("button_jpeg", "n_clicks"),
+    Output("download_pdf", "href"),
     Input("graph_figure", "figure"),
     prevent_initial_call=True,
 )
-def func(button_jpeg, graph_figure):
-    print("type ", type(graph_figure))
+def make_pdf(figure):
+    """Makes a pdf of the drawn graph
+
+    Args:
+        figure: the drawn figure of the graph
+
+    Returns:
+        pdf_string: the figure in the form of a pdf
+    """
     fmt = "pdf"
     mimetype = "application/pdf"
-    filename = "figure.%s" % fmt
-    data = base64.b64encode(to_image(graph_figure, format=fmt)).decode("utf-8")
-    pdf_string = f"data:{mimetype};base64,{data}"
-    # return dcc.send_file(graph_figure)
-    return pdf_string
+
+    print("figure = ", figure)
+    if figure is not None:
+        # PreventUpdate
+
+        print("figure = ", figure)
+        data = base64.b64encode(to_image(figure, format=fmt)).decode("utf-8")
+        pdf_string = f"data:{mimetype};base64,{data}"
+        return pdf_string
 
 
 def graph_name_input():
+    """Takes user input for the graph label"""
     return dcc.Input(
         className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 h-[30%]",
         id="graph_name",
@@ -166,6 +174,7 @@ def graph_name_input():
 
 
 def x_axis_name():
+    """Takes user input for the x axis label"""
     return dcc.Input(
         className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 h-[30%]",
         id="x_axis_name",
@@ -176,6 +185,7 @@ def x_axis_name():
 
 
 def y_axis_name():
+    """Takes user input for the y axis label"""
     return dcc.Input(
         className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 h-[30%]",
         id="y_axis_name",
@@ -198,6 +208,7 @@ def graph_window() -> Component:
     )
 
 
+# @callback(Output("fig", "figure"), Input("n_clicks", "n_clicks"))
 def create_graph(
     df: pl.DataFrame, graph_type: str, graph_name: str, x_axis_name: str, y_axis_name: str
 ) -> Component:
@@ -465,6 +476,8 @@ def update_output(
         raise PreventUpdate
 
     df = pl.read_json(io.StringIO(session_storage))
+    # loc_graph = dcc.Graph(
+    #    figure=create_graph(df, choose_graph_type, graph_name, x_axis_name, y_axis_name)
+    # )
     loc_graph = create_graph(df, choose_graph_type, graph_name, x_axis_name, y_axis_name)
-
     return loc_graph
