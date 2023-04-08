@@ -20,12 +20,12 @@ colors = {
     "black": "#00000",
 }
 
-NORMAL_FIELD_CLASS = "w-[420px] p-[13px] rounded-full"
+NORMAL_FIELD_CLASS = "w-[420px] p-[13px] rounded-md shadow-inner shadow-lg"
 
 ERROR_FIELD_CLASS = (
     "w-[420px] p-[13px] bg-red-50 "
-    "placeholder-red-700 rounded-full focus:ring-red-500"
-    "focus:border-red-500 dark:text-red-500 "
+    "placeholder-red-700 rounded-md focus:ring-red-500"
+    "focus:border-red-500 dark:text-red-500/75 "
     "dark:placeholder-red-500 dark:border-red-500"
 )
 
@@ -67,7 +67,7 @@ def layout() -> Component:
                             # login button
                             html.Button(
                                 className=(
-                                    f'bg-[{colors["dark_purp"]}] w-[40%] p-[10px] ' "rounded-full"
+                                    f'bg-[{colors["dark_purp"]}] w-[40%] p-[10px] ' "rounded-full shadow-lg"
                                 ),
                                 children=[
                                     html.Div(
