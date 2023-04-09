@@ -5,13 +5,13 @@ from either a csv-file or from a database.
 """
 import base64
 import io
+import os
 
 import dash
 from dash import callback, dcc, html
 from dash.dependencies import Component, Input, Output, State
 from dash.exceptions import PreventUpdate
 import plotly.express as px
-from plotly.io import to_image
 import polars as pl
 
 from dashboard.components import button, icon
@@ -39,6 +39,8 @@ def layout() -> Component:
             graph_window(),
             right_settings_bar(),
             dcc.Store(id="session_storage"),
+            dcc.Store(id="df_storage"),
+            dcc.Store(id="fig_storage"),
             # dcc.Download(id="download_pdf"),
             left_setting_bar(),
         ],
@@ -67,10 +69,15 @@ def left_setting_bar() -> Component:
                     html.Div(id="output_left_setting_bar"),
                 ],
             ),
-            graph_name_input(),
+            graph_name(),
             x_axis_name(),
             y_axis_name(),
-            download_as_pdf(),
+            file_name(),
+            download_png(),
+            download_jpeg(),
+            download_pdf(),
+            download_html()
+            # download_as_pdf(),
         ],
     )
 
@@ -118,51 +125,91 @@ def db_button() -> Component:
     )
 
 
-def download_as_pdf():
-    """Downloads the drawn graph as pdf"""
-    return dcc.Loading(
-        children=html.Div(
-            html.A(
-                className=f"bg-[{colors['meny_back']}]  flex flex-col mt-4 px-4 justify-center"
-                " border-2 border-black",
-                id="download_pdf",
-                href="",
-                children=[html.Button("Download as pdf", id="pdf_btn")],
-                target="_blank",
-                download="my_figure.pdf",
+def download_png() -> Component:
+    """NOT IN USE: button to get data from a database."""
+    return html.Button(
+        className=f"bg-[{colors['meny_back']}] flex flex-col mt-4 px-4 justify-center"
+        " border-2 border-black",
+        children=[
+            html.Div(
+                # className=f'bg-[{colors["background"]}',
+                children=[
+                    html.P(
+                        "Download as png",
+                        style={"color": colors["black"]},
+                    ),
+                ],
             )
-        ),
+        ],
+        id="download_png",
+        n_clicks=0,
     )
 
 
-@callback(
-    Output("download_pdf", "href"),
-    Input("graph_figure", "figure"),
-    prevent_initial_call=True,
-)
-def make_pdf(figure):
-    """Makes a pdf of the drawn graph
-
-    Args:
-        figure: the drawn figure of the graph
-
-    Returns:
-        pdf_string: the figure in the form of a pdf
-    """
-    fmt = "pdf"
-    mimetype = "application/pdf"
-
-    print("figure = ", figure)
-    if figure is not None:
-        # PreventUpdate
-
-        print("figure = ", figure)
-        data = base64.b64encode(to_image(figure, format=fmt)).decode("utf-8")
-        pdf_string = f"data:{mimetype};base64,{data}"
-        return pdf_string
+def download_jpeg() -> Component:
+    """NOT IN USE: button to get data from a database."""
+    return html.Button(
+        className=f"bg-[{colors['meny_back']}] flex flex-col mt-4 px-4 justify-center"
+        " border-2 border-black",
+        children=[
+            html.Div(
+                # className=f'bg-[{colors["background"]}',
+                children=[
+                    html.P(
+                        "Download as jpeg",
+                        style={"color": colors["black"]},
+                    ),
+                ],
+            )
+        ],
+        id="download_jpeg",
+        n_clicks=0,
+    )
 
 
-def graph_name_input():
+def download_pdf() -> Component:
+    """NOT IN USE: button to get data from a database."""
+    return html.Button(
+        className=f"bg-[{colors['meny_back']}] flex flex-col mt-4 px-4 justify-center"
+        " border-2 border-black",
+        children=[
+            html.Div(
+                # className=f'bg-[{colors["background"]}',
+                children=[
+                    html.P(
+                        "Download as pdf",
+                        style={"color": colors["black"]},
+                    ),
+                ],
+            )
+        ],
+        id="download_pdf",
+        n_clicks=0,
+    )
+
+
+def download_html() -> Component:
+    """NOT IN USE: button to get data from a database."""
+    return html.Button(
+        className=f"bg-[{colors['meny_back']}] flex flex-col mt-4 px-4 justify-center"
+        " border-2 border-black",
+        children=[
+            html.Div(
+                # className=f'bg-[{colors["background"]}',
+                children=[
+                    html.P(
+                        "Download as html",
+                        style={"color": colors["black"]},
+                    ),
+                ],
+            )
+        ],
+        id="download_html",
+        n_clicks=0,
+    )
+
+
+def graph_name():
     """Takes user input for the graph label"""
     return dcc.Input(
         className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 h-[30%]",
@@ -195,6 +242,17 @@ def y_axis_name():
     )
 
 
+def file_name():
+    """Takes user input for the graph label"""
+    return dcc.Input(
+        className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 h-[30%]",
+        id="file_name",
+        type="text",
+        debounce=True,
+        placeholder="File name",
+    )
+
+
 def graph_window() -> Component:
     """A window used to display the created graph.
 
@@ -208,8 +266,7 @@ def graph_window() -> Component:
     )
 
 
-# @callback(Output("fig", "figure"), Input("n_clicks", "n_clicks"))
-def create_graph(
+def create_fig(
     df: pl.DataFrame, graph_type: str, graph_name: str, x_axis_name: str, y_axis_name: str
 ) -> Component:
     """Creates a graph based on the chosen type by the user.
@@ -414,11 +471,11 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
 
 
 @callback(
-    [Output("session_storage", "data")],
+    [Output("df_storage", "data")],
     Input("uploaded_data", "contents"),
     State("uploaded_data", "filename"),
 )
-def store_session_data(contents: str, filename: str) -> str:
+def store_dataframe(contents: str, filename: str) -> str:
     """Stores the uploaded frame in the form of a dataframe.
 
     Args:
@@ -444,23 +501,42 @@ def store_session_data(contents: str, filename: str) -> str:
 
 @callback(
     Output("graph_output", "children"),
-    Input("session_storage", "data"),
+    # Output("fig_test", "data"),
+    Input("df_storage", "data"),
     Input("choose_graph_type", "value"),
     Input("graph_name", "value"),
     Input("x_axis_name", "value"),
     Input("y_axis_name", "value"),
+    Input("file_name", "value"),
+    Input("download_png", "n_clicks"),
+    Input("download_jpeg", "n_clicks"),
+    Input("download_pdf", "n_clicks"),
+    Input("download_html", "n_clicks"),
 )
-def update_output(
-    session_storage, choose_graph_type: str, graph_name: str, x_axis_name: str, y_axis_name: str
+def update_main(
+    df_storage,
+    choose_graph_type: str,
+    graph_name: str,
+    x_axis_name: str,
+    y_axis_name: str,
+    file_name: str,
+    download_png,
+    download_jpeg,
+    download_html,
+    download_pdf,
 ) -> Component:
     """Update_output creates graph from a stored dataframe.
 
     Args:
-        session_storage: the stored df frame in json format.
+        df_storage: the stored df frame in json format.
         choose_graph_type: the type of graph that shall be displayed.
         graph_name: user chosen name of the graph.
         x_axis_name: user chosen name of the x-axis.
         y_axis_name: user chosen name of y-axis
+        download_png: button to download png of the graph
+        download_jpeg: button to download jpeg of the graph
+        download_pdf: button to download pdf of the graph
+        download_html: button to download html of the graph
 
     Returns:
         A graph in the form of a plotly figure.
@@ -471,13 +547,27 @@ def update_output(
         x_axis_name = "x-axis name"
     if y_axis_name == None:
         y_axis_name = "y-axis name"
+    if file_name == None:
+        file_name = "filename"
 
-    if session_storage is None:
+    if df_storage is None:
         raise PreventUpdate
 
-    df = pl.read_json(io.StringIO(session_storage))
-    # loc_graph = dcc.Graph(
-    #    figure=create_graph(df, choose_graph_type, graph_name, x_axis_name, y_axis_name)
-    # )
-    loc_graph = create_graph(df, choose_graph_type, graph_name, x_axis_name, y_axis_name)
+    df = pl.read_json(io.StringIO(df_storage))
+    loc_fig = create_fig(df, choose_graph_type, graph_name, x_axis_name, y_axis_name)
+
+    if not os.path.exists("graph_images"):
+        os.mkdir("graph_images")
+
+    if download_png:
+        loc_fig.write_image("graph_images/" + file_name + ".png", width=1920, height=1080)
+    if download_jpeg:
+        loc_fig.write_image("graph_images/" + file_name + ".jpeg", width=1920, height=1080)
+    if download_pdf:
+        loc_fig.write_image("graph_images/" + file_name + ".pdf", width=1920, height=1080)
+    if download_html:
+        loc_fig.write_html("graph_images/" + file_name + ".html")
+
+    loc_graph = dcc.Graph(figure=loc_fig)
+
     return loc_graph
