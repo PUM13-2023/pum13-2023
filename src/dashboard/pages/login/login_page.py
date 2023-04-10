@@ -184,7 +184,7 @@ def get_main_rectangle() -> Component:
     """
     return html.Div(
         id="login_ui",
-        className="flex h-[350px] w-[600px] md:w-[700px] lg:w-[950] xl:w-[1200px] drop-shadow-lg",
+        className="flex h-[350px] w-[600px] md:w-[700px] lg:w-[950px] drop-shadow-lg",
         children=[
             get_main_left_rectangle(),
             get_main_right_rectangle(),
