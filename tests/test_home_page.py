@@ -10,6 +10,14 @@ CREATE_DASHBOARD_BUTTON_ID = "create-dashboard"
 LATEST_OPENED_DASHBOARDS_ID = "latest-opened-dashboards"
 SHARED_DASHBOARDS_ID = "shared-dashboards"
 
+driver_type = (
+    webdriver.Chrome
+    | webdriver.Firefox
+    | webdriver.Safari
+    | webdriver.Edge
+    | webdriver.ChromiumEdge
+)
+
 """
 TODO
 Add tests for modals when modal component is finished
@@ -21,11 +29,11 @@ class TestHomePage:
     """A class to group functions to test the dashboard capabilities."""
 
     @pytest.mark.usefixtures("start_server")
-    def test_create_dashboard_button(self, browser_driver: webdriver) -> None:
+    def test_create_dashboard_button(self, browser_driver: driver_type) -> None:
         """Check that the create dashboard button exists.
 
         Args:
-            browser_driver (webdriver): webdriver used for selenium
+            browser_driver (driver_type): webdriver used for selenium
         """
         browser_driver.get(settings.URL)
 
@@ -33,11 +41,11 @@ class TestHomePage:
         assert element
 
     @pytest.mark.usefixtures("start_server")
-    def test_carousel(self, browser_driver: webdriver) -> None:
+    def test_carousel(self, browser_driver: driver_type) -> None:
         """Check that the carousels are displayed.
 
         Args:
-            browser_driver (webdriver): webdriver used for selenium
+            browser_driver (driver_type): webdriver used for selenium
         """
         browser_driver.get(settings.URL)
         helper.get_element_by_id(browser_driver, LATEST_OPENED_DASHBOARDS_ID)
