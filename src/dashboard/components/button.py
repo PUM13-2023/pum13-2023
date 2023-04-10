@@ -38,11 +38,13 @@ def button(
     """
     class_name = kwargs.pop("className", "")
     _icon_kwargs: IconKWArgs = icon_kwargs if icon_kwargs else {}
+    if "bg-" not in class_name:
+        class_name += " bg-white"
 
     return html.Button(
         **kwargs,
         className=(
-            f"{class_name} flex bg-white items-center text-[{size}px] px-2 py-1 rounded-lg"
+            f"{class_name} flex items-center text-[{size}px] px-2 py-1 rounded-lg"
             " drop-shadow-sm hover:drop-shadow-md transition"
         ),
         children=[
