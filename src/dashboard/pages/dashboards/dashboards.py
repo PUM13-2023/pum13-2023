@@ -2,7 +2,7 @@
 import dash
 from dash import html
 
-from dashboard.components import dashboards_list_component
+from dashboard.components import button, dashboards_list_component
 import dashboard.pages.dashboards.controller
 
 dash.register_page(
@@ -35,12 +35,12 @@ def layout() -> html.Div:
             html.Div(
                 className="flex justify-between my-4",
                 children=[
-                    html.Button(className="bg-white", children="View"),
-                    html.Button(
+                    button(className="bg-white", icon_name="list_alt", text="View"),
+                    button(
                         id="dashboards-add-button",
                         n_clicks=0,
-                        className="bg-white",
-                        children="Add Dashboard",
+                        icon_name="add",
+                        text="Add Dashboard",
                     ),
                 ],
             ),

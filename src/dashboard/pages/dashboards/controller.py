@@ -2,7 +2,7 @@
 
 from typing import List
 
-from dash import Input, Output, State, callback
+from dash import Input, Output, Patch, State, callback
 from dash.dependencies import Component
 
 from dashboard.components.dashboards_list_component import generate_list_row
@@ -25,7 +25,8 @@ def dashboards_add_button_clicked(children: List[Component], n_clicks: int) -> L
         List[Component]: The dashboards list rows with one more row.
     """
     new_index = 0 if not children else children[-1]["props"]["id"]["index"] + 1
-    return children + [
+    children_patch: List[Component] = Patch()
+    children_patch.append(
         generate_list_row(
             (
                 new_index,
@@ -36,4 +37,5 @@ def dashboards_add_button_clicked(children: List[Component], n_clicks: int) -> L
                 ],
             )
         )
-    ]
+    )
+    return children_patch
