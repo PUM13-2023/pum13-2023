@@ -7,7 +7,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from tests import helper_test_functions as helper
 from tests import settings
 
-NAVBAR_COUNT = 3
+NAVBAR_COUNT = 4
 NAVBAR_CONTAINER_ID = "main-navbar"
 HOME_BUTTON_ID = "home-button-navbar"
 DASHBOARD_BUTTON_ID = "dashboards-button-navbar"
@@ -62,7 +62,7 @@ class TestNavbarComponent:
         # redirect shared navbar
         self.redirect_navbar(
             browser_driver,
-            DASHBOARD_BUTTON_ID,
+            SHARED_DASHBOARD_BUTTON_ID,
             settings.SHARED_DASHBOARDS_PAGE_URL,
             "Shared dashboard page",
         )

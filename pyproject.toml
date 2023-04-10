@@ -71,7 +71,7 @@ src_paths = ["src"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-m 'not youtube and not test_create_dashboard and not test_navbar_component'"
+addopts = "-m 'not youtube and not test_create_dashboard'"
 markers = [
     "youtube",
     "test_login: This are test that will test the login capabilities of the website.",
