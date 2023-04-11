@@ -21,14 +21,15 @@ from flask import Flask
 
 from dashboard.components.navbar_component import navbar_component
 
-external_scripts = ["https://cdn.tailwindcss.com"]
-
 external_stylesheets = [
     {
-        "href": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-        ":opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200",
+        "href": "/assets/font.css",
         "rel": "stylesheet",
-    }
+    },
+    {
+        "href": "/assets/dashboard.css",
+        "rel": "stylesheet",
+    },
 ]
 
 server = Flask(__name__)
@@ -36,7 +37,6 @@ app = Dash(
     __name__,
     server=server,
     use_pages=True,
-    external_scripts=external_scripts,
     external_stylesheets=external_stylesheets,
 )
 

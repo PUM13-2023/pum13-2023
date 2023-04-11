@@ -10,16 +10,6 @@ PATH = "/login"
 
 dash.register_page(__name__, path=PATH, nav_item=False)
 
-# sets the colors of the login page
-colors = {
-    "background": "#E9E9F2",
-    "text": "#7FDBFF",
-    "meny_back": "#636AF2",
-    "white": "#FFFFFF",
-    "dark_purp": "#2F3273",
-    "black": "#00000",
-}
-
 NORMAL_FIELD_CLASS = "w-[90%] p-[13px] rounded-full"
 
 ERROR_FIELD_CLASS = (
@@ -88,14 +78,13 @@ def get_login_button() -> Component:
         - className: The CSS class name for the button.
         - children: The text element of the button.
         - id: The unique ID for the button.
-
     """
     return html.Button(
-        className=(f'bg-[{colors["dark_purp"]}] w-[40%] p-[10px] ' "rounded-full"),
+        className=("bg-dark-purple w-[40%] p-[10px] " "rounded-full"),
         children=[
             html.Div(
-                className=f'bg-[{colors["white"]}',
-                children=[html.P("Login", style={"color": colors["white"]})],
+                className="bg-white",
+                children=[html.P("Login", className="text-white bg-dark-purple")],
             )
         ],
         id="login_button",
@@ -111,7 +100,7 @@ def get_main_left_rectangle() -> Component:
         - children: A div component with different text field.
     """
     return html.Div(
-        className=f'bg-[{colors["meny_back"]}] flex flex-col items-center'
+        className="bg-menu-back flex flex-col items-center"
         " justify-center w-[600px] rounded-l-lg",
         children=[
             html.Div(id="dcc_location_login"),
@@ -131,8 +120,7 @@ def get_main_right_rectangle() -> Component:
         - children: A div component with picture.
     """
     return html.Div(
-        className=f'bg-[{colors["white"]}] flex flex-col items-center'
-        " justify-center w-[600px] rounded-r-lg",
+        className="bg-white flex flex-col items-center" " justify-center w-[600px] rounded-r-lg",
         children=[
             html.H1(
                 className=" mt-4 pd-4 text-2xl",
@@ -180,7 +168,6 @@ def get_main_rectangle() -> Component:
         A Dash Div component with the following properties:
         - className: The CSS class name for the main rectangle.
         - children: A div component of the main rectangle.
-
     """
     return html.Div(
         id="login_ui",
@@ -197,11 +184,10 @@ def layout() -> Component:
     """The layout of the login page."""
     return html.Div(
         className=(
-            f'bg-[{colors["background"]}] flex h-screen w-full '
-            "justify-center items-center overflow-x-hidden"
+            "bg-background flex h-screen w-full " "justify-center items-center overflow-x-hidden"
         ),
         children=[
-            # Layout for the login meny
+            # Layout for the login menu
             get_main_rectangle(),
         ],
     )

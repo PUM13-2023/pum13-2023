@@ -26,7 +26,7 @@ from dashboard.components.icon import icon
 RegistryItem: TypeAlias = dict[str, Any]
 PageRegistry: TypeAlias = OrderedDict[str, RegistryItem]
 
-HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-[#777df2]/30 "
+HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-light-purple/30 "
 NON_HIGHLIGHT_STYLE = (
     "mr-1 mt-2 hover:text-white opacity-80 hover:opacity-90 transition ease-in-out"
 )
@@ -129,7 +129,7 @@ def navbar_component() -> Component:
     """
     return html.Div(
         id="main-navbar",
-        className="bg-[#2f3273] justify-center text-left flex shadow-md hidden",
+        className="bg-dark-purple justify-center text-left flex shadow-md hidden",
         children=[
             dcc.Location(id="url", refresh=False),
             html.Div(
