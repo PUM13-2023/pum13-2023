@@ -13,6 +13,8 @@ from dash.exceptions import PreventUpdate
 import plotly.express as px
 import polars as pl
 
+from dashboard.components import button, icon
+
 dash.register_page(__name__, path="/create-graph", nav_item=False)
 
 
@@ -39,35 +41,8 @@ def layout() -> Component:
     """
     # main background element
     return html.Div(
-        className=f'bg-[{colors["background"]}] flex h-screen w-full items-center',
-        children=[left_setting_bar(), graph_window(), right_settings_bar()],
-    )
-
-
-def left_setting_bar() -> Component:
-    """Left settings bar contaning.
-
-    Returns:
-        A component containing the csv_button and db_button.
-    """
-    # import button, and settings to the left
-    return html.Div(  # change back to temp for debugging
-        className=f"bg-[{colors['background']}] flex flex-col items-center ml-5 px-5 h-[80%]"
-        "w-[20%]",
-        children=[
-            # buttons for import and get from database
-            html.Div(
-                className=f'bg-[{colors["background"]}] flex flex-row mt-10 h-[9%] w-[100%]',
-                children=[
-                    # left button
-                    csv_button(),
-                    html.Div(id="csv_uploaded_data"),
-                    # right button for getting data from the database
-                    db_button(),
-                    html.Div(id="output_left_setting_bar"),
-                ],
-            )
-        ],
+        className=f'bg-[{colors["background"]}] flex h-screen',
+        children=[graph_window(), right_settings_bar()],
     )
 
 
@@ -78,35 +53,18 @@ def csv_button() -> Component:
         A dcc.upload containg a csv-file.
     """
     return dcc.Upload(
-        className=f"bg-[{colors['meny_back']}] grow h-[100%] flex flex-col px-4 justify-center"
-        " border-2 border-black",
+        className=f"bg-[{colors['meny_back']}] duration-150 shrink flex flex-col "
+        "cursor-pointer p-3 mr-2 rounded-md hover:bg-[#2F3273]",
         id="uploaded_data",
         children=html.Div(
-            html.A("Import a CSV file"),
+            className="flex items-center",
+            children=[
+                icon("upload", size=36, className="mr-1"),
+                html.P(className="whitespace-nowrap", children="CSV-file"),
+            ],
         ),
         # false so multiple files cant be uploaded
         multiple=False,
-    )
-
-
-def db_button() -> Component:
-    """NOT IN USE: button to get data from a database."""
-    return html.Button(
-        className=f"bg-[{colors['meny_back']}] grow h-[100%] flex flex-col px-4 justify-center"
-        " border-2 border-black",
-        children=[
-            html.Div(
-                # className=f'bg-[{colors["background"]}',
-                children=[
-                    html.P(
-                        "Get from database",
-                        style={"color": colors["black"]},
-                    ),
-                ],
-            )
-        ],
-        id="database_button",
-        n_clicks=0,
     )
 
 
@@ -116,8 +74,8 @@ def graph_window() -> Component:
     Returns:
         A html.div containing the created graph.
     """
-    return html.Div(  # change back to temp for debugging
-        className=f"bg-[{colors['background']}] flex justify-center mx-4 h-[62%] w-[55%]",
+    return html.Div(
+        className="bg-white w-full ml-[3rem] my-[3rem] rounded-md shadow-md",
         children=html.Div(id="graph_output"),
     )
 
@@ -129,19 +87,78 @@ def display_graph(df: pl.DataFrame, graph_type: str) -> Component:
         df: a dataframe containg used for creating the graph.
         graph_type: a string used to check what type of graph
         to draw.
-
     """
     if df is not None:
-        # print("graph_type ", graph_type)
         if graph_type == "scatter":
             fig = px.scatter(
                 df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file"
             )
         if graph_type == "line":
             fig = px.line(df, x=list(df["x"]), y=list(df["y"]), title="Test graph from csv file")
-        if graph_type == "hist":
+        if graph_type == "histo":
             fig = px.histogram(df, x=list(df["x"]), title="Test graph from csv file")
-        return dcc.Graph(figure=fig)
+        return dcc.Graph(className="m-5 shadow-md", figure=fig)
+
+
+def top_right_settings() -> html.Div:
+    """Buttons for the graph settings.
+
+    Returns:
+        html.Div: A div containing the buttons used for graph settings
+    """
+    # Container
+    return html.Div(
+        className="flex flex-col space-y-4",
+        children=[
+            html.Div(
+                className="flex items-center",
+                children=[
+                    icon("settings", fill=1, size=36),
+                    html.H1(
+                        className="text-[1.5rem] w-full text-center", children="Customize graph"
+                    ),
+                ],
+            ),
+            # Settings buttons
+            html.Div(
+                className="flex flex-col",
+                children=[
+                    html.P("Upload data"),
+                    html.Div(
+                        className="flex text-white",
+                        children=[
+                            csv_button(),
+                            button(
+                                "database",
+                                "Database",
+                                size=18,
+                                className="bg-[#636af2] hover:bg-[#2F3273] justify-center flex-1",
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            html.Div(
+                className="flex flex-col",
+                children=[
+                    html.P("Plot type "),
+                    dcc.RadioItems(
+                        className="flex space-x-2",
+                        options=[
+                            radio_item("Line", "line", "show_chart"),
+                            radio_item("Bar", "histo", "bar_chart"),
+                            radio_item("Scatter", "scatter", "scatter_plot"),
+                        ],
+                        inputClassName="peer hidden",
+                        value="line",
+                        labelStyle={"": ""},
+                        labelClassName="flex-1",
+                        id="choose_graph_type",
+                    ),
+                ],
+            ),
+        ],
+    )
 
 
 def right_settings_bar() -> Component:
@@ -150,21 +167,56 @@ def right_settings_bar() -> Component:
     Returns:
         A html.div containing all the settings components.
     """
-    return html.Div(  # change back to temp for debugging
-        className=f"bg-[{colors['background']}] flex flex-col items-center justify-center"
-        " h-[80%] w-[20%]",
+    return html.Div(
+        className="bg-white flex flex-col m-[3rem] p-[2rem] shadow-md rounded-lg",
         children=[
-            dcc.RadioItems(
-                options=[
-                    {"label": "linjediagram", "value": "line"},
-                    {"label": "scatter plot", "value": "scatter"},
-                    {"label": "histogram", "value": "hist"},
+            top_right_settings(),
+            # Lower part of the settings bar
+            html.Div(
+                className="flex mt-auto justify-center space-x-2 text-white",
+                children=[
+                    button(
+                        "cancel",
+                        "Cancel",
+                        size=18,
+                        id="cancel-graph",
+                        className="bg-[#636af2] px-5 hover:bg-[#2F3273]",
+                    ),
+                    button(
+                        "check",
+                        "Create dashboard",
+                        size=18,
+                        id="create-graph",
+                        className="bg-[#636af2] px-5 py-3 hover:bg-[#2F3273]",
+                    ),
                 ],
-                value="line",
-                id="choose_graph_type",
-            )
+            ),
         ],
     )
+
+
+def radio_item(name: str, value: str, icon_name: str) -> dict[str, html.Div]:
+    """Creates a styled radio button.
+
+    Args:
+        name (str): Text that the radio should display
+        value (str): checked value
+        icon_name (str): name of the icon
+    Returns:
+        dict[str, html.Div]: Dictionary containing label and
+        values required for dcc.RadioItems
+    """
+    classname = (
+        "peer-checked:opacity-100 peer-checked:shadow-lg peer-checked:bg-[#03c04a] "
+        "peer-checked:text-[#2f3273] flex flex-col items-center p-3 cursor-pointer "
+        "bg-[#636af2] rounded-md shadow-md duration-150 hover:bg-[#2F3273] text-white"
+    )
+    return {
+        "label": [
+            html.Div(className=classname, children=[icon(icon_name, size=40), html.P(name)]),
+        ],
+        "value": value,
+    }
 
 
 def parse_contents(contents: str, filename: str) -> pl.DataFrame:
@@ -176,7 +228,6 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
 
     Returns:
         A parsed and read version of the csv-file.
-
     """
     content_type, content_string = contents.split(",")
     decoded = base64.b64decode(content_string)
@@ -188,7 +239,7 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
     Output("graph_output", "children"),
     Input("uploaded_data", "contents"),
     State("uploaded_data", "filename"),
-    State("choose_graph_type", "value"),
+    Input("choose_graph_type", "value"),
 )
 def update_output(content: str, filename: str, value: str) -> Component:
     """Update_output takes input creates graph from a dataframe.
@@ -200,7 +251,6 @@ def update_output(content: str, filename: str, value: str) -> Component:
 
     Returns:
         A graph in the form of a plotly figure.
-
     """
     if content is None:
         raise PreventUpdate
