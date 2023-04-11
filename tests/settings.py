@@ -1,4 +1,6 @@
 """Settings constant."""
+from selenium import webdriver
+
 # Server settings
 PORT = 8000
 HOST = "127.0.0.1"
@@ -21,3 +23,12 @@ HOME_BUTTON_NAV = "home_button_nav"
 DASHBOARD_BUTTON_NAV = "dashboard_button_nav"
 
 # Constants specifically for test_login
+
+# Type aliases
+DriverType = (
+    webdriver.Chrome
+    | webdriver.Firefox
+    | webdriver.Safari
+    | webdriver.Edge
+    | webdriver.ChromiumEdge
+)

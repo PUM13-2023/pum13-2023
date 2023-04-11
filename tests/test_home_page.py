@@ -1,22 +1,16 @@
 """Test home page."""
 
 import pytest
-from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 from tests import helper_test_functions as helper
 from tests import settings
+
+from .settings import DriverType
 
 CREATE_DASHBOARD_BUTTON_ID = "create-dashboard"
 LATEST_OPENED_DASHBOARDS_ID = "latest-opened-dashboards"
 SHARED_DASHBOARDS_ID = "shared-dashboards"
 
-driver_type = (
-    webdriver.Chrome
-    | webdriver.Firefox
-    | webdriver.Safari
-    | webdriver.Edge
-    | webdriver.ChromiumEdge
-)
 
 """
 TODO
@@ -29,11 +23,11 @@ class TestHomePage:
     """A class to group functions to test the dashboard capabilities."""
 
     @pytest.mark.usefixtures("start_server")
-    def test_create_dashboard_button(self, browser_driver: driver_type) -> None:
+    def test_create_dashboard_button(self, browser_driver: DriverType) -> None:
         """Check that the create dashboard button exists.
 
         Args:
-            browser_driver (driver_type): webdriver used for selenium
+            browser_driver (DriverType): webdriver used for selenium
         """
         browser_driver.get(settings.URL)
 
@@ -41,11 +35,11 @@ class TestHomePage:
         assert element
 
     @pytest.mark.usefixtures("start_server")
-    def test_carousel(self, browser_driver: driver_type) -> None:
+    def test_carousel(self, browser_driver: DriverType) -> None:
         """Check that the carousels are displayed.
 
         Args:
-            browser_driver (driver_type): webdriver used for selenium
+            browser_driver (DriverType): webdriver used for selenium
         """
         browser_driver.get(settings.URL)
         helper.get_element_by_id(browser_driver, LATEST_OPENED_DASHBOARDS_ID)
