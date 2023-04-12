@@ -119,43 +119,60 @@ def top_right_settings() -> html.Div:
                     ),
                 ],
             ),
-            # Settings buttons
+            upload_buttons(),
+            radio_buttons(),
+        ],
+    )
+
+
+def upload_buttons() -> html.Div:
+    """Buttons for uploading file.
+
+    Returns:
+        html.Div: Div with upload buttons with either CSV or database
+    """
+    return html.Div(
+        className="flex flex-col",
+        children=[
+            html.P("Upload data"),
             html.Div(
-                className="flex flex-col",
+                className="flex text-white",
                 children=[
-                    html.P("Upload data"),
-                    html.Div(
-                        className="flex text-white",
-                        children=[
-                            csv_button(),
-                            button(
-                                "database",
-                                "Database",
-                                size=18,
-                                className="bg-[#636af2] hover:bg-[#2F3273] justify-center flex-1",
-                            ),
-                        ],
+                    csv_button(),
+                    button(
+                        "database",
+                        "Database",
+                        size=18,
+                        className="bg-[#636af2] hover:bg-[#2F3273] justify-center flex-1",
                     ),
                 ],
             ),
-            html.Div(
-                className="flex flex-col",
-                children=[
-                    html.P("Plot type "),
-                    dcc.RadioItems(
-                        className="flex space-x-2",
-                        options=[
-                            radio_item("Line", "line", "show_chart"),
-                            radio_item("Bar", "histo", "bar_chart"),
-                            radio_item("Scatter", "scatter", "scatter_plot"),
-                        ],
-                        inputClassName="peer hidden",
-                        value="line",
-                        labelStyle={"": ""},
-                        labelClassName="flex-1",
-                        id="choose_graph_type",
-                    ),
+        ],
+    )
+
+
+def radio_buttons() -> html.Div:
+    """Radio buttons for the graph type.
+
+    Returns:
+        html.Div: Div with radio buttons
+    """
+    return html.Div(
+        className="flex flex-col",
+        children=[
+            html.P("Plot type "),
+            dcc.RadioItems(
+                className="flex space-x-2",
+                options=[
+                    radio_item("Line", "line", "show_chart"),
+                    radio_item("Bar", "histo", "bar_chart"),
+                    radio_item("Scatter", "scatter", "scatter_plot"),
                 ],
+                inputClassName="peer hidden",
+                value="line",
+                labelStyle={"": ""},
+                labelClassName="flex-1",
+                id="choose_graph_type",
             ),
         ],
     )
