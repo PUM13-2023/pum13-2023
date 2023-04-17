@@ -42,6 +42,19 @@ pip install -e '.[dev]'
 > package refers to the project source directory. Omiting this flag results in
 > hard-to-find bugs as changes to the code are not applied as expected.
 
+### Tailwind CLI
+
+This project uses Tailwind CLI which generates css code for your tailwind syntax.
+To setup tailwind CLI on your machine follow this guide.
+https://tailwindcss.com/blog/standalone-cli
+Notable change from the guide is:
+input.css is tailwind.css.
+output.css is dashboard.css.
+
+
+> Note: tailwind CLI will not continually update the css as you code  like CDN did before
+> unless you use a watch.
+
 ## Deployment
 This section will describe how you deploy the GraphIt dashboard locally on your own computer or containerized using Docker and Nginx.
 
