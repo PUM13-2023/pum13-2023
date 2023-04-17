@@ -62,14 +62,10 @@ def layout() -> Component:
         className=f'bg-[{colors["background"]}] flex h-screen',
         children=[
             dcc.Store(id="df_storage1"),
-            dcc.Store(id="df_storage2"),
-            # dcc.Download(id="download_pdf"),
             left_setting_bar(),
             graph_window(),
-            # dcc.Graph(id="test_graph"),
             right_settings_bar(),
-            html.Plaintext(id="color_output1"),
-            html.Plaintext(id="color_output2"),
+            html.Plaintext(id="color_output"),
         ],
     )
 
@@ -90,8 +86,6 @@ def left_setting_bar() -> Component:
                 children=[
                     # left button
                     csv_button(),
-                    # html.Div(id="csv_uploaded_data"),
-                    # right button for getting data from the database
                     db_button(),
                     html.Div(id="output_left_setting_bar"),
                 ],
@@ -263,14 +257,11 @@ def right_settings_bar_2() -> Component:
 
 def create_fig(
     df1: pl.DataFrame,
-    df2: pl.DataFrame,
     graph_type: str,
-    # graph_type2: str,
     graph_name: str,
     x_axis_name: str,
     y_axis_name: str,
-    color_output1,
-    # color_output2,
+    color_output,
 ):
     """Creates a graph based on the chosen type by the user.
 
@@ -298,7 +289,7 @@ def create_fig(
             fig1 = go.Scatter(
                 x=df1["x"],
                 y=df1["y"],
-                marker_color=color_output1["color"],
+                marker_color=color_output["color"],
                 mode="lines",
                 name="graf 1",
             )
@@ -307,7 +298,7 @@ def create_fig(
             fig1 = go.Scatter(
                 x=df1["x"],
                 y=df1["y"],
-                marker_color=color_output1["color"],
+                marker_color=color_output["color"],
                 mode="markers",
                 name="graf 1",
             )
@@ -316,44 +307,10 @@ def create_fig(
             fig1 = go.Histogram(
                 # x=x1_list,
                 x=df1["y"],
-                marker_color=color_output1["color"],
+                marker_color=color_output["color"],
                 name="graf 1",
             )
         data.append(fig1)
-
-    # if df2 is not None:
-    # fig2 = go.Scatter(
-    #     x=df2["x"],
-    #     y=df2["y"],
-    #     marker_color=color_output2["color"],
-    #     mode="lines",
-    #     name="graf 2",
-    # )
-    # # if graph_type2 == "line2":
-    #     fig2 = go.Scatter(
-    #         x=df2["x"],
-    #         y=df2["y"],
-    #         marker_color=color_output2["color"],
-    #         mode="lines",
-    #         name="graf 2",
-    #     )
-    # # if graph_type2 == "scatter2":
-    #     fig2 = go.Scatter(
-    #         x=df2["x"],
-    #         y=df2["y"],
-    #         marker_color=color_output2["color"],
-    #         mode="markers",
-    #         name="graf 2",
-    #     )
-
-    # if graph_type2 == "hist2":
-    #     fig2 = go.Histogram(
-    #         x=df2["y"],
-    #         # x=df2["x"],
-    #         marker_color=color_output2["color"],
-    #         name="graf 2",
-    #     )
-    # data.append(fig2)
 
     layout = go.Layout(
         title=graph_name,
@@ -367,7 +324,6 @@ def create_fig(
         # plot_bgcolor="rgba(0,0,0,0)"
     )
     fig = go.Figure(data=data, layout=layout)
-    # print("fig test ", fig)
 
     return fig
 
@@ -481,35 +437,20 @@ def right_settings_bar() -> Component:
                     dbc.Label("Choose color for graph 1 "),
                     dbc.Input(
                         type="color",
-                        id="color_input1",
+                        id="color_input",
                         value="#0000FF",
                         style={"width": 75, "height": 50},
-                        debounce=True,
                     ),
-                    #     dbc.Label("Choose color for graph 2 "),
-                    #     dbc.Input(
-                    #         type="color",
-                    #         id="color_input2",
-                    #         value="#FF0000",
-                    #         style={"width": 75, "height": 50},
-                    #         debounce=True,
-                    #     ),
                 ],
             ),
         ],
     )
 
 
-@callback(Output("color_output1", "style"), Input("color_input1", "value"))
-def choose_color1(color_input1):
-    # print("color_input ", color_input1)
-    return {"color": color_input1}
-
-
-# @callback(Output("color_output2", "style"), Input("color_input2", "value"))
-# def choose_color1(color_input2):
-#     print("color_input ", color_input2)
-#     return {"color": color_input2}
+@callback(Output("color_output", "style"), Input("color_input", "value"))
+def choose_color1(color_input):
+    # print("color_input ", color_input)
+    return {"color": color_input}
 
 
 def radio_item(name: str, value: str, icon_name: str) -> dict[str, html.Div]:
@@ -554,7 +495,7 @@ def parse_contents(contents: str, filename: str) -> pl.DataFrame:
 
 @callback(
     # [Output("df_storage", "dict")],
-    [Output("df_storage1", "data"), Output("df_storage2", "data")],
+    [Output("df_storage1", "data")],
     Input("uploaded_data", "contents"),
     State("uploaded_data", "filename"),
 )
@@ -573,30 +514,16 @@ def store_dataframe(contents: str, filename: str) -> list[str]:
         raise PreventUpdate
 
     try:
-        if len(contents) == 2:
-            df1 = parse_contents(contents[0], filename)
-            df2 = parse_contents(contents[1], filename)
-            # test = json.dumps({"graph1": df1, "graph2": df2})
-            # return test
-            return [df1.write_json(), df2.write_json()]
-
-        else:
-            df1 = parse_contents(contents[0], filename)
-            return [df1.write_json(), None]
+        df1 = parse_contents(contents[0], filename)
+        return [df1.write_json()]
     except ValueError:
         raise PreventUpdate
-
-    # print("df1 ", df1)
-    # print("df2 ", df2)
 
 
 @callback(
     Output("graph_output", "children"),
-    # Output("test_graph", "figure"),
     Input("df_storage1", "data"),
-    Input("df_storage2", "data"),
     Input("choose_graph_type", "value"),
-    # Input("choose_graph_type2", "value"),
     Input("graph_name", "value"),
     Input("x_axis_name", "value"),
     Input("y_axis_name", "value"),
@@ -605,14 +532,11 @@ def store_dataframe(contents: str, filename: str) -> list[str]:
     Input("download_jpeg", "n_clicks"),
     Input("download_pdf", "n_clicks"),
     Input("download_html", "n_clicks"),
-    Input("color_output1", "style"),
-    # Input("color_output2", "style"),
+    Input("color_output", "style"),
 )
 def main(
     df_storage1: Component,
-    df_storage2: Component,
     choose_graph_type: str,
-    # choose_graph_type2: str,
     graph_name: str,
     x_axis_name: str,
     y_axis_name: str,
@@ -621,8 +545,7 @@ def main(
     download_jpeg: bool,
     download_html: bool,
     download_pdf: bool,
-    color_output1,
-    # color_output2,
+    color_output,
 ) -> Component:
     """Main function for the code.
 
@@ -645,7 +568,6 @@ def main(
         into the folder /graph_images in the top folder
 
     """
-    # print("color_output1 ", color_output1)
     if graph_name == None:
         graph_name = "Graph name"
     if x_axis_name == None:
@@ -662,34 +584,15 @@ def main(
 
     loc_config = {"doubleClick": "reset", "showTips": True, "displayModeBar": False}
 
-    if (df_storage1 and df_storage2) is not None:
+    if df_storage1 is not None:
         df1 = pl.read_json(io.StringIO(df_storage1))
-        df2 = pl.read_json(io.StringIO(df_storage2))
         loc_fig = create_fig(
             df1,
-            df2,
             choose_graph_type,
-            # choose_graph_typ2,
             graph_name,
             x_axis_name,
             y_axis_name,
-            color_output1,
-            # color_output2,
-        )
-
-    else:
-        df1 = pl.read_json(io.StringIO(df_storage1))
-        df2 = None
-        loc_fig = create_fig(
-            df1,
-            df2,
-            choose_graph_type,
-            # choose_graph_type2,
-            graph_name,
-            x_axis_name,
-            y_axis_name,
-            color_output1,
-            # color_output2,
+            color_output,
         )
 
     if download_png:
