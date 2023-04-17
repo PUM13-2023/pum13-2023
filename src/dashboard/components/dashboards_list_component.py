@@ -61,7 +61,7 @@ def generate_list_titles(list_titles: List[str]) -> List[html.Span]:
     return list(map(generate_row_item, list_titles))
 
 
-def generate_list_rows(list_rows: List[List[str]]) -> list[html.Div]:
+def generate_list_rows(list_rows: List[List[str]]) -> List[html.Div]:
     """Generate list row elements.
 
     Args:

@@ -16,14 +16,7 @@ from dashboard.components.dashboards_list_component import (
 
 from . import helper_test_functions as helper
 from . import settings
-
-driver_type = (
-    webdriver.Chrome
-    | webdriver.Firefox
-    | webdriver.Safari
-    | webdriver.Edge
-    | webdriver.ChromiumEdge
-)
+from .settings import DriverType
 
 DASHBOARDS_LIST_TITLES = ["Title", "Last edited at", "Created at"]
 DASHBOARDS_LIST_TITLES_TOO_MANY = ["Title", "Last edited at", "Created at", "Another one"]
@@ -75,11 +68,11 @@ class TestDashboardsPage:
 
     @pytest.mark.usefixtures("start_server")
     @pytest.mark.usefixtures("browser_driver")
-    def test_find_dashboards_list(self, browser_driver: driver_type) -> None:
+    def test_find_dashboards_list(self, browser_driver: DriverType) -> None:
         """Test that the dashboards page list can be found.
 
         Args:
-            browser_driver (driver_type): The browser driver to use.
+            browser_driver (DriverType): The browser driver to use.
         """
         browser_driver.get(settings.DASHBOARDS_PAGE_URL)
         helper.get_element_by_id(browser_driver, "dashboards-list")
@@ -119,14 +112,14 @@ class TestDashboardsPage:
 
     @pytest.mark.usefixtures("start_server")
     @pytest.mark.usefixtures("browser_driver")
-    def test_add_new_dashboard(self, browser_driver: driver_type) -> None:
+    def test_add_new_dashboard(self, browser_driver: DriverType) -> None:
         """Test adding a new dashboard.
 
         Test that adding a new dashboard from the dashboards
         page adds it to the list.
 
         Args:
-            browser_driver (driver_type): The browser driver
+            browser_driver (DriverType): The browser driver
             that should be used.
         """
         browser_driver.get(settings.DASHBOARDS_PAGE_URL)
