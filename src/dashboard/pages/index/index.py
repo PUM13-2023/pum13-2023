@@ -43,7 +43,7 @@ def carousel_layout(container_title: str, id_: Optional[str] = None) -> html.Div
                 "hover:rounded-t-xl mr-[3.5rem]",
                 children=[
                     html.Div(
-                        className="bg-[#dcdcdc]/70 h-full w-full flex items-center justify-center",
+                        className="bg-white/70 h-full w-full flex items-center justify-center",
                         children=[icon("add_circle", fill=1, className="text-4xl text-black/75")],
                     ),
                     html.P(className="text-md my-3", children=empty_dashboard_text),
@@ -76,7 +76,7 @@ def layout() -> html.Div:
         html.Div: Div tag with the home page layout
     """
     return html.Div(
-        className="flex flex-col bg-[#e9e9f2] p-10 pb-0",
+        className="flex flex-col bg-background p-10 pb-0",
         children=[
             html.Div(
                 className="block w-full text-3xl",

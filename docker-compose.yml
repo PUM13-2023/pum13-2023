@@ -1,4 +1,6 @@
 version: '3.8'
+volumes:
+  assets:
 
 services:
 
@@ -6,6 +8,8 @@ services:
     container_name: dashboard
     restart: always
     build: ./
+    volumes:
+      - assets:/static/assets
     ports:
       - "8000:8000"
     command: gunicorn --workers=3 -b :8000 dashboard.main:server
@@ -15,6 +19,8 @@ services:
     container_name: nginx
     restart: always
     build: ./nginx
+    volumes:
+      - assets:/static/assets
     ports:
       - "80:80"
     depends_on:

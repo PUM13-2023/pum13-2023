@@ -18,17 +18,6 @@ from dashboard.components import button, icon
 dash.register_page(__name__, path="/create-graph", nav_item=False)
 
 
-# sets the colors of the login page
-colors = {
-    "background": "#E9E9F2",
-    "text": "#7FDBFF",
-    "meny_back": "#636AF2",
-    "white": "#FFFFFF",
-    "dark_purp": "#2F3273",
-    "black": "#00000",
-    "temp": "#ffc0cb",
-}
-
 event = {"event": "click", "props": ["scatter", "line"]}
 
 
@@ -41,7 +30,7 @@ def layout() -> Component:
     """
     # main background element
     return html.Div(
-        className=f'bg-[{colors["background"]}] flex h-screen',
+        className="bg-background flex h-screen",
         children=[graph_window(), right_settings_bar()],
     )
 
@@ -53,8 +42,8 @@ def csv_button() -> Component:
         A dcc.upload containg a csv-file.
     """
     return dcc.Upload(
-        className=f"bg-[{colors['meny_back']}] duration-150 shrink flex flex-col "
-        "cursor-pointer p-3 mr-2 rounded-md hover:bg-[#2F3273]",
+        className="bg-menu-back duration-150 shrink flex flex-col "
+        "cursor-pointer p-3 mr-2 rounded-md hover:bg-dark-purple",
         id="uploaded_data",
         children=html.Div(
             className="flex items-center",
