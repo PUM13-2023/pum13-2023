@@ -14,7 +14,7 @@ from dashboard.components.dashboards_list_component import generate_list_row
     Input("dashboards-add-button", "n_clicks"),
     prevent_initial_call=True,
 )
-def dashboards_add_button_clicked(children: List[Component], n_clicks: int) -> List[Component]:
+def dashboards_add_button_clicked(children: List[Component], n_clicks: int) -> Patch:
     """Add dashboard to dashboards list.
 
     Args:
@@ -25,7 +25,7 @@ def dashboards_add_button_clicked(children: List[Component], n_clicks: int) -> L
         List[Component]: The dashboards list rows with one more row.
     """
     new_index = 0 if not children else children[-1]["props"]["id"]["index"] + 1
-    children_patch: List[Component] = Patch()
+    children_patch = Patch()
     children_patch.append(
         generate_list_row(
             (
