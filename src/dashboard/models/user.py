@@ -1,6 +1,4 @@
-"""
-Models related to user database.
-"""
+"""Models related to user database."""
 from mongoengine import (
     Document,
     EmbeddedDocument,
@@ -21,11 +19,11 @@ class Diagram(EmbeddedDocument):
     extended to store various metadata about the diagram.
 
     Attributes:
-        data (DBRef): A DBRef to the data object which contains the
+        data (Data): A reference to the data object which contains the
             data to be plotted.
     """
 
-    data = ReferenceField("data", dbref=True)
+    data = ReferenceField("Data", dbref=True)
 
 
 class Dashboard(EmbeddedDocument):
