@@ -11,7 +11,8 @@ dependencies = [
   "polars == 0.17.4",
   "pymongo == 4.3.3",
   "mongoengine == 0.27.0",
-  "python-dotenv == 0.21.1"
+  "python-dotenv == 0.21.1",
+  "blinker == 1.6.2"
 ]
 name = "pum13-2023"
 description = "Data visualization dashboard written with Dash"
@@ -90,6 +91,8 @@ markers = [
     "test_creating_home_page: A test that would try to create the dashboard from the create dashboard button in the home screen.",
     "test_creating_dashboard_page: A test that would try to create a dashboard from the dashboard page.",
     "test_navbar_component: A test that test navbar component.",
+    "test_data_db: Test db models for that measurement data part of the db",
+    "test_user_db: Test user db models",
     "dependency",
 ]
 
