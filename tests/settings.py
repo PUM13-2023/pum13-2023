@@ -2,10 +2,11 @@
 from selenium import webdriver
 
 # Server settings
-PORT = 8000
+PORT = 8001
 HOST = "127.0.0.1"
 URL = f"http://{HOST}:{str(PORT)}"
 SERVER_STARTUP_WAIT = 3
+IMPLICIT_WAIT = 10
 
 # Normally used constants
 START_PAGE_URL = f"{URL}/login/"

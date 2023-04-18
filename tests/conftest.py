@@ -63,5 +63,6 @@ def browser_driver(request: FixtureRequest):
             if request.config.option.head == "1":
                 options.add_argument("--headless")
             driver = webdriver.Firefox(options=options)
+    driver.implicitly_wait(settings.IMPLICIT_WAIT)
     yield driver
     driver.close()
