@@ -253,6 +253,7 @@ def create_fig(
 
     """
     # data = []
+    fig = None
     if df is not None:
         # x1_list = df["x"].to_list()
         # y1_list = df["y"].to_list()
@@ -469,11 +470,7 @@ def parse_contents(contents: str) -> pl.DataFrame:
 def number_of_graphs(contents):
     return len(contents)
 
-@callback(
-    [Output("df_storage", "data")],
-    Input("uploaded_data", "contents"),
-)
-def store_dataframe(contents: str) -> tuple[list[dict[str, list[Any]]]]:
+def convert_to_dataframe(contents: str) -> tuple[list[dict[str, list[Any]]]]:
     """Stores the uploaded frame in the form of a dataframe.
 
     Args:
@@ -493,93 +490,48 @@ def store_dataframe(contents: str) -> tuple[list[dict[str, list[Any]]]]:
             temp_df = parse_contents(i)
 
             loc_list.append(temp_df)
-        return ([df.to_dict(as_series=False) for df in loc_list],)
+        return [df.to_dict(as_series=False) for df in loc_list]
 
     except ValueError:
         raise PreventUpdate
     
 @callback(
-    Output("graph_id", "figure"),
+    Output("graph_id", "figure", allow_duplicate=True),
+    Input("choose_graph_type", "value"),
+    Input("graph_id", "figure"),
+    prevent_initial_call=True
+) 
+def patch_graph_type(graph_type: str, graph_data):
+    data_frame = {"x":graph_data["data"][0]["x"], "y": graph_data["data"][0]["y"]}
+    print(data_frame)
+    color = graph_data["data"][0]["marker"]
+    patched_figure = Patch()
+    patched_figure["data"][0] = create_fig(data_frame, graph_type=graph_type, color_input=color["color"], num=1)
+    return patched_figure
+    
+@callback(
+    Output("graph_id", "figure", allow_duplicate=True),
     Input("color_input", "value"),
+    prevent_initial_call=True
 )
 def patch_color(color):
     patched_figure = Patch()
     patched_figure["data"][0]["marker"] = {"color": color}
     return patched_figure
-    
 
 @callback(
     Output("graph_output", "children"),
-    Input("df_storage", "data"),
-    Input("choose_graph_type", "value"),
-    Input("graph_name", "value"),
-    Input("x_axis_name", "value"),
-    Input("y_axis_name", "value"),
-    Input("file_name", "value"),
-    Input("download_png", "n_clicks"),
-    Input("download_jpeg", "n_clicks"),
-    Input("download_pdf", "n_clicks"),
-    Input("download_html", "n_clicks"),
-    Input("graph_index", "value")
+    Input("uploaded_data", "contents")
 )
-def main(
-    df_storage: Component,
-    choose_graph_type: str,
-    graph_name: str,
-    x_axis_name: str,
-    y_axis_name: str,
-    file_name: str,
-    download_png: bool,
-    download_jpeg: bool,
-    download_html: bool,
-    download_pdf: bool,
-    graph_index
-) -> Component:
-    """Main function for the code.
-
-    Args:
-        df_storage: the stored df frame in json format.
-        choose_graph_type: the type of graph that shall be displayed.
-        graph_name: user chosen name of the graph.
-        x_axis_name: user chosen name of the x-axis.
-        y_axis_name: user chosen name of y-axis
-        download_png: button to download png of the graph
-        download_jpeg: button to download jpeg of the graph
-        download_pdf: button to download pdf of the graph
-        download_html: button to download html of the graph
-
-    Returns:
-        A graph in the form of a plotly figure.
-
-    Downloads:
-        a png, jpeg, pdf or html image of the created graph
-        into the folder /graph_images in the top folder
-
-    """
-    if graph_name == None:
-        graph_name = "Graph name"
-    if x_axis_name == None:
-        x_axis_name = "x-axis name"
-    if y_axis_name == None:
-        y_axis_name = "y-axis name"
-    if file_name == None:
-        file_name = "filename"
-
-    if df_storage is None:
-        raise PreventUpdate
-    if not os.path.exists("graph_images"):
-        os.mkdir("graph_images")
-
-    loc_config = {"doubleClick": "reset", "showTips": True, "displayModeBar": False}
-
-    if df_storage is not None:
-        data_frames = [pl.from_dict(x) for x in df_storage]
-
+def render_figure(contents: str):
     created_figs = []
+    data_frame = convert_to_dataframe(contents)
+
+    data_frames = [pl.from_dict(x) for x in data_frame]
     for num, i in enumerate(data_frames):
         loc_fig = create_fig(
             i,
-            choose_graph_type,
+            "line",
             # graph_name,
             # x_axis_name,
             # y_axis_name,
@@ -589,31 +541,22 @@ def main(
         )
         created_figs.append(loc_fig)
     
-    
     layout = go.Layout(
-        title=graph_name,
+        title="graph",
         # to not show grid-lines
         # , showgrid=False
         # to choose background color
         # plot_bgcolor="#FFFFFF",
-        xaxis=dict(title=x_axis_name, linecolor=colors["black"], fixedrange=True),
-        yaxis=dict(title=y_axis_name, linecolor=colors["black"], fixedrange=True),
+        xaxis=dict(title="x", linecolor=colors["black"], fixedrange=True),
+        yaxis=dict(title="x", linecolor=colors["black"], fixedrange=True),
         # paper_bgcolor="rgba(0,0,0,0)",
         # plot_bgcolor="rgba(0,0,0,0)"
     )
-
-    fig = go.Figure(data=created_figs, layout=layout)
-
-    print(fig.to_json())
     
-    if download_png:
-        fig.write_image(file=f'graph_images/{file_name}', format="png", width=1920, height=1080)
-    if download_jpeg:
-        fig.write_image("graph_images/" + file_name + ".jpeg", width=1920, height=1080)
-    if download_pdf:
-        fig.write_image("graph_images/" + file_name + ".pdf", width=1920, height=1080)
-    if download_html:
-        fig.write_html("graph_images/" + file_name + ".html")
+    loc_config = {"doubleClick": "reset", "showTips": True, "displayModeBar": False}
+    fig = go.Figure(data=created_figs)
 
-    loc_graph = dcc.Graph(figure=fig, config=loc_config, id="graph_id")
+    loc_graph = dcc.Graph(figure=fig, id="graph_id", config=loc_config)
     return loc_graph
+    
+
