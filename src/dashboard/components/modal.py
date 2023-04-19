@@ -1,4 +1,17 @@
-"""Module containing functionality related to modals."""
+"""Module containing functionality related to modals.
+
+When creating a modal, a modal container should be created
+in the page first. A modal dialog can then be passed
+as a child to the modal container. When the open property
+is modified on the child, the modal container will react
+to the change and will show or hide depending on the state.
+
+Example::
+
+    modal_container(children=[
+        modal_dialog(id="<id>", children=["<Components>"]
+    ])
+"""
 from typing import Optional
 
 from dash import ALL, Input, Output, State, callback, ctx, html
