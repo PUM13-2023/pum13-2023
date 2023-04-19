@@ -1,11 +1,16 @@
 """Models related to user database."""
+from datetime import datetime
+from typing import Any
+
 from mongoengine import (
+    DateTimeField,
     Document,
     EmbeddedDocument,
     EmbeddedDocumentListField,
     ListField,
     ReferenceField,
     StringField,
+    signals,
 )
 
 
@@ -41,8 +46,24 @@ class Dashboard(EmbeddedDocument):
 
     name: str = StringField()
     description: str = StringField()
+    modified: datetime | None = DateTimeField()
+    created: datetime | None = DateTimeField()
     authorized_users: list["User"] = ListField(ReferenceField("User"))
     diagrams: list[Diagram] = EmbeddedDocumentListField(Diagram)
+
+    def update_modified(self) -> None:
+        """Sets self.modified to datetime.now()."""
+        self.modified = datetime.now()
+
+    @staticmethod
+    def post_init(sender: type, document: "Dashboard", **kwargs: Any) -> None:
+        """Initialize time information."""
+        if not document.created:
+            document.update_modified()
+            document.created = document.modified
+
+
+signals.post_init.connect(Dashboard.post_init, sender=Dashboard)
 
 
 class User(Document):
