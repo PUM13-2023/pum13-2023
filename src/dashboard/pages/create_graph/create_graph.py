@@ -109,16 +109,16 @@ def csv_button() -> Component:
     )
 
 
-def download_button(icon, text, id):
-    """Predefined button style
+def download_button(icon: str, text: str, id: str) -> html.Button:
+    """Predefined button style.
 
     Args:
-        icon (_type_): _description_
-        text (_type_): _description_
-        id (_type_): _description_
+        icon str: _description_
+        text str: _description_
+        id str: _description_
 
     Returns:
-        _type_: _description_
+        html.Button: Styled button used for download buttons
     """
     return button(
         icon_name=icon,
@@ -128,7 +128,12 @@ def download_button(icon, text, id):
     )
 
 
-def download_buttons():
+def download_buttons() -> html.Div:
+    """Div containing the download buttons.
+
+    Returns:
+        html.Div: Div with download buttons
+    """
     return html.Div(
         className="flex flex-col",
         children=[
@@ -146,62 +151,39 @@ def download_buttons():
     )
 
 
-def db_button() -> Component:
-    """NOT IN USE: button to get data from a database."""
-    return button2("Get from database", "database_button")
-
-
-def button2(button_text: str, button_id: str) -> Component:
-    return html.Button(
-        className=f"bg-[{colors['meny_back']}] flex flex-col mt-4 px-4 justify-center"
-        " border-2 border-black",
-        children=[
-            html.Div(
-                children=[
-                    html.P(
-                        button_text,
-                        style={"color": colors["black"]},
-                    ),
-                ],
-            )
-        ],
-        id=button_id,
-        n_clicks=0,
-    )
-
-
 def graph_name() -> Component:
-    """Takes user input for the graph label"""
+    """Takes user input for the graph label."""
     return input_field("graph_name", "Graph name")
 
 
 def x_axis_name() -> Component:
-    """Takes user input for the x axis label"""
+    """Takes user input for the x axis label."""
     return input_field("x_axis_name", "x-axis name")
 
 
 def y_axis_name() -> Component:
-    """Takes user input for the y axis label"""
+    """Takes user input for the y axis label."""
     return input_field("y_axis_name", "y-axis name")
 
 
 def file_name() -> Component:
-    """Takes user input for the graph label"""
+    """Takes user input for the graph label."""
     return input_field("file_name", "File name")
 
 
 def input_field(loc_id: str, loc_placeholder: str) -> Component:
-    """Input_field that lets user choose a color
+    """Input_field that lets user choose a color.
 
     Args:
         loc_id: local id of the input field
         loc_placeholder: a placeholder color
 
     Returns:
-
+        Component: epic component
     """
     return dcc.Input(
-        className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 rounded-md shadow-inner",
+        className=f"bg-[{colors['background']}] flex items-center "
+        "justify-center mt-5 p-2 rounded-md shadow-inner",
         id=loc_id,
         type="text",
         debounce=True,
@@ -230,12 +212,8 @@ def graph_window() -> Component:
 def create_fig(
     df: pl.DataFrame,
     graph_type: str,
-    # graph_name: str,
-    # x_axis_name: str,
-    # y_axis_name: str,
     color_input: str,
     num: int,
-    id="",
 ) -> go.Figure:
     """Creates a graph based on the chosen type by the user.
 
@@ -248,21 +226,15 @@ def create_fig(
     if df is not None:
         graph_name: user chosen name of the graph.
         x_axis_name: user chosen name of the x-axis.
-        y_axis_name: user chosen name of y-axis
-
+        y_axis_name: user chosen name of y-axis.
 
     Returns:
         fig: a draw graph of the users choice with chosen
         names for the graph and axis.
-
     """
-    # data = []
     cols = df.columns
     fig = None
     if df is not None:
-        # x1_list = df["x"].to_list()
-        # y1_list = df["y"].to_list()
-
         if graph_type == "line":
             fig = go.Scatter(
                 x=df[cols[0]],
@@ -320,11 +292,21 @@ def top_right_settings() -> html.Div:
     )
 
 
-def dropdown():
+def dropdown() -> dcc.Dropdown:
+    """Makes a dcc dropdown to pick graphs.
+
+    Returns:
+        dcc.Dropdown: dropdown containing all of the uploaded graphs
+    """
     return dcc.Dropdown([], placeholder="Select graph", id="graph_selector")
 
 
-def color_picker():
+def color_picker() -> html.Div:
+    """Color picker element.
+
+    Returns:
+        html.Div: Element with color picker
+    """
     return html.Div(
         className="flex flex-col",
         children=[
@@ -428,7 +410,15 @@ def right_settings_bar() -> Component:
 
 
 @callback(Output("graph_index", "value"), Input("graph_selector", "value"))
-def dropdown_select_graph(graph_value):
+def dropdown_select_graph(graph_value: int) -> int:
+    """Stores the current selectd graph index.
+
+    Args:
+        graph_value (int): The index of the graph to select
+
+    Returns:
+        int: Graph index
+    """
     return graph_value
 
 
@@ -472,15 +462,7 @@ def parse_contents(contents: str) -> pl.DataFrame:
     return pl.read_csv(io.StringIO(decoded.decode("utf-8")))
 
 
-@callback(
-    Output("num_graphs", "value"),
-    Input("uploaded_data", "contents"),
-)
-def number_of_graphs(contents):
-    return len(contents)
-
-
-def convert_to_dataframe(contents: str) -> tuple[list[dict[str, list[Any]]]]:
+def convert_to_dataframe(contents: str) -> list[dict[str, list[Any]]]:
     """Stores the uploaded frame in the form of a dataframe.
 
     Args:
@@ -513,7 +495,17 @@ def convert_to_dataframe(contents: str) -> tuple[list[dict[str, list[Any]]]]:
     State("graph_index", "value"),
     prevent_initial_call=True,
 )
-def patch_graph_type(graph_type: str, graph_data, i):
+def patch_graph_type(graph_type: str, graph_data: dict[str, list[Any]], i: int) -> Patch:
+    """A patched figure object that patches the graph type.
+
+    Args:
+        graph_type (str): The new graph type
+        graph_data (_type_): Current graph data
+        i (int): Graph index
+
+    Returns:
+        Patch: Patched figure with new graph type
+    """
     data_frame = pl.DataFrame({"x": graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]})
     color = graph_data["data"][i]["marker"]
     patched_figure = Patch()
@@ -529,7 +521,16 @@ def patch_graph_type(graph_type: str, graph_data, i):
     State("graph_index", "value"),
     prevent_initial_call=True,
 )
-def patch_color(color, i):
+def patch_color(color: str, i: int) -> Patch:
+    """Patched figure with new selected line color.
+
+    Args:
+        color (str): New color
+        i (int): Graph index
+
+    Returns:
+        Patch: Patched figure object with new color
+    """
     patched_figure = Patch()
     patched_figure["data"][i]["marker"] = {"color": color}
     return patched_figure
@@ -540,14 +541,20 @@ def patch_color(color, i):
     Output("graph_selector", "options"),
     Input("uploaded_data", "contents"),
 )
-def render_figure(contents: str):
+def render_figure(contents: str) -> dcc.Graph | list[dict[str, str]]:
+    """Renders the figure using CSV-files.
+
+    Returns:
+        dcc.Graph: Graph to be rendered
+        list[dict[str: str]]: list of all the graph names
+    """
     created_figs = []
     figure_names = []
     data_frame = convert_to_dataframe(contents)
 
     data_frames = [pl.from_dict(x) for x in data_frame]
     for num, i in enumerate(data_frames):
-        loc_fig = create_fig(i, "line", "#000000", num=num, id="graph_" + str(num))
+        loc_fig = create_fig(i, "line", "#000000", num=num)
         figure_names.append({"label": loc_fig["name"], "value": num})
         created_figs.append(loc_fig)
 
