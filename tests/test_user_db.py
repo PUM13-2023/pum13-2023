@@ -1,6 +1,7 @@
 """Test user db."""
 import mongoengine
 import mongomock
+import pymongo
 import pytest
 
 from dashboard.models import user
@@ -20,7 +21,11 @@ def connection():
 def example_user():
     """Example user."""
     username = "fixture-user"
-    return user.login_user(username)
+    usr = user.login_user(username)
+    usr.dashboards.clear()
+    usr.dashboards.append(user.Dashboard())
+    usr.save()
+    return usr
 
 
 def find_user(username):
@@ -54,3 +59,23 @@ class TestUserDb:
         usr = user.login_user(example_user.username)
 
         assert usr.id == example_user.id
+
+    def test_missing_dashboard_time(
+        self, connection: pymongo.MongoClient, example_user: user.User
+    ):
+        """Test that dashboard time info is not updated.
+
+        Test that dashboard time info is not updated
+        when user is queried after a dashboard has
+        been created and saved.
+        """
+        db = connection["dashboard"]
+        queried_user = db["user"].find_one({"username": example_user.username})
+        assert queried_user is not None
+        queried_dashboard = queried_user["dashboards"][0]
+
+        odm_user = user.login_user(example_user.username)
+        odm_dashboard = odm_user.dashboards[0]
+
+        assert queried_dashboard["created"] == odm_dashboard.created
+        assert queried_dashboard["modified"] == odm_dashboard.modified
