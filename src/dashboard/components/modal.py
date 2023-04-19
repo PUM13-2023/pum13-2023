@@ -71,6 +71,13 @@ def modal_container(children: Optional[list[Component]]) -> Component:
         A modal container dash component.
     """
     children = [] if children is None else children
+    container_classname: str = "z-40 absolute w-screen h-screen top-0 left-0"
+
+    # Check if a child is open, if not hide container.
+    for child in children:
+        if not getattr(child, "open", True):
+            container_classname += " hidden"
+            break
 
     return html.Div(
         id="modal-container",
@@ -85,15 +92,17 @@ def modal_container(children: Optional[list[Component]]) -> Component:
                 children=children,
             ),
         ],
-        className="z-40 absolute w-screen h-screen top-0 left-0",
+        className=container_classname,
     )
 
 
-def modal_dialog(children: list[Component], id: str) -> Component:
+def modal_dialog(children: list[Component], id: str, open_: Optional[bool] = False) -> Component:
     """Create a simple modal dialog.
 
     Args:
         children (list[Component]): Children of the modal dialog.
+        open_ (Optional[bool]): Specifies if the modal should be open
+        by default.
 
     Returns:
         A modal dash component.
@@ -114,7 +123,7 @@ def modal_dialog(children: list[Component], id: str) -> Component:
     """
     return html.Dialog(
         id={"type": "modal-dialog", "id": id},
-        open=True,
+        open=open_,
         children=children,
         className="absolute z-50 top-0 left-0 p-0 mx-auto my-auto bottom-0",
     )
