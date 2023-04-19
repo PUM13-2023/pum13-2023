@@ -46,16 +46,21 @@ class Dashboard(EmbeddedDocument):
 
     name: str = StringField()
     description: str = StringField()
-    modified: datetime = DateTimeField()
-    created: datetime = DateTimeField()
+    modified: datetime | None = DateTimeField()
+    created: datetime | None = DateTimeField()
     authorized_users: list["User"] = ListField(ReferenceField("User"))
     diagrams: list[Diagram] = EmbeddedDocumentListField(Diagram)
+
+    def update_modified(self) -> None:
+        """Sets self.modified to datetime.now()."""
+        self.modified = datetime.now()
 
     @staticmethod
     def post_init(sender: type, document: "Dashboard", **kwargs: Any) -> None:
         """Initialize time information."""
-        document.created = datetime.now()
-        document.modified = document.created
+        if not document.created:
+            document.update_modified()
+            document.created = document.modified
 
 
 signals.post_init.connect(Dashboard.post_init, sender=Dashboard)
