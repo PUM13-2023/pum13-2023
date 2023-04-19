@@ -47,7 +47,7 @@ class Dashboard(EmbeddedDocument):
     name: str = StringField()
     description: str = StringField()
     modified: datetime | None = DateTimeField()
-    created: datetime | None = DateTimeField()
+    created: datetime = DateTimeField(required=True)
     authorized_users: list["User"] = ListField(ReferenceField("User"))
     diagrams: list[Diagram] = EmbeddedDocumentListField(Diagram)
 
@@ -58,9 +58,8 @@ class Dashboard(EmbeddedDocument):
     @staticmethod
     def post_init(sender: type, document: "Dashboard", **kwargs: Any) -> None:
         """Initialize time information."""
-        if not document.created:
-            document.update_modified()
-            document.created = document.modified
+        if not document.modified:
+            document.modified = document.created
 
 
 signals.post_init.connect(Dashboard.post_init, sender=Dashboard)
