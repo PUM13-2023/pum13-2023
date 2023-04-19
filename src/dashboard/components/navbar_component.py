@@ -129,7 +129,7 @@ def navbar_component() -> Component:
     """
     return html.Div(
         id="main-navbar",
-        className="bg-dark-purple justify-center text-left flex shadow-md hidden",
+        className="bg-dark-purple justify-center text-left flex shadow-md hidden overflow-auto",
         children=[
             dcc.Location(id="url", refresh=False),
             html.Div(
