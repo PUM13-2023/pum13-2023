@@ -46,7 +46,7 @@ class Dashboard(EmbeddedDocument):
 
     name: str = StringField()
     description: str = StringField()
-    modified: datetime | None = DateTimeField()
+    modified: datetime = DateTimeField()
     created: datetime = DateTimeField(required=True)
     authorized_users: list["User"] = ListField(ReferenceField("User"))
     diagrams: list[Diagram] = EmbeddedDocumentListField(Diagram)
