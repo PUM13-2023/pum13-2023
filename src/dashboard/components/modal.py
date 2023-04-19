@@ -1,4 +1,17 @@
-"""Module containing functionality related to modals."""
+"""Module containing functionality related to modals.
+
+When creating a modal, a modal container should be created
+in the page first. A modal dialog can then be passed
+as a child to the modal container. When the open property
+is modified on the child, the modal container will react
+to the change and will show or hide depending on the state.
+
+Example::
+
+    modal_container(children=[
+        modal_dialog(id="<id>", children=["<Components>"]
+    ])
+"""
 from typing import Optional
 
 from dash import ALL, Input, Output, State, callback, ctx, html
@@ -71,6 +84,13 @@ def modal_container(children: Optional[list[Component]]) -> Component:
         A modal container dash component.
     """
     children = [] if children is None else children
+    container_classname: str = "z-40 absolute w-screen h-screen top-0 left-0"
+
+    # Check if a child is open, if not hide container.
+    for child in children:
+        if not getattr(child, "open", True):
+            container_classname += " hidden"
+            break
 
     return html.Div(
         id="modal-container",
@@ -78,22 +98,24 @@ def modal_container(children: Optional[list[Component]]) -> Component:
             html.Div(
                 id="modal-backdrop",
                 n_clicks=0,
-                className="w-full h-full opacity-25 bg-black",
+                className="z-49 w-full h-full opacity-25 bg-black",
             ),
             html.Div(
                 id="modal-dialog-container",
                 children=children,
             ),
         ],
-        className="absolute w-screen h-screen top-0 left-0",
+        className=container_classname,
     )
 
 
-def modal_dialog(children: list[Component], id: str) -> Component:
+def modal_dialog(children: list[Component], id: str, open_: Optional[bool] = False) -> Component:
     """Create a simple modal dialog.
 
     Args:
         children (list[Component]): Children of the modal dialog.
+        open_ (Optional[bool]): Specifies if the modal should be open
+        by default.
 
     Returns:
         A modal dash component.
@@ -114,7 +136,7 @@ def modal_dialog(children: list[Component], id: str) -> Component:
     """
     return html.Dialog(
         id={"type": "modal-dialog", "id": id},
-        open=True,
+        open=open_,
         children=children,
-        className="absolute z-1 top-0 left-0 p-0 mx-auto my-auto bottom-0",
+        className="absolute z-50 top-0 left-0 p-0 mx-auto my-auto bottom-0",
     )
