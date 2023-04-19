@@ -78,14 +78,14 @@ def modal_container(children: Optional[list[Component]]) -> Component:
             html.Div(
                 id="modal-backdrop",
                 n_clicks=0,
-                className="w-full h-full opacity-25 bg-black",
+                className="z-49 w-full h-full opacity-25 bg-black",
             ),
             html.Div(
                 id="modal-dialog-container",
                 children=children,
             ),
         ],
-        className="absolute w-screen h-screen top-0 left-0",
+        className="z-40 absolute w-screen h-screen top-0 left-0",
     )
 
 
@@ -116,5 +116,5 @@ def modal_dialog(children: list[Component], id: str) -> Component:
         id={"type": "modal-dialog", "id": id},
         open=True,
         children=children,
-        className="absolute z-1 top-0 left-0 p-0 mx-auto my-auto bottom-0",
+        className="absolute z-50 top-0 left-0 p-0 mx-auto my-auto bottom-0",
     )
