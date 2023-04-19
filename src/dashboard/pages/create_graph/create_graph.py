@@ -7,8 +7,9 @@ from either a csv-file or from a database.
 import base64
 import io
 from typing import Any
+
 import dash
-from dash import callback, dcc, html, Patch, State
+from dash import Patch, State, callback, dcc, html
 from dash.dependencies import Component, Input, Output
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
@@ -62,7 +63,7 @@ def layout() -> Component:
             graph_window(),
             right_settings_bar(),
             dcc.Input(id="graph_index", value=0, className="hidden"),
-            dcc.Input(id="num_graphs", value=0, className="hidden")
+            dcc.Input(id="num_graphs", value=0, className="hidden"),
         ],
     )
 
@@ -106,7 +107,8 @@ def csv_button() -> Component:
         # True so multiple files can be uploaded
         multiple=True,
     )
-    
+
+
 def download_button(icon, text, id):
     """Predefined button style
 
@@ -118,7 +120,13 @@ def download_button(icon, text, id):
     Returns:
         _type_: _description_
     """
-    return button(icon_name=icon, text=text, id=id, className="bg-[#636af2] hover:bg-[#2F3273] justify-center flex-1 text-white")
+    return button(
+        icon_name=icon,
+        text=text,
+        id=id,
+        className="bg-[#636af2] hover:bg-[#2F3273] justify-center flex-1 text-white",
+    )
+
 
 def download_buttons():
     return html.Div(
@@ -132,16 +140,16 @@ def download_buttons():
                     download_button(icon="image", text="Jpeg", id="download_jpeg"),
                     download_button(icon="picture_as_pdf", text="Pdf", id="download_pdf"),
                     download_button(icon="html", text="Html", id="download_html"),
-                ]
-                     
+                ],
             ),
-            
-        ]
+        ],
     )
+
 
 def db_button() -> Component:
     """NOT IN USE: button to get data from a database."""
     return button2("Get from database", "database_button")
+
 
 def button2(button_text: str, button_id: str) -> Component:
     return html.Button(
@@ -249,6 +257,7 @@ def create_fig(
 
     """
     # data = []
+    cols = df.columns
     fig = None
     if df is not None:
         # x1_list = df["x"].to_list()
@@ -256,28 +265,28 @@ def create_fig(
 
         if graph_type == "line":
             fig = go.Scatter(
-                x=df["x"],
-                y=df["y"],
+                x=df[cols[0]],
+                y=df[cols[1]],
                 marker_color=color_input,
                 mode="lines",
-                name=f'Graph {num}'
+                name=f"Graph {num}",
             )
 
         if graph_type == "scatter":
             fig = go.Scatter(
-                x=df["x"],
-                y=df["y"],
+                x=df[cols[0]],
+                y=df[cols[1]],
                 marker_color=color_input,
                 mode="markers",
-                name=f'Graph {num}',
+                name=f"Graph {num}",
             )
 
         if graph_type == "bar":
             fig = go.Bar(
-                x=df["x"],
-                y=df["y"],
+                x=df[cols[0]],
+                y=df[cols[1]],
                 marker_color=color_input,
-                name=f'Graph {num}',
+                name=f"Graph {num}",
             )
 
     return fig
@@ -306,17 +315,14 @@ def top_right_settings() -> html.Div:
             dropdown(),
             radio_buttons(),
             download_buttons(),
-            color_picker()
-
+            color_picker(),
         ],
     )
 
+
 def dropdown():
-    return dcc.Dropdown(
-        [],
-        placeholder="Select graph",
-        id="graph_selector"
-    )
+    return dcc.Dropdown([], placeholder="Select graph", id="graph_selector")
+
 
 def color_picker():
     return html.Div(
@@ -330,8 +336,9 @@ def color_picker():
                 style={"width": 75, "height": 50},
                 debounce=True,
             ),
-        ]
+        ],
     )
+
 
 def upload_buttons() -> html.Div:
     """Buttons for uploading file.
@@ -419,12 +426,11 @@ def right_settings_bar() -> Component:
         ],
     )
 
-@callback(
-    Output("graph_index", "value"),
-    Input("graph_selector", "value")
-)
+
+@callback(Output("graph_index", "value"), Input("graph_selector", "value"))
 def dropdown_select_graph(graph_value):
     return graph_value
+
 
 def radio_item(name: str, value: str, icon_name: str) -> dict[str, html.Div]:
     """Creates a styled radio button.
@@ -465,12 +471,14 @@ def parse_contents(contents: str) -> pl.DataFrame:
 
     return pl.read_csv(io.StringIO(decoded.decode("utf-8")))
 
+
 @callback(
     Output("num_graphs", "value"),
     Input("uploaded_data", "contents"),
 )
 def number_of_graphs(contents):
     return len(contents)
+
 
 def convert_to_dataframe(contents: str) -> tuple[list[dict[str, list[Any]]]]:
     """Stores the uploaded frame in the form of a dataframe.
@@ -496,36 +504,41 @@ def convert_to_dataframe(contents: str) -> tuple[list[dict[str, list[Any]]]]:
 
     except ValueError:
         raise PreventUpdate
-    
+
+
 @callback(
     Output("graph_id", "figure", allow_duplicate=True),
     Input("choose_graph_type", "value"),
     Input("graph_id", "figure"),
     State("graph_index", "value"),
-    prevent_initial_call=True
-) 
+    prevent_initial_call=True,
+)
 def patch_graph_type(graph_type: str, graph_data, i):
-    data_frame = {"x":graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]}
+    data_frame = pl.DataFrame({"x": graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]})
     color = graph_data["data"][i]["marker"]
     patched_figure = Patch()
-    patched_figure["data"][i] = create_fig(data_frame, graph_type=graph_type, color_input=color["color"], num=i)
+    patched_figure["data"][i] = create_fig(
+        data_frame, graph_type=graph_type, color_input=color["color"], num=i
+    )
     return patched_figure
-    
+
+
 @callback(
     Output("graph_id", "figure", allow_duplicate=True),
     Input("color_input", "value"),
     State("graph_index", "value"),
-    prevent_initial_call=True
+    prevent_initial_call=True,
 )
 def patch_color(color, i):
     patched_figure = Patch()
     patched_figure["data"][i]["marker"] = {"color": color}
     return patched_figure
 
+
 @callback(
     Output("graph_output", "children"),
     Output("graph_selector", "options"),
-    Input("uploaded_data", "contents")
+    Input("uploaded_data", "contents"),
 )
 def render_figure(contents: str):
     created_figs = []
@@ -534,20 +547,12 @@ def render_figure(contents: str):
 
     data_frames = [pl.from_dict(x) for x in data_frame]
     for num, i in enumerate(data_frames):
-        loc_fig = create_fig(
-            i,
-            "line",
-            "#000000",
-            num=num,
-            id="graph_"+ str(num)
-        )
+        loc_fig = create_fig(i, "line", "#000000", num=num, id="graph_" + str(num))
         figure_names.append({"label": loc_fig["name"], "value": num})
         created_figs.append(loc_fig)
-    
+
     loc_config = {"doubleClick": "reset", "showTips": True, "displayModeBar": False}
     fig = go.Figure(data=created_figs)
 
     loc_graph = dcc.Graph(figure=fig, id="graph_id", config=loc_config)
     return loc_graph, figure_names
-    
-
