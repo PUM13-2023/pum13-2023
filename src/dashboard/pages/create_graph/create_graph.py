@@ -419,9 +419,19 @@ def right_settings_bar() -> Component:
         ],
     )
 
+@callback(
+    Output("graph_index", "value"),
+    Input("graph_selector", "value")
+)
+def dropdown_select_graph(graph_value):
+    return graph_value
 
-@callback(Output("graph_1", "figure"), Input("color_input", "value"))
-def choose_color1(color_input: str) -> dict[str, Any]:
+    
+@callback(Output("graph_id", "figure"), 
+          Input("color_input", "value"),
+          Input("graph_index", "value")
+)
+def choose_color1(color_input: str, i) -> dict[str, Any]:
     patched_figure = Patch()
     patched_figure["data"][0]["marker"]["color"] = color_input
     return patched_figure
@@ -502,24 +512,26 @@ def convert_to_dataframe(contents: str) -> tuple[list[dict[str, list[Any]]]]:
     Output("graph_id", "figure", allow_duplicate=True),
     Input("choose_graph_type", "value"),
     Input("graph_id", "figure"),
+    Input("graph_index", "value"),
     prevent_initial_call=True
 ) 
-def patch_graph_type(graph_type: str, graph_data):
-    data_frame = {"x":graph_data["data"][0]["x"], "y": graph_data["data"][0]["y"]}
-    print(data_frame)
-    color = graph_data["data"][0]["marker"]
+def patch_graph_type(graph_type: str, graph_data, i):
+    data_frame = {"x":graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]}
+    color = graph_data["data"][i]["marker"]
     patched_figure = Patch()
-    patched_figure["data"][0] = create_fig(data_frame, graph_type=graph_type, color_input=color["color"], num=1)
+    patched_figure["data"][i] = create_fig(data_frame, graph_type=graph_type, color_input=color["color"], num=1)
     return patched_figure
     
 @callback(
     Output("graph_id", "figure", allow_duplicate=True),
     Input("color_input", "value"),
+    Input("graph_index", "value"),
     prevent_initial_call=True
 )
-def patch_color(color):
+def patch_color(color, i):
+    print(i)
     patched_figure = Patch()
-    patched_figure["data"][0]["marker"] = {"color": color}
+    patched_figure["data"][i]["marker"] = {"color": color}
     return patched_figure
 
 @callback(
@@ -529,7 +541,7 @@ def patch_color(color):
 )
 def render_figure(contents: str):
     created_figs = []
-    figure_names = {}
+    figure_names = []
     data_frame = convert_to_dataframe(contents)
 
     data_frames = [pl.from_dict(x) for x in data_frame]
@@ -538,10 +550,10 @@ def render_figure(contents: str):
             i,
             "line",
             "#000000",
-            num=num,
+            num=num + 1,
             id="graph_"+ str(num)
         )
-        figure_names[loc_fig["name"]] = num
+        figure_names.append({"label": loc_fig["name"], "value": num})
         created_figs.append(loc_fig)
     
     loc_config = {"doubleClick": "reset", "showTips": True, "displayModeBar": False}
