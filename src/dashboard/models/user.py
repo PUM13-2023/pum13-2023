@@ -70,7 +70,7 @@ def register_user(username: str) -> User:
         username (str): the username of the new user.
 
     Returns:
-        A User object returning the newly created user.
+        A User object representing the newly created user.
 
     Raises:
         ValueError: a user with the specified username already exists.

@@ -61,6 +61,7 @@ class Settings(Document):
                 pass
 
 
+# Enable the post_init callback for Settings objects
 signals.post_init.connect(Settings.post_init, sender=Settings)
 
 
@@ -90,6 +91,10 @@ class Data(Document):
 
     MongoEngine also defaults to using the ``_cls`` attribute in
     queries, which made Data.objects return an empty query set.
+
+    This is solved by using data classes for the specialized data models
+    which are not subclasses of this class. Doing this avoid the issues
+    with MongoEngine subclasses.
 
     Attributes:
         settings (Settings): Settings document model.
@@ -208,4 +213,5 @@ class XyData(BaseData):
 
         Convert marker dicts to Marker objects.
         """
+        # Before post_init self.markers is a list of marker dicts.
         self.markers = [Marker(**marker) for marker in self.markers]  # type: ignore
