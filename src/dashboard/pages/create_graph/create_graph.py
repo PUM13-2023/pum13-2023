@@ -6,16 +6,12 @@ from either a csv-file or from a database.
 
 import base64
 import io
-import json
-import os
 from typing import Any
-import pprint
 import dash
 from dash import callback, dcc, html, Patch
-from dash.dependencies import Component, Input, Output, State
+from dash.dependencies import Component, Input, Output
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
-import plotly.express as px
 import plotly.graph_objs as go
 import polars as pl
 
@@ -215,7 +211,7 @@ def graph_window() -> Component:
         className="bg-white w-full ml-[3rem] my-[3rem] rounded-md shadow-md",
         children=[
             input_field("graph_name", "Graph name"),
-            html.Div(id="graph_output"),
+            html.Div(id="graph_output", className="h-[70%] w-full"),
             x_axis_name(),
             y_axis_name(),
             file_name(),
@@ -264,8 +260,7 @@ def create_fig(
                 y=df["y"],
                 marker_color=color_input,
                 mode="lines",
-                name="graf " + str(num),
-                uid=id
+                name=f'Graph {num}'
             )
 
         if graph_type == "scatter":
@@ -274,15 +269,15 @@ def create_fig(
                 y=df["y"],
                 marker_color=color_input,
                 mode="markers",
-                name="graf " + str(num),
+                name=f'Graph {num}',
             )
 
-        if graph_type == "histo":
-            fig = go.Histogram(
-                # x=x1_list,
-                x=df["y"],
+        if graph_type == "bar":
+            fig = go.Bar(
+                x=df["x"],
+                y=df["y"],
                 marker_color=color_input,
-                name="graf " + str(num),
+                name=f'Graph {num}',
             )
 
     return fig
@@ -308,11 +303,19 @@ def top_right_settings() -> html.Div:
                 ],
             ),
             upload_buttons(),
+            dropdown(),
             radio_buttons(),
             download_buttons(),
             color_picker()
 
         ],
+    )
+
+def dropdown():
+    return dcc.Dropdown(
+        [],
+        placeholder="Select graph",
+        id="graph_selector"
     )
 
 def color_picker():
@@ -370,7 +373,7 @@ def radio_buttons() -> html.Div:
                 className="flex space-x-2",
                 options=[
                     radio_item("Line", "line", "show_chart"),
-                    radio_item("Bar", "histo", "bar_chart"),
+                    radio_item("Bar", "bar", "bar_chart"),
                     radio_item("Scatter", "scatter", "scatter_plot"),
                 ],
                 inputClassName="peer hidden",
@@ -521,10 +524,12 @@ def patch_color(color):
 
 @callback(
     Output("graph_output", "children"),
+    Output("graph_selector", "options"),
     Input("uploaded_data", "contents")
 )
 def render_figure(contents: str):
     created_figs = []
+    figure_names = {}
     data_frame = convert_to_dataframe(contents)
 
     data_frames = [pl.from_dict(x) for x in data_frame]
@@ -532,31 +537,17 @@ def render_figure(contents: str):
         loc_fig = create_fig(
             i,
             "line",
-            # graph_name,
-            # x_axis_name,
-            # y_axis_name,
             "#000000",
-            num + 1,
+            num=num,
             id="graph_"+ str(num)
         )
+        figure_names[loc_fig["name"]] = num
         created_figs.append(loc_fig)
-    
-    layout = go.Layout(
-        title="graph",
-        # to not show grid-lines
-        # , showgrid=False
-        # to choose background color
-        # plot_bgcolor="#FFFFFF",
-        xaxis=dict(title="x", linecolor=colors["black"], fixedrange=True),
-        yaxis=dict(title="x", linecolor=colors["black"], fixedrange=True),
-        # paper_bgcolor="rgba(0,0,0,0)",
-        # plot_bgcolor="rgba(0,0,0,0)"
-    )
     
     loc_config = {"doubleClick": "reset", "showTips": True, "displayModeBar": False}
     fig = go.Figure(data=created_figs)
 
     loc_graph = dcc.Graph(figure=fig, id="graph_id", config=loc_config)
-    return loc_graph
+    return loc_graph, figure_names
     
 
