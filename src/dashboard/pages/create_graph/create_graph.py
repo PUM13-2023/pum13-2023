@@ -8,7 +8,7 @@ import base64
 import io
 from typing import Any
 import dash
-from dash import callback, dcc, html, Patch
+from dash import callback, dcc, html, Patch, State
 from dash.dependencies import Component, Input, Output
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
@@ -426,17 +426,6 @@ def right_settings_bar() -> Component:
 def dropdown_select_graph(graph_value):
     return graph_value
 
-    
-@callback(Output("graph_id", "figure"), 
-          Input("color_input", "value"),
-          Input("graph_index", "value")
-)
-def choose_color1(color_input: str, i) -> dict[str, Any]:
-    patched_figure = Patch()
-    patched_figure["data"][0]["marker"]["color"] = color_input
-    return patched_figure
-
-
 def radio_item(name: str, value: str, icon_name: str) -> dict[str, html.Div]:
     """Creates a styled radio button.
 
@@ -512,24 +501,23 @@ def convert_to_dataframe(contents: str) -> tuple[list[dict[str, list[Any]]]]:
     Output("graph_id", "figure", allow_duplicate=True),
     Input("choose_graph_type", "value"),
     Input("graph_id", "figure"),
-    Input("graph_index", "value"),
+    State("graph_index", "value"),
     prevent_initial_call=True
 ) 
 def patch_graph_type(graph_type: str, graph_data, i):
     data_frame = {"x":graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]}
     color = graph_data["data"][i]["marker"]
     patched_figure = Patch()
-    patched_figure["data"][i] = create_fig(data_frame, graph_type=graph_type, color_input=color["color"], num=1)
+    patched_figure["data"][i] = create_fig(data_frame, graph_type=graph_type, color_input=color["color"], num=i)
     return patched_figure
     
 @callback(
     Output("graph_id", "figure", allow_duplicate=True),
     Input("color_input", "value"),
-    Input("graph_index", "value"),
+    State("graph_index", "value"),
     prevent_initial_call=True
 )
 def patch_color(color, i):
-    print(i)
     patched_figure = Patch()
     patched_figure["data"][i]["marker"] = {"color": color}
     return patched_figure
@@ -550,7 +538,7 @@ def render_figure(contents: str):
             i,
             "line",
             "#000000",
-            num=num + 1,
+            num=num,
             id="graph_"+ str(num)
         )
         figure_names.append({"label": loc_fig["name"], "value": num})
