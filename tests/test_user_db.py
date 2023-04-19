@@ -22,7 +22,6 @@ def example_user():
     """Example user."""
     username = "fixture-user"
     usr = user.login_user(username)
-    usr.dashboards.clear()
     usr.dashboards.append(user.Dashboard())
     usr.save()
     return usr
