@@ -1,84 +1,61 @@
 """Dashboards list component."""
 
-from typing import Dict, List, Tuple
+from datetime import datetime, timedelta
 
-from dash import html
 from dash.dependencies import Component
 
-from dashboard.components.icon import icon
+from dashboard.models.user import Dashboard
+
+from .list_component import list_component
 
 
-def generate_row_item(content: str) -> html.Span:
-    """Generate a list row item.
-
-    Args:
-        content (str): The content to display inside the row item.
-
-    Returns:
-        Component: The list row item.
-    """
-    return html.Span(
-        className=(
-            "last:border-r-0 flex-1 border-r-2 pl-2 py-1 text-ellipsis overflow-hidden"
-            " whitespace-nowrap"
-        ),
-        children=content,
-    )
-
-
-def generate_list_row(list_row_data: Tuple[int, List[str]]) -> html.Div:
-    """Generate a list row.
+def generate_list_row_contents(dashboard: Dashboard) -> list[str]:
+    """Generate list row from a Dashboard model.
 
     Args:
-        list_row_data (Tuple[int, List[str]]): The row index and
-        content of the row.
+        dashboard (Dashboard): A Dashboard model.
 
     Returns:
-        Component: The list row.
+        list[str]: A list row.
     """
-    index = list_row_data[0]
-    list_row = list_row_data[1]
-    return html.Div(
-        id={"type": "dashboards-list-row", "index": index},
-        n_clicks=0,
-        className=(
-            "flex pl-2 justify-start items-center border-b-2 border-gray-400"
-            " text-base cursor-pointer hover:bg-gray-100"
-        ),
-        children=[icon("analytics", fill=1, size=28)] + list(map(generate_row_item, list_row)),
-    )
+    datetime_now = datetime.now()
+
+    def get_readable_time_delta(since: datetime) -> str:
+        time_delta: timedelta = datetime_now - since
+        seconds = int(time_delta.total_seconds())
+        days = time_delta.days
+        hours = seconds // 3600
+        minutes = seconds // 60
+        if days > 0:
+            if days >= 7:
+                # NOTE: locale will change %b !
+                return since.strftime("%d %b. %Y")
+            if days > 1:
+                return f"{days} days ago"
+
+            return "A day ago"
+        if hours > 0:
+            if hours > 1:
+                return f"{hours} hours ago"
+
+            return "An hour ago"
+        if minutes > 0:
+            if minutes > 1:
+                return f"{minutes} minutes ago"
+
+            return "A minute ago"
+
+        return f"{time_delta.seconds} seconds ago"
+
+    return [
+        dashboard.name,
+        get_readable_time_delta(dashboard.modified),
+        get_readable_time_delta(dashboard.created),
+    ]
 
 
-def generate_list_titles(list_titles: List[str]) -> List[html.Span]:
-    """Generate list title elements.
-
-    Args:
-        list_titles (List[str]): A list of titles.
-
-    Returns:
-        List[html.Div]: A list of title elements.
-    """
-    return list(map(generate_row_item, list_titles))
-
-
-def generate_list_rows(list_rows: List[List[str]]) -> List[html.Div]:
-    """Generate list row elements.
-
-    Args:
-        list_rows (List[List[str]]): A list of rows.
-
-    Returns:
-        list[html.Div]: A list of row elements.
-    """
-    return list(map(generate_list_row, enumerate(list_rows)))
-
-
-def dashboards_list_component(
-    list_titles: List[str],
-    list_rows: List[List[str]],
-    _id: (str | Dict[str, str]) = "",
-) -> Component:
-    """Create the dashboards list component.
+def dashboards_list_component(dashboards: list[Dashboard], _id: str) -> Component:
+    """Create a dashboards list component.
 
     Args:
         titles_names (List[str]): The titles to display at the top of
@@ -91,28 +68,10 @@ def dashboards_list_component(
         of list rows.
 
     Returns:
-        Component: The dashboards list component.
+        Component: A dashboards list component.
     """
-    if len(list_rows) > 0 and not all(len(list_titles) == len(list_row) for list_row in list_rows):
-        raise IndexError(
-            f"in {__name__}: The amount of list titles does not match the amount of list rows."
-        )
-
-    return html.Div(
-        id=_id,
-        className="bg-white overflow-auto grow drop-shadow-sm rounded",
-        children=[
-            html.Div(
-                className=(
-                    "bg-white sticky top-0 first:pl-9 flex justify-start"
-                    " border-b-2 border-black text-lg"
-                ),
-                children=generate_list_titles(list_titles),
-            ),
-            html.Div(
-                id={"parent": _id, "child": "list-rows"},
-                className="w-full",
-                children=generate_list_rows(list_rows),
-            ),
-        ],
+    return list_component(
+        ["Title", "Last edited at", "Created at"],
+        [generate_list_row_contents(dashboard) for dashboard in dashboards],
+        _id,
     )
