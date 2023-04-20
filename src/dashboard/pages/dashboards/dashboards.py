@@ -6,7 +6,7 @@ from dash import html
 from dashboard.components import button, dashboards_list_component
 from dashboard.models.db import connect_user_db
 from dashboard.models.user import login_user
-import dashboard.pages.dashboards.controller
+import dashboard.pages.dashboards.controller  # noqa: F401
 
 dash.register_page(
     __name__,

@@ -36,9 +36,7 @@ class TestDashboardsPage:
         """
         browser_driver.get(settings.DASHBOARDS_PAGE_URL)
 
-        dashboards_list_items_selector = (
-            '#\{\\"child\\"\:\\"list-rows\\"\,\\"parent\\"\:\\"dashboards-list\\"\}'
-        )
+        dashboards_list_items_selector = '#\{\\"child\\"\:\\"list-rows\\"\,\\"parent\\"\:\\"dashboards-list\\"\}'  # noqa: W605, E501
         dashboards_list_items_before = helper.get_element_by_css_selector(
             browser_driver, dashboards_list_items_selector
         )
