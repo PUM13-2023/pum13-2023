@@ -7,8 +7,6 @@ import pytest
 from selenium import webdriver
 from tests import settings
 
-from dashboard import main
-
 
 def pytest_addoption(parser):
     """Pytest function that would addoption."""
@@ -18,6 +16,12 @@ def pytest_addoption(parser):
 
 def server(host, port):
     """Start the graphit application."""
+    from dashboard import config
+
+    config.MOCK_DB = True
+
+    from dashboard import main
+
     main.app.run(host, port)
 
 

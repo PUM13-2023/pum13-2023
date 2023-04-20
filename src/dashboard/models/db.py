@@ -14,6 +14,8 @@ import mongoengine
 from pymongo import MongoClient
 from pymongo.database import Database
 
+from dashboard import config
+
 load_dotenv()
 
 DB_URL_ENV_NAME = "DB_URL"
@@ -29,6 +31,14 @@ def _get_db_url() -> str:
     return db_url
 
 
+def _connect_mock_db(db_name: str, alias: str = "default") -> None:
+    import mongomock
+
+    mongoengine.connect(
+        db=db_name, alias=alias, host="127.0.0.1", mongo_client_class=mongomock.MongoClient
+    )
+
+
 def connect_data_db(db_name: str, alias: str = "data") -> None:
     """Connect to project db.
 
@@ -37,15 +47,22 @@ def connect_data_db(db_name: str, alias: str = "data") -> None:
         alias (str): the alias of the connection. This is only needed
             if multiple connections need to be managed.
     """
+    if config.MOCK_DB:
+        _connect_mock_db(db_name=db_name, alias=alias)
+        return
+
     db_url = _get_db_url()
     mongoengine.connect(db=db_name, alias=alias, host=db_url)
 
 
 def connect_user_db() -> None:
     """Connect to user db."""
-    db_url = _get_db_url()
+    if config.MOCK_DB:
+        _connect_mock_db(db_name=USER_DB_NAME)
+        return
 
-    mongoengine.connect(host=db_url, name=USER_DB_NAME)
+    db_url = _get_db_url()
+    mongoengine.connect(db=USER_DB_NAME, host=db_url)
 
 
 def _is_project_db(db: Database[dict[str, Any]]) -> bool:
