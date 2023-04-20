@@ -38,6 +38,7 @@ app = Dash(
     server=server,
     use_pages=True,
     external_stylesheets=external_stylesheets,
+    suppress_callback_exceptions=True,
 )
 
 PORT = 8000
