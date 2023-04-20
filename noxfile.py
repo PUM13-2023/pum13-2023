@@ -1,3 +1,5 @@
+import pathlib
+
 import nox
 
 
@@ -28,3 +30,12 @@ def test(s: nox.Session) -> None:
     s.run("pytest", "--cov", "--junitxml=test_result.xml")
     s.run("coverage", "report")
     s.run("coverage", "xml")
+
+
+@nox.session(tags=["tailwind"], venv_backend="none")
+def tailwind(s: nox.Session) -> None:
+    path = pathlib.Path("./tailwindcss")
+    tailwind = "./tailwindcss" if path.exists() else "tailwindcss"
+
+    args = ["--input", "tailwind.css", "--output", "src/dashboard/assets/dashboard.css"]
+    s.run(tailwind, *args)
