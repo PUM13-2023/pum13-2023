@@ -1,8 +1,11 @@
 """Dashboard page."""
+
 import dash
 from dash import html
 
 from dashboard.components import button, dashboards_list_component
+from dashboard.models.db import connect_user_db
+from dashboard.models.user import login_user
 import dashboard.pages.dashboards.controller
 
 dash.register_page(
@@ -14,6 +17,8 @@ dash.register_page(
     icon_name="dashboard",
 )
 
+connect_user_db()
+
 
 def layout() -> html.Div:
     """Create the dashboards page.
@@ -21,8 +26,10 @@ def layout() -> html.Div:
     Returns:
         html.Div: The dashboards page.
     """
+    test_user = login_user("dashboards-page-test-user")
+
     return html.Div(
-        className="flex flex-col mx-4 max-h-screen",
+        className="flex flex-col mx-4 py-4 h-screen max-h-screen",
         children=[
             html.H1(className="text-3xl my-8", children="Dashboards"),
             html.Div(
@@ -45,16 +52,8 @@ def layout() -> html.Div:
                 ],
             ),
             html.Div(
-                className="flex min-h-[200px] max-h-[400px]",
-                children=dashboards_list_component(
-                    ["Title", "Last edited at", "Created at"],
-                    [
-                        # ["Dashboard 1", "Today", "Yesterday"],
-                        # ["Dashboard 2", "3 days ago", "2 days ago"],
-                        # ["Dashboard 3", "1 year ago", "5 years ago"],
-                    ],
-                    _id="dashboards-list",
-                ),
+                className="flex grow overflow-hidden",
+                children=dashboards_list_component(test_user.dashboards, _id="dashboards-list"),
             ),
         ],
     )
