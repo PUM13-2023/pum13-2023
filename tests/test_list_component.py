@@ -46,28 +46,28 @@ class TestListComponent:
     def test_correct_list_dimensions(
         self, list_rows: List[html.Div], list_titles: List[html.Span]
     ) -> None:
-        """Test generating a dashboards list.
+        """Test generating a list.
 
-        Test that a dashboards list generated from constants has
+        Test that a list generated from constants has
         the correct dimensions.
 
         Args:
-            dashboards_list_rows (List[html.Div]): The generated
-            dashboards list rows.
-            dashboards_list_titles (List[html.Span]): The generated
-            dashboards list titles.
+            list_rows (List[html.Div]): The generated
+            list rows.
+            list_titles (List[html.Span]): The generated
+            list titles.
         """
         assert len(list_rows) == len(LIST_ROWS)
         assert len(list_titles) == len(LIST_TITLES)
 
     def test_incorrect_list_dimensions(self) -> None:
-        """Test incorrectly generating dashboards list.
+        """Test incorrectly generating a list.
 
-        Test that generating a dashboards list with the incorrect
+        Test that generating a list with the incorrect
         dimensions will result in an error.
 
         Raises:
-            AssertionError: If a dashboards list with the incorrect
+            AssertionError: If a list with the incorrect
             dimensions is possible to generate.
         """
         try:
