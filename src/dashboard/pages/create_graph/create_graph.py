@@ -6,13 +6,16 @@ from either a csv-file or from a database.
 
 import base64
 import io
-from typing import Any
+import json
+import os
 
 import dash
-from dash import Patch, State, callback, dcc, html
-from dash.dependencies import Component, Input, Output
+from dash import callback, dcc, html
+from dash.dependencies import Component, Input, Output, State
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
+import dash_daq as daq
+import plotly.express as px
 import plotly.graph_objs as go
 import polars as pl
 
@@ -27,23 +30,6 @@ suppress_callback_exceptions = True
 global debug
 debug = True
 
-<<<<<<< HEAD
-=======
-
-# Colors used when creating the layout
-colors = {
-    "background": "#E9E9F2",
-    "text": "#7FDBFF",
-    "meny_back": "#636AF2",
-    "white": "#FFFFFF",
-    "dark_purp": "#2F3273",
-    "black": "#000000",
-    "debug": "#ffc0cb",
-    "blue": "#0000FF",
-    "red": "#FF0000",
-}
-
->>>>>>> 603fc12 (Fixed docstrings and cleaned the code abit)
 event = {"event": "click", "props": ["scatter", "line"]}
 
 
@@ -58,12 +44,15 @@ def layout() -> Component:
     return html.Div(
         className=f'bg-[{colors["background"]}] flex h-screen',
         children=[
-            # dcc.Store(id="df_storage", storage_type="local"),
-            dcc.Store(id="df_storage"),
+            dcc.Store(id="df_storage1"),
+            dcc.Store(id="df_storage2"),
+            # dcc.Download(id="download_pdf"),
+            left_setting_bar(),
             graph_window(),
+            # dcc.Graph(id="test_graph"),
             right_settings_bar(),
-            dcc.Input(id="graph_index", value=0, className="hidden"),
-            dcc.Input(id="num_graphs", value=0, className="hidden"),
+            html.Plaintext(id="color_output1"),
+            html.Plaintext(id="color_output2"),
         ],
     )
 
@@ -79,10 +68,25 @@ def left_setting_bar() -> Component:
         className=f"bg-[{colors['debug']}] flex flex-col items-center ml-5 px-5 h-[80%]" "w-[20%]",
         children=[
             # buttons for import and get from database
+            html.Div(
+                className=f'bg-[{colors["background"]}] flex flex-row mt-4 h-[12%] w-[100%]',
+                children=[
+                    # left button
+                    csv_button(),
+                    # html.Div(id="csv_uploaded_data"),
+                    # right button for getting data from the database
+                    db_button(),
+                    html.Div(id="output_left_setting_bar"),
+                ],
+            ),
             graph_name(),
             x_axis_name(),
             y_axis_name(),
             file_name(),
+            download_png(),
+            download_jpeg(),
+            download_pdf(),
+            download_html(),
         ],
     )
 
@@ -109,81 +113,82 @@ def csv_button() -> Component:
     )
 
 
-def download_button(icon: str, text: str, id: str) -> html.Button:
-    """Predefined button style.
-
-    Args:
-        icon str: _description_
-        text str: _description_
-        id str: _description_
-
-    Returns:
-        html.Button: Styled button used for download buttons
-    """
-    return button(
-        icon_name=icon,
-        text=text,
-        id=id,
-        className="bg-[#636af2] hover:bg-[#2F3273] justify-center flex-1 text-white",
-    )
+def db_button() -> Component:
+    """NOT IN USE: button to get data from a database."""
+    return button2("Get from database", "database_button")
 
 
-def download_buttons() -> html.Div:
-    """Div containing the download buttons.
+def download_png() -> Component:
+    """Called to download the created graph as png"""
+    return button2("Download as png", "download_png")
 
-    Returns:
-        html.Div: Div with download buttons
-    """
-    return html.Div(
-        className="flex flex-col",
+
+def download_jpeg() -> Component:
+    """Called to download the created graph as jpeg"""
+    return button2("Download as jpg", "download_jpeg")
+
+
+def download_pdf() -> Component:
+    """Called to download the created graph as pdf"""
+    return button2("Download as pdf", "download_pdf")
+
+
+def download_html() -> Component:
+    """Called to download the created graph as html"""
+    return button2("Download as html", "download_html")
+
+
+def button2(button_text: str, button_id: str) -> Component:
+    return html.Button(
+        className=f"bg-[{colors['meny_back']}] flex flex-col mt-4 px-4 justify-center"
+        " border-2 border-black",
         children=[
-            html.P("Download as"),
             html.Div(
-                className="flex space-x-2",
                 children=[
-                    download_button(icon="image", text="Png", id="download_png"),
-                    download_button(icon="image", text="Jpeg", id="download_jpeg"),
-                    download_button(icon="picture_as_pdf", text="Pdf", id="download_pdf"),
-                    download_button(icon="html", text="Html", id="download_html"),
+                    html.P(
+                        button_text,
+                        style={"color": colors["black"]},
+                    ),
                 ],
-            ),
+            )
         ],
+        id=button_id,
+        n_clicks=0,
     )
 
 
 def graph_name() -> Component:
-    """Takes user input for the graph label."""
+    """Takes user input for the graph label"""
     return input_field("graph_name", "Graph name")
 
 
 def x_axis_name() -> Component:
-    """Takes user input for the x axis label."""
+    """Takes user input for the x axis label"""
     return input_field("x_axis_name", "x-axis name")
 
 
 def y_axis_name() -> Component:
-    """Takes user input for the y axis label."""
+    """Takes user input for the y axis label"""
     return input_field("y_axis_name", "y-axis name")
 
 
 def file_name() -> Component:
-    """Takes user input for the graph label."""
+    """Takes user input for the graph label"""
     return input_field("file_name", "File name")
 
 
 def input_field(loc_id: str, loc_placeholder: str) -> Component:
-    """Input_field that lets user choose a color.
+    """Input_field that lets user choose a color
 
     Args:
         loc_id: local id of the input field
         loc_placeholder: a placeholder color
 
     Returns:
-        Component: epic component
+
     """
     return dcc.Input(
-        className=f"bg-[{colors['background']}] flex items-center "
-        "justify-center mt-5 p-2 rounded-md shadow-inner",
+        className=f"bg-[{colors['background']}] flex items-center justify-center mt-5 p-2 h-[30%]",
         id=loc_id,
         type="text",
         debounce=True,
@@ -199,67 +204,242 @@ def graph_window() -> Component:
     """
     return html.Div(
         className="bg-white w-full ml-[3rem] my-[3rem] rounded-md shadow-md",
-        children=[
-            input_field("graph_name", "Graph name"),
-            html.Div(id="graph_output", className="h-[70%] w-full"),
-            x_axis_name(),
-            y_axis_name(),
-            file_name(),
+        children=[html.Div(id="graph_output"),
         ],
     )
 
 
+def right_settings_bar_2() -> Component:
+    """Right settings bar.
+
+    Returns:
+        A html.div containing all the settings components.
+    """
+    return html.Div(  # change back to debug for debugging
+        className=f"bg-[{colors['debug']}] flex flex-col items-center justify-center"
+        " h-[80%] w-[20%]",
+        children=[
+            html.Div("Graph type for graph 1"),
+            dcc.RadioItems(
+                options=[
+                    {"label": "linjediagram", "value": "line"},
+                    {"label": "scatter plot", "value": "scatter"},
+                    {"label": "histogram", "value": "hist"},
+                ],
+                value="line",
+                id="choose_graph_type",
+            ),
+            html.Div("Graph type for graph 2"),
+            dcc.RadioItems(
+                options=[
+                    {"label": "linjediagram", "value": "line2"},
+                    {"label": "scatter plot", "value": "scatter2"},
+                    {"label": "histogram", "value": "hist2"},
+                ],
+                value="line2",
+                id="choose_graph_type2",
+            ),
+            
+        ],
+    )
+
+
+@callback(Output("color_output1", "style"), Input("color_input1", "value"))
+def choose_color1(color_input1):
+    print("color_input ", color_input1)
+    return {"color": color_input1}
+
+
+@callback(Output("color_output2", "style"), Input("color_input2", "value"))
+def choose_color1(color_input2):
+    print("color_input ", color_input2)
+    return {"color": color_input2}
+
+
+# def create_fig(
+#     df: pl.DataFrame, graph_type: str, graph_name: str, x_axis_name: str, y_axis_name: str
+# ) -> Component:
+#     """Creates a graph based on the chosen type by the user.
+
+#     Args:
+#         df: a dataframe containg used for creating the graph.
+#         graph_type: a string used to check what type of graph
+#         to draw.
+#         graph_name: user chosen name of the graph.
+#         x_axis_name: user chosen name of the x-axis.
+#         y_axis_name: user chosen name of y-axis
+
+
+#     Returns:
+#         fig: a draw graph of the users choice with chosen
+#         names for the graph and axis.
+
+#     """
+
+#     if df is not None:
+#         if graph_type == "line":
+#             fig = px.line(
+#                 df,
+#                 x=list(df["x"]),
+#                 y=list(df["y"]),
+#                 labels={
+#                     "x": x_axis_name,
+#                     "y": y_axis_name,
+#                 },
+#                 title=graph_name,
+#             )
+#         if graph_type == "scatter":
+#             fig = px.scatter(
+#                 df,
+#                 x=list(df["x"]),
+#                 y=list(df["y"]),
+#                 labels={
+#                     "x": x_axis_name,
+#                     "y": y_axis_name,
+#                 },
+#                 title=graph_name,
+#             )
+
+#         if graph_type == "hist":
+#             fig = px.histogram(
+#                 df,
+#                 x=list(df["x"]),
+#                 labels={
+#                     "x": x_axis_name,
+#                 },
+#                 title=graph_name,
+#             )
+
+#     return fig
+
+
 def create_fig(
-    df: pl.DataFrame,
+    df1: pl.DataFrame,
+    df2: pl.DataFrame,
     graph_type: str,
-    color_input: str,
-    num: int,
-) -> go.Figure:
+    graph_type2: str,
+    graph_name: str,
+    x_axis_name: str,
+    y_axis_name: str,
+    color_output1,
+    color_output2,
+):
     """Creates a graph based on the chosen type by the user.
 
     Args:
         df: a dataframe containg used for creating the graph.
         graph_type: a string used to check what type of graph
         to draw.
-        color_output: user chosen color of the graph
-        num: the graph number
     if df is not None:
         graph_name: user chosen name of the graph.
         x_axis_name: user chosen name of the x-axis.
-        y_axis_name: user chosen name of y-axis.
+        y_axis_name: user chosen name of y-axis
+
 
     Returns:
         fig: a draw graph of the users choice with chosen
         names for the graph and axis.
+
     """
-    cols = df.columns
-    fig = None
-    if df is not None:
+
+    # loc_graph = dcc.Graph(
+    #     figure={
+    #         "data": [
+    #             {
+    #                 "x": list(df1["x"]),
+    #                 "y": list(df1["y"]),
+    #                 "type": graph_type,
+    #                 "name": "graph1",
+    #             },
+    #             {"x": list(df2["x"]), "y": list(df2["y"]), "type": graph_type, "name": "graph2"},
+    #         ],
+    #         "layout": {
+    #             "title": "testgraph",
+    #             "name": "test",
+    #             "x": "test",
+    #             "xname": "test",
+    #             "xlabel": "test",
+    #             "style": "test",
+    #         },
+    #     }
+    # )
+    # return loc_graph
+    ###SOMETHING ELSE
+
+    print("create_fig ", color_output1["color"])
+    data = []
+    if df1 is not None:
+        # x1_list = df1["x"].to_list()
+        # y1_list = df1["y"].to_list()
+
         if graph_type == "line":
-            fig = go.Scatter(
-                x=df[cols[0]],
-                y=df[cols[1]],
-                marker_color=color_input,
+            fig1 = go.Scatter(
+                x=df1["x"],
+                y=df1["y"],
+                marker_color=color_output1["color"],
                 mode="lines",
-                name=f"Graph {num}",
+                name="graf 1",
             )
 
         if graph_type == "scatter":
-            fig = go.Scatter(
-                x=df[cols[0]],
-                y=df[cols[1]],
-                marker_color=color_input,
+            fig1 = go.Scatter(
+                x=df1["x"],
+                y=df1["y"],
+                marker_color=color_output1["color"],
                 mode="markers",
-                name=f"Graph {num}",
+                name="graf 1",
             )
 
-        if graph_type == "bar":
-            fig = go.Bar(
-                x=df[cols[0]],
-                y=df[cols[1]],
-                marker_color=color_input,
-                name=f"Graph {num}",
+        if graph_type == "hist":
+            fig1 = go.Histogram(
+                # x=x1_list,
+                x=df1["y"],
+                marker_color=color_output1["color"],
+                name="graf 1",
             )
+        data.append(fig1)
+
+    if df2 is not None:
+        if graph_type2 == "line2":
+            fig2 = go.Scatter(
+                x=df2["x"],
+                y=df2["y"],
+                marker_color=color_output2["color"],
+                mode="lines",
+                name="graf 2",
+            )
+        if graph_type2 == "scatter2":
+            fig2 = go.Scatter(
+                x=df2["x"],
+                y=df2["y"],
+                marker_color=color_output2["color"],
+                mode="markers",
+                name="graf 2",
+            )
+
+        if graph_type2 == "hist2":
+            fig2 = go.Histogram(
+                x=df2["y"],
+                # x=df2["x"],
+                marker_color=color_output2["color"],
+                name="graf 2",
+            )
+        data.append(fig2)
+
+    # print("colors test ", colors["background"])
+    layout = go.Layout(
+        title=graph_name,
+        # to not show grid-lines
+        # , showgrid=False
+        # to choose background color
+        # plot_bgcolor="#FFFFFF",
+        xaxis=dict(title=x_axis_name, linecolor=colors["black"], fixedrange=True),
+        yaxis=dict(title=y_axis_name, linecolor=colors["black"], fixedrange=True),
+        # paper_bgcolor="rgba(0,0,0,0)",
+        # plot_bgcolor="rgba(0,0,0,0)"
+    )
+    fig = go.Figure(data=data, layout=layout)
+    print("fig test ", fig)
 
     return fig
 
@@ -284,40 +464,7 @@ def top_right_settings() -> html.Div:
                 ],
             ),
             upload_buttons(),
-            dropdown(),
             radio_buttons(),
-            download_buttons(),
-            color_picker(),
-        ],
-    )
-
-
-def dropdown() -> dcc.Dropdown:
-    """Makes a dcc dropdown to pick graphs.
-
-    Returns:
-        dcc.Dropdown: dropdown containing all of the uploaded graphs
-    """
-    return dcc.Dropdown([], placeholder="Select graph", id="graph_selector")
-
-
-def color_picker() -> html.Div:
-    """Color picker element.
-
-    Returns:
-        html.Div: Element with color picker
-    """
-    return html.Div(
-        className="flex flex-col",
-        children=[
-            html.Label("Line color"),
-            dbc.Input(
-                type="color",
-                id="color_input",
-                value="#0000FF",
-                style={"width": 75, "height": 50},
-                debounce=True,
-            ),
         ],
     )
 
@@ -362,7 +509,7 @@ def radio_buttons() -> html.Div:
                 className="flex space-x-2",
                 options=[
                     radio_item("Line", "line", "show_chart"),
-                    radio_item("Bar", "bar", "bar_chart"),
+                    radio_item("Bar", "histo", "bar_chart"),
                     radio_item("Scatter", "scatter", "scatter_plot"),
                 ],
                 inputClassName="peer hidden",
@@ -403,23 +550,32 @@ def right_settings_bar() -> Component:
                         id="create-graph",
                         className="bg-[#636af2] px-5 py-3 hover:bg-[#2F3273]",
                     ),
+                    dbc.Label("Choose color for graph 1 "),
+                    dbc.Input(
+                        type="color",
+                        id="color_input1",
+                        value="#0000FF",
+                        style={"width": 75, "height": 50},
+                        debounce=True,
+                    ),
+                    dbc.Label("Choose color for graph 2 "),
+                    dbc.Input(
+                        type="color",
+                        id="color_input2",
+                        value="#FF0000",
+                        style={"width": 75, "height": 50},
+                        debounce=True,
+                    ),
                 ],
+            
             ),
         ],
     )
 
 
-@callback(Output("graph_index", "value"), Input("graph_selector", "value"))
-def dropdown_select_graph(graph_value: int) -> int:
-    """Stores the current selectd graph index.
-
-    Args:
-        graph_value (int): The index of the graph to select
-
-    Returns:
-        int: Graph index
-    """
-    return graph_value
+@callback(Output("color_picker_output1", "value"), Input("color_picker1", "value"))
+def update_output(value):
+    return value
 
 
 def radio_item(name: str, value: str, icon_name: str) -> dict[str, html.Div]:
@@ -443,10 +599,13 @@ def radio_item(name: str, value: str, icon_name: str) -> dict[str, html.Div]:
             html.Div(className=classname, children=[icon(icon_name, size=40), html.P(name)]),
         ],
         "value": value,
+        
     }
 
 
-def parse_contents(contents: str) -> pl.DataFrame:
+
+
+def parse_contents(contents: str, filename: str) -> pl.DataFrame:
     """Parses the input from a csv-file.
 
     Args:
@@ -462,7 +621,13 @@ def parse_contents(contents: str) -> pl.DataFrame:
     return pl.read_csv(io.StringIO(decoded.decode("utf-8")))
 
 
-def convert_to_dataframe(contents: str) -> list[dict[str, list[Any]]]:
+@callback(
+    # [Output("df_storage", "dict")],
+    [Output("df_storage1", "data"), Output("df_storage2", "data")],
+    Input("uploaded_data", "contents"),
+    State("uploaded_data", "filename"),
+)
+def store_dataframe(contents: str, filename: str) -> list[str]:
     """Stores the uploaded frame in the form of a dataframe.
 
     Args:
@@ -473,93 +638,212 @@ def convert_to_dataframe(contents: str) -> list[dict[str, list[Any]]]:
         The a json version of the dataframe from the
         parsed csv-file.
     """
-    loc_list = []
+    # print("contents ", contents)
+    # print("contents[0] ", contents[0])
+    # print("contents[1] ", contents[1])
+    # print("len(contents) ", len(contents))
+    # print("filename", filename)
+    # if contents is None:
+    #     raise PreventUpdate
+
+    # try:
+    #     df = parse_contents(contents, filename)
+
+    # except ValueError:
+    #     raise PreventUpdate
+
     if contents is None:
         raise PreventUpdate
 
     try:
-        for i in contents:
-            temp_df = parse_contents(i)
+        if len(contents) == 2:
+            df1 = parse_contents(contents[0], filename)
+            df2 = parse_contents(contents[1], filename)
+            # test = json.dumps({"graph1": df1, "graph2": df2})
+            # return test
+            return [df1.write_json(), df2.write_json()]
 
-            loc_list.append(temp_df)
-        return [df.to_dict(as_series=False) for df in loc_list]
-
+        else:
+            df1 = parse_contents(contents[0], filename)
+            return [df1.write_json(), None]
     except ValueError:
         raise PreventUpdate
 
-
-@callback(
-    Output("graph_id", "figure", allow_duplicate=True),
-    Input("choose_graph_type", "value"),
-    Input("graph_id", "figure"),
-    State("graph_index", "value"),
-    prevent_initial_call=True,
-)
-def patch_graph_type(graph_type: str, graph_data: dict[str, list[Any]], i: int) -> Patch:
-    """A patched figure object that patches the graph type.
-
-    Args:
-        graph_type (str): The new graph type
-        graph_data (_type_): Current graph data
-        i (int): Graph index
-
-    Returns:
-        Patch: Patched figure with new graph type
-    """
-    data_frame = pl.DataFrame({"x": graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]})
-    color = graph_data["data"][i]["marker"]
-    patched_figure = Patch()
-    patched_figure["data"][i] = create_fig(
-        data_frame, graph_type=graph_type, color_input=color["color"], num=i
-    )
-    return patched_figure
-
-
-@callback(
-    Output("graph_id", "figure", allow_duplicate=True),
-    Input("color_input", "value"),
-    State("graph_index", "value"),
-    prevent_initial_call=True,
-)
-def patch_color(color: str, i: int) -> Patch:
-    """Patched figure with new selected line color.
-
-    Args:
-        color (str): New color
-        i (int): Graph index
-
-    Returns:
-        Patch: Patched figure object with new color
-    """
-    patched_figure = Patch()
-    patched_figure["data"][i]["marker"] = {"color": color}
-    return patched_figure
+    # print("df1 ", df1)
+    # print("df2 ", df2)
 
 
 @callback(
     Output("graph_output", "children"),
-    Output("graph_selector", "options"),
-    Input("uploaded_data", "contents"),
+    # Output("test_graph", "figure"),
+    Input("df_storage1", "data"),
+    Input("df_storage2", "data"),
+    Input("choose_graph_type", "value"),
+    Input("choose_graph_type2", "value"),
+    Input("graph_name", "value"),
+    Input("x_axis_name", "value"),
+    Input("y_axis_name", "value"),
+    Input("file_name", "value"),
+    Input("download_png", "n_clicks"),
+    Input("download_jpeg", "n_clicks"),
+    Input("download_pdf", "n_clicks"),
+    Input("download_html", "n_clicks"),
+    Input("color_output1", "style"),
+    Input("color_output2", "style"),
 )
-def render_figure(contents: str) -> dcc.Graph | list[dict[str, str]]:
-    """Renders the figure using CSV-files.
+def main(
+    df_storage1: Component,
+    df_storage2: Component,
+    choose_graph_type: str,
+    choose_graph_typ2: str,
+    graph_name: str,
+    x_axis_name: str,
+    y_axis_name: str,
+    file_name: str,
+    download_png: bool,
+    download_jpeg: bool,
+    download_html: bool,
+    download_pdf: bool,
+    color_output1,
+    color_output2,
+) -> Component:
+    """Main function for the code.
+
+    Args:
+        df_storage: the stored df frame in json format.
+        choose_graph_type: the type of graph that shall be displayed.
+        graph_name: user chosen name of the graph.
+        x_axis_name: user chosen name of the x-axis.
+        y_axis_name: user chosen name of y-axis
+        download_png: button to download png of the graph
+        download_jpeg: button to download jpeg of the graph
+        download_pdf: button to download pdf of the graph
+        download_html: button to download html of the graph
 
     Returns:
-        dcc.Graph: Graph to be rendered
-        list[dict[str: str]]: list of all the graph names
+        A graph in the form of a plotly figure.
+
+    Downloads:
+        a png, jpeg, pdf or html image of the created graph
+        into the folder /graph_images in the top folder
+
     """
-    created_figs = []
-    figure_names = []
-    data_frame = convert_to_dataframe(contents)
+    print("color_output1 ", color_output1)
+    if graph_name == None:
+        graph_name = "Graph name"
+    if x_axis_name == None:
+        x_axis_name = "x-axis name"
+    if y_axis_name == None:
+        y_axis_name = "y-axis name"
+    if file_name == None:
+        file_name = "filename"
 
-    data_frames = [pl.from_dict(x) for x in data_frame]
-    for num, i in enumerate(data_frames):
-        loc_fig = create_fig(i, "line", "#000000", num=num)
-        figure_names.append({"label": loc_fig["name"], "value": num})
-        created_figs.append(loc_fig)
+    if df_storage1 is None:
+        raise PreventUpdate
+    if not os.path.exists("graph_images"):
+        os.mkdir("graph_images")
 
+    # print("df_storage1 ", df_storage1)
+    # print("df_storage2 ", df_storage2)
     loc_config = {"doubleClick": "reset", "showTips": True, "displayModeBar": False}
-    fig = go.Figure(data=created_figs)
 
-    loc_graph = dcc.Graph(figure=fig, id="graph_id", config=loc_config)
-    return loc_graph, figure_names
+    if (df_storage1 and df_storage2) is not None:
+        df1 = pl.read_json(io.StringIO(df_storage1))
+        df2 = pl.read_json(io.StringIO(df_storage2))
+        loc_fig = create_fig(
+            df1,
+            df2,
+            choose_graph_type,
+            choose_graph_typ2,
+            graph_name,
+            x_axis_name,
+            y_axis_name,
+            color_output1,
+            color_output2,
+        )
+        # if download_png:
+        #     loc_fig2.write_image("graph_images/" + file_name + ".png", width=1920, height=1080)
+        # if download_jpeg:
+        #     loc_fig2.write_image("graph_images/" + file_name + ".jpeg", width=1920, height=1080)
+        # if download_pdf:
+        #     loc_fig2.write_image("graph_images/" + file_name + ".pdf", width=1920, height=1080)
+        # if download_html:
+        #     loc_fig2.write_html("graph_images/" + file_name + ".html", width=1920, height=1080)
+
+        # TESTING
+        # print("list(df[x]) ", list(df1["x"]), " ", list(df1["y"]))
+
+        # loc_graph2 = dcc.Graph(figure=loc_fig, config=loc_config)
+        # return loc_graph2
+        # return loc_fig2
+
+    else:
+        df1 = pl.read_json(io.StringIO(df_storage1))
+        df2 = None
+        loc_fig = create_fig(
+            df1,
+            df2,
+            choose_graph_type,
+            choose_graph_typ2,
+            graph_name,
+            x_axis_name,
+            y_axis_name,
+            color_output1,
+            color_output2,
+        )
+        # loc_fig1 = create_fig2(df1, choose_graph_type, graph_name, x_axis_name, y_axis_name)
+
+        # downloads the created graph into the folder "graph_images"
+        # if download_png:
+        #     loc_fig1.write_image("graph_images/" + file_name + ".png", width=1920, height=1080)
+        # if download_jpeg:
+        #     loc_fig1.write_image("graph_images/" + file_name + ".jpeg", width=1920, height=1080)
+        # if download_pdf:
+        #     loc_fig1.write_image("graph_images/" + file_name + ".pdf", width=1920, height=1080)
+        # if download_html:
+        #     loc_fig1.write_html("graph_images/" + file_name + ".html")
+
+        # loc_graph1 = dcc.Graph(figure=loc_fig, config=loc_config)
+
+        # return loc_graph1
+        # return loc_fig1
+
+    if download_png:
+        loc_fig.write_image("graph_images/" + file_name + ".png", width=1920, height=1080)
+    if download_jpeg:
+        loc_fig.write_image("graph_images/" + file_name + ".jpeg", width=1920, height=1080)
+    if download_pdf:
+        loc_fig.write_image("graph_images/" + file_name + ".pdf", width=1920, height=1080)
+    if download_html:
+        loc_fig.write_html("graph_images/" + file_name + ".html")
+
+    loc_graph = dcc.Graph(figure=loc_fig, config=loc_config)
+    return loc_graph
+
+    # loc_fig1 = create_fig(df1, choose_graph_type, graph_name, x_axis_name, y_axis_name)
+    # loc_fig2 = create_fig(df2, choose_graph_type, graph_name, x_axis_name, y_axis_name)
+
+    # test = dcc.Graph(
+    #     figure={
+    #         "data": [
+    #             {
+    #                 "x": list(df1["x"]),
+    #                 "y": list(df1["y"]),
+    #                 "type": "line",
+    #                 "name": "graph1",
+    #             },
+    #             {"x": list(df2["x"]), "y": list(df2["y"]), "type": "bar", "name": "graph2"},
+    #         ],
+    #         "layout": {
+    #             "title": "testgraph",
+    #             "name": "test",
+    #             "x": "test",
+    #             "xname": "test",
+    #             "xlabel": "test",
+    #             "style": "test",
+    #         },
+    #     }
+    # )
+
+    # if not os.path.exists("graph_images"):
+    #    os.mkdir("graph_images")
