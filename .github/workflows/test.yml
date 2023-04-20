@@ -27,11 +27,7 @@ jobs:
       - name: Run tests
         run: nox -t test
         env:
-          DATA_DB_URL: ${{ secrets.DATA_DB_URL }}
-          DATA_DB_COLLECTION: ${{ vars.DATA_DB_COLLECTION }}
-          DATA_DB_NAME: ${{ vars.DATA_DB_NAME }}
-          USER_DB_URL: ${{ secrets.USER_DB_URL }}
-          USER_DB_NAME: ${{ vars.USER_DB_NAME }}
+          DB_URL: ${{ secrets.DB_URL }}
       - name: Save code coverage file
         uses: actions/upload-artifact@v3
         with:
