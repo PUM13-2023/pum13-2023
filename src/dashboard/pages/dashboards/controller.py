@@ -31,6 +31,6 @@ def dashboards_add_button_clicked(n_clicks: int) -> Patch:
 
     children_patch = Patch()
     children_patch.append(
-        generate_list_row((new_index, generate_list_row_contents(added_dashboard)))
+        generate_list_row(new_index, generate_list_row_contents(added_dashboard))
     )
     return children_patch

@@ -1,7 +1,5 @@
 """List component."""
 
-from typing import List, Tuple
-
 from dash import dcc, html
 
 from dashboard.components.icon import icon
@@ -25,18 +23,17 @@ def generate_row_item(content: str) -> html.Span:
     )
 
 
-def generate_list_row(list_row_data: Tuple[int, List[str]]) -> dcc.Link:
+def generate_list_row(index: int, list_row_contents: list[str]) -> dcc.Link:
     """Generate a list row.
 
     Args:
-        list_row_data (Tuple[int, List[str]]): The row index and
-        content of the row.
+        index (int): The index of the row.
+        list_row_data (list[str]): The contents
+        of the row.
 
     Returns:
         Component: The list row.
     """
-    index = list_row_data[0]
-    list_row = list_row_data[1]
     return dcc.Link(
         id={"type": "list-row", "index": index},
         href="/",
@@ -44,41 +41,44 @@ def generate_list_row(list_row_data: Tuple[int, List[str]]) -> dcc.Link:
             "flex pl-2 justify-start items-center border-b-2 border-gray-400"
             " text-base cursor-pointer hover:bg-gray-100"
         ),
-        children=[icon("analytics", fill=1, size=28)] + list(map(generate_row_item, list_row)),
+        children=[
+            icon("analytics", fill=1, size=28),
+        ]
+        + [generate_row_item(content) for content in list_row_contents],
     )
 
 
-def generate_list_titles(list_titles: List[str]) -> List[html.Span]:
+def generate_list_titles(list_titles: list[str]) -> list[html.Span]:
     """Generate list title elements.
 
     Args:
-        list_titles (List[str]): A list of titles.
+        list_titles (list[str]): A list of titles.
 
     Returns:
-        List[html.Div]: A list of title elements.
+        list[html.Span]: A list of title elements.
     """
-    return list(map(generate_row_item, list_titles))
+    return [generate_row_item(title) for title in list_titles]
 
 
-def generate_list_rows(list_rows: List[List[str]]) -> List[dcc.Link]:
+def generate_list_rows(list_rows: list[list[str]]) -> list[dcc.Link]:
     """Generate list row elements.
 
     Args:
-        list_rows (List[List[str]]): A list of rows.
+        list_rows (list[list[str]]): A list of rows.
 
     Returns:
-        list[html.Div]: A list of row elements.
+        list[dcc.Link]: A list of row elements.
     """
-    return list(map(generate_list_row, enumerate(list_rows)))
+    return [generate_list_row(index, row) for index, row in enumerate(list_rows)]
 
 
-def list_component(list_titles: List[str], list_rows: List[List[str]], _id: str) -> html.Div:
+def list_component(list_titles: list[str], list_rows: list[list[str]], _id: str) -> html.Div:
     """Create a list component.
 
     Args:
-        titles_names (List[str]): The titles to display at the top of
+        titles_names (list[str]): The titles to display at the top of
         the list.
-        list_rows (List[List[str]]): The rows that make up the list
+        list_rows (list[list[str]]): The rows that make up the list
         contents.
 
     Raises:

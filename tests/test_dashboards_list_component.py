@@ -1,6 +1,5 @@
 """Test list component."""
 from datetime import datetime
-from typing import List
 
 import pytest
 
@@ -19,19 +18,20 @@ DASHBOARDS = [
 
 
 @pytest.fixture
-def dashboards_list_rows_contents() -> List[List[str]]:
+def dashboards_list_rows_contents() -> list[list[str]]:
     """Generate dashboard list row elements.
 
     Returns:
-        List[html.Div]: The dashboard list row elements.
+        list[html.Div]: The dashboard list row elements.
     """
     return [generate_list_row_contents(dashboard) for dashboard in DASHBOARDS]
 
 
+@pytest.mark.test_dashboards_list_component
 class TestDashboardsListComponent:
     """Class that contains tests for the dashboards list component."""
 
-    def test_generate_list_row_contents(self, dashboards_list_rows_contents: List[List[str]]):
+    def test_generate_list_row_contents(self, dashboards_list_rows_contents: list[list[str]]):
         """Test that generated list row contents is valid."""
         assert all(
             (

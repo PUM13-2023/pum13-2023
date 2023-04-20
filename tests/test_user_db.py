@@ -12,7 +12,6 @@ from dashboard.models import user
 @pytest.fixture(autouse=True)
 def connection():
     """Connect mongoengine to mongomock and return client."""
-    mongoengine.disconnect()
     conn = mongoengine.connect(
         db="dashboard", host="mongodb://localhost", mongo_client_class=mongomock.MongoClient
     )

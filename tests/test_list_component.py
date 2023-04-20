@@ -40,6 +40,7 @@ def list_titles() -> List[html.Span]:
     return generate_list_titles(LIST_TITLES)
 
 
+@pytest.mark.test_list_component
 class TestListComponent:
     """Class that contains tests for the list component."""
 
