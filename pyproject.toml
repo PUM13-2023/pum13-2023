@@ -36,10 +36,10 @@ dev = [
   "pytest-cov == 4.0.0",
   "selenium == 4.8.3",
   "pytest-dependency == 0.5.1",
-  "mongomock == 4.1.2"
+  "mongomock == 4.1.2",
   "dash-bootstrap-components == 1.4.1",
   "mongomock == 4.1.2",
-  "jsonpickle == 3.0.1"
+  "jsonpickle == 3.0.1",
 ]
 
 prod = [
