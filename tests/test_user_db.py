@@ -1,4 +1,6 @@
 """Test user db."""
+from datetime import datetime
+
 import mongoengine
 import mongomock
 import pymongo
@@ -22,7 +24,7 @@ def example_user():
     """Example user."""
     username = "fixture-user"
     usr = user.login_user(username)
-    usr.dashboards.append(user.Dashboard())
+    usr.dashboards.append(user.Dashboard(created=datetime.now()))
     usr.save()
     return usr
 
