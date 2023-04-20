@@ -38,6 +38,8 @@ dev = [
   "pytest-dependency == 0.5.1",
   "mongomock == 4.1.2"
   "dash-bootstrap-components == 1.4.1",
+  "mongomock == 4.1.2",
+  "jsonpickle == 3.0.1"
 ]
 
 prod = [
@@ -52,7 +54,7 @@ strict = true
 
 
 [[tool.mypy.overrides]]
-module = ["dash.*", "plotly.*", "dash_bootstrap_components.*"]
+module = ["dash.*", "plotly.*", "dash_bootstrap_components.*", "jsonpickle.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

@@ -6,16 +6,14 @@ from either a csv-file or from a database.
 
 import base64
 import io
-import json
-import os
+from typing import Any
 
 import dash
 from dash import callback, dcc, html
 from dash.dependencies import Component, Input, Output, State
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
-import dash_daq as daq
-import plotly.express as px
+import jsonpickle
 import plotly.graph_objs as go
 import polars as pl
 
@@ -42,7 +40,7 @@ def layout() -> Component:
     """
     # main background element
     return html.Div(
-        className=f'bg-[{colors["background"]}] flex h-screen',
+        className="bg-background flex h-screen",
         children=[
             dcc.Store(id="df_storage1"),
             dcc.Store(id="df_storage2"),
@@ -51,8 +49,8 @@ def layout() -> Component:
             graph_window(),
             # dcc.Graph(id="test_graph"),
             right_settings_bar(),
-            html.Plaintext(id="color_output1"),
-            html.Plaintext(id="color_output2"),
+            dcc.Download(id="download_fig"),
+            dcc.Input(id="graph_index", value=0, className="hidden"),
         ],
     )
 
@@ -177,8 +175,8 @@ def file_name() -> Component:
     return input_field("file_name", "File name")
 
 
-def input_field(loc_id: str, loc_placeholder: str) -> Component:
-    """Input_field that lets user choose a color
+def input_field(loc_id: str, loc_placeholder: str, disabled: bool = False) -> Component:
+    """Input_field that lets user choose a color.
 
     Args:
         loc_id: local id of the input field
@@ -193,6 +191,7 @@ def input_field(loc_id: str, loc_placeholder: str) -> Component:
         type="text",
         debounce=True,
         placeholder=loc_placeholder,
+        disabled=disabled,
     )
 
 
@@ -672,6 +671,140 @@ def store_dataframe(contents: str, filename: str) -> list[str]:
     # print("df1 ", df1)
     # print("df2 ", df2)
 
+@callback(
+    Output("graph_id", "figure", allow_duplicate=True),
+    Input("choose_graph_type", "value"),
+    State("graph_id", "figure"),
+    State("graph_index", "value"),
+    State("graph_name", "value"),
+    prevent_initial_call=True,
+)
+def patch_graph_type(
+    graph_type: str, graph_data: dict[str, list[Any]], i: int, graph_name: str
+) -> Patch:
+    """A patched figure object that patches the graph type.
+
+    Args:
+        graph_type (str): The new graph type
+        graph_data (_type_): Current graph data
+        i (int): Graph index
+
+    Returns:
+        Patch: Patched figure with new graph type
+    """
+    data_frame = pl.DataFrame({"x": graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]})
+    color = graph_data["data"][i]["marker"]
+    patched_figure = Patch()
+    patched_figure["data"][i] = create_fig(
+        data_frame, graph_type=graph_type, color_input=color["color"], name=graph_name
+    )
+    return patched_figure
+
+
+@callback(
+    Output("graph_id", "figure", allow_duplicate=True),
+    Input("color_input", "value"),
+    State("graph_index", "value"),
+    prevent_initial_call=True,
+)
+def patch_color(color: str, i: int) -> Patch:
+    """Patched figure with new selected line color.
+
+    Args:
+        color (str): New color
+        i (int): Graph index
+
+    Returns:
+        Patch: Patched figure object with new color
+    """
+    patched_figure = Patch()
+    patched_figure["data"][i]["marker"] = {"color": color}
+    return patched_figure
+
+
+@callback(
+    Output("graph_id", "figure", allow_duplicate=True),
+    Input("graph_name", "value"),
+    State("graph_index", "value"),
+    prevent_initial_call=True,
+)
+def patch_graph_name(name: str, index: int) -> Patch:
+    """Changes an individual graphs name.
+
+    Args:
+        name (str): Name of the graph
+        index (int): Graph index to change
+
+    Returns:
+        Patch: Patched figure where the new name is changed
+    """
+    patched_figure = Patch()
+    patched_figure["data"][index]["name"] = name
+    return patched_figure
+
+
+@callback(
+    Output("download_fig", "data"),
+    Input("download_png", "n_clicks"),
+    State("fig_json", "value"),
+    State("file_name", "value"),
+    prevent_initial_call=True,
+)
+def download_fig(n_clicks: int, fig_json: str, file_name: str) -> Any:
+    """Callback for downloading figures.
+
+    Args:
+        n_clicks (int): number of clicks
+        fig_json (str): figure stored as a json string
+        file_name (str): desired filename
+
+    Returns:
+        dict[str, Any | None]: The file download
+    """
+    figure = jsonpickle.decode(fig_json)
+    return dcc.send_bytes(figure.write_image, f"{file_name}.png")
+
+
+@callback(
+    Output("graph_id", "figure", allow_duplicate=True),
+    Input("figure_name", "value"),
+    prevent_initial_call=True,
+)
+def patch_figure_name(name: str) -> Patch:
+    """Patches figure title.
+
+    Args:
+        name (str): figure title
+
+    Returns:
+        Patch: Patched figure with new title
+    """
+    patched_figure = Patch()
+    patched_figure["layout"]["title"]["text"] = name
+    return patched_figure
+
+
+@callback(
+    Output("graph_id", "figure", allow_duplicate=True),
+    Input("x_axis_name", "value"),
+    Input("y_axis_name", "value"),
+    prevent_initial_call=True,
+)
+def patch_axis_names(x: str, y: str) -> Patch:
+    """Renames figure graph names.
+
+    Args:
+        x (str): x-axis name
+        y (str): y-axis name
+
+    Returns:
+        Patch: Patched figure with new axis names
+    """
+    patched_figure = Patch()
+    patched_figure["layout"]["xaxis"]["title"] = x
+    patched_figure["layout"]["yaxis"]["title"] = y
+    return patched_figure
+
 
 @callback(
     Output("graph_output", "children"),
@@ -738,10 +871,11 @@ def main(
     if file_name == None:
         file_name = "filename"
 
-    if df_storage1 is None:
-        raise PreventUpdate
-    if not os.path.exists("graph_images"):
-        os.mkdir("graph_images")
+    data_frames = [pl.from_dict(x) for x in data_frame]
+    for num, i in enumerate(data_frames):
+        loc_fig = create_fig(i, "line", "#000000", name=f"Graph {num}")
+        figure_names.append({"label": loc_fig["name"], "value": num})
+        created_figs.append(loc_fig)
 
     # print("df_storage1 ", df_storage1)
     # print("df_storage2 ", df_storage2)
