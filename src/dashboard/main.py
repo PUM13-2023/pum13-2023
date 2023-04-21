@@ -46,7 +46,7 @@ PORT = 8000
 
 def page_container() -> Component:
     """Main page layout containing navbar and page container."""
-    dash.page_container.className = "grow overflow-auto"
+    dash.page_container.className = "grow overflow-auto bg-background"
     return html.Div(
         id="main",
         className="flex h-screen overflow-x-hidden",

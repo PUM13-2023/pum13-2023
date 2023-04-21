@@ -11,7 +11,7 @@ IMPLICIT_WAIT = 10
 # Normally used constants
 START_PAGE_URL = f"{URL}/login/"
 HOME_PAGE_URL = f"{URL}/"
-DASHBOARD_PAGE_URL = f"{URL}/dashboards"
+DASHBOARDS_PAGE_URL = f"{URL}/dashboards"
 SHARED_DASHBOARDS_PAGE_URL = f"{URL}/shared-dashboards"
 
 USERS_USERNAME = "admin"

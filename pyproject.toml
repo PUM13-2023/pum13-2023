@@ -98,6 +98,9 @@ markers = [
     "test_user_db: Test user db models",
     "test_utilities: A test that test utility functions.",
     "test_modal: A test that test modals.",
+    "test_dashboards_page: Tests for the dashboards page.",
+    "test_dashboards_list_component: Tests for the dashboards list component.",
+    "test_list_component: Tests for the list component.",
     "dependency",
 ]
 
