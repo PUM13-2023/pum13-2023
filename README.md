@@ -42,6 +42,19 @@ pip install -e '.[dev]'
 > package refers to the project source directory. Omiting this flag results in
 > hard-to-find bugs as changes to the code are not applied as expected.
 
+### Tailwind CLI
+
+This project uses Tailwind CLI which generates css code for your tailwind syntax.
+To setup tailwind CLI on your machine follow this guide.
+https://tailwindcss.com/blog/standalone-cli
+Notable change from the guide is:
+input.css is tailwind.css.
+output.css is dashboard.css.
+
+
+> Note: tailwind CLI will not continually update the css as you code  like CDN did before
+> unless you use a watch.
+
 ## Deployment
 This section will describe how you deploy the GraphIt dashboard locally on your own computer or containerized using Docker and Nginx.
 
@@ -53,7 +66,7 @@ python -m dashboard.main
 
 ### Docker containerized
 
-To run the GraphIt dashboard application using Docker, Gunicorn and Nginx. Start the Docker daemon and go to the root directory and use the command below. 
+To run the GraphIt dashboard application using Docker, Gunicorn and Nginx. Start the Docker daemon and go to the root directory and use the command below.
 
 ```bash
 docker compose up --build
@@ -61,6 +74,11 @@ docker compose up --build
 
 This command will create two separate Docker containers, one for the dashboard and one for Nginx and run it on your machine.
 
+### Environment
+The project uses a `.env` file to store MongoDB url. This is to avoid commiting potentially sensitive information to GitHub. Creating this file is needed for running the project. Example:
+```bash
+DB_URL=mongodb://...
+```
 
 ## Contributing
 For information on how to contribute, see [`CONTRIBUTING.md`](./CONTRIBUTING.md)

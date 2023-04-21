@@ -2,7 +2,7 @@
 from typing import Optional
 
 import dash
-from dash import html
+from dash import dcc, html
 
 from dashboard.components.icon import icon
 
@@ -35,15 +35,17 @@ def carousel_layout(container_title: str, id_: Optional[str] = None) -> html.Div
         className="flex h-full mb-[3rem]",
         children=[
             html.Button(
-                className="bg-white transition-all transition duration-150 "
-                "drop-shadow-md w-[20rem] h-[17rem] "
-                "flex border-b-4 hover:border-b-indigo-500 "
-                "justify-center items-center items-baseline flex-col rounded-[2px] "
-                "hover:drop-shadow-[2px_4px_10px_rgba(0,0,0,0.20)] p-5 "
-                "hover:rounded-t-xl mr-[3.5rem]",
+                className=(
+                    "bg-white transition-all transition duration-150 "
+                    "drop-shadow-md w-[20rem] h-[17rem] "
+                    "flex border-b-4 hover:border-b-indigo-500 "
+                    "justify-center items-center items-baseline flex-col rounded-[2px] "
+                    "hover:drop-shadow-[2px_4px_10px_rgba(0,0,0,0.20)] p-5 "
+                    "hover:rounded-t-xl mr-[3.5rem]"
+                ),
                 children=[
                     html.Div(
-                        className="bg-[#dcdcdc]/70 h-full w-full flex items-center justify-center",
+                        className="bg-white/70 h-full w-full flex items-center justify-center",
                         children=[icon("add_circle", fill=1, className="text-4xl text-black/75")],
                     ),
                     html.P(className="text-md my-3", children=empty_dashboard_text),
@@ -76,7 +78,7 @@ def layout() -> html.Div:
         html.Div: Div tag with the home page layout
     """
     return html.Div(
-        className="flex flex-col bg-[#e9e9f2] p-10 pb-0",
+        className="flex flex-col bg-background p-10 pb-0",
         children=[
             html.Div(
                 className="block w-full text-3xl",
@@ -89,14 +91,17 @@ def layout() -> html.Div:
             html.Div(
                 className="flex justify-center w-full",
                 children=[
-                    html.Button(
-                        className="bg-white w-[40rem] h-[25rem] duration-150 "
-                        "[&>p]:text-2xl shadow-sm "
-                        "hover:shadow-lg flex justify-center flex-col text-black/50 "
-                        "items-center rounded-md drop-shadow-[0px_0px_2px_rgba(0,0,0,0.20)] "
-                        "hover:text-black hover:rounded-[20px]",
+                    dcc.Link(
+                        className=(
+                            "bg-white w-[40rem] h-[25rem] duration-150 "
+                            "[&>p]:text-2xl shadow-sm "
+                            "hover:shadow-lg flex justify-center flex-col text-black/50 "
+                            "items-center rounded-md drop-shadow-[0px_0px_2px_rgba(0,0,0,0.20)] "
+                            "hover:text-black hover:rounded-[20px]"
+                        ),
                         children=[icon("add_circle", fill=1), html.P("Create dashboard")],
                         id="create-dashboard",
+                        href="/create-graph",
                     )
                 ],
             ),

@@ -117,6 +117,7 @@ class TestCreateDashboard:
         dashboard_button: WebElement = helper.get_element_by_id(
             browser_driver, settings.DASHBOARD_BUTTON_NAV
         )
+
         dashboard_button.click()
 
         # Press the create dashboard button and check if the modal is
@@ -124,6 +125,7 @@ class TestCreateDashboard:
         create_dashboard_button: WebElement = helper.get_element_by_id(
             browser_driver, ID_ADD_DASHBOARD_BUTTON
         )
+
         create_dashboard_button.click()
 
         dashboard_modal: WebElement = helper.get_element_by_id(

@@ -5,10 +5,16 @@ requires = ["setuptools", "setuptools-scm"]
 [project]
 classifiers = ["Programming Language :: Python :: 3"]
 dependencies = [
-  "dash == 2.9.2",
+  "dash == 2.9.3",
   "pymongo == 4.3.3",
   "pandas == 2.0.0",
-  "polars == 0.16.18"
+  "polars == 0.17.4",
+  "pymongo == 4.3.3",
+  "mongoengine == 0.27.0",
+  "python-dotenv == 0.21.1",
+  "blinker == 1.6.2",
+  "dash-bootstrap-components == 1.4.1",
+  "jsonpickle == 3.0.1",
 ]
 name = "pum13-2023"
 description = "Data visualization dashboard written with Dash"
@@ -20,18 +26,19 @@ version = "0.0.1"
 dev = [
   "isort == 5.12.0",
   "black == 23.3.0",
-  "mypy == 1.1.1",
+  "mypy == 1.2.0",
   "nox == 2022.11.21",
-  "pytest == 7.2.2",
+  "pytest == 7.3.1",
   "flake8 == 6.0.0",
   "flake8-bugbear == 23.3.23",
-  "flake8-comprehensions == 3.11.1",
+  "flake8-comprehensions == 3.12.0",
   "flake8-docstrings",
   "pep8-naming == 0.13.3",
   "pyproject-flake8 == 6.0.0.post1",
   "pytest-cov == 4.0.0",
   "selenium == 4.8.3",
   "pytest-dependency == 0.5.1",
+  "mongomock == 4.1.2",
 ]
 
 prod = [
@@ -46,7 +53,11 @@ strict = true
 
 
 [[tool.mypy.overrides]]
-module = ["dash.*", "plotly.*"]
+module = ["dash.*", "plotly.*", "dash_bootstrap_components.*", "jsonpickle.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "mongoengine.*"
 ignore_missing_imports = true
 
 [tool.flake8]
@@ -71,9 +82,8 @@ src_paths = ["src"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-m 'not youtube and not test_create_dashboard and not test_navbar_component'"
+addopts = "-m 'not test_create_dashboard'"
 markers = [
-    "youtube",
     "test_login: This are test that will test the login capabilities of the website.",
     "test_unsuccessful_login: A test that would try to login with invalid username and password.",
     "test_successful_login: A test that would try to login to the system.",
@@ -83,6 +93,13 @@ markers = [
     "test_creating_home_page: A test that would try to create the dashboard from the create dashboard button in the home screen.",
     "test_creating_dashboard_page: A test that would try to create a dashboard from the dashboard page.",
     "test_navbar_component: A test that test navbar component.",
+    "test_data_db: Test db models for that measurement data part of the db",
+    "test_user_db: Test user db models",
+    "test_utilities: A test that test utility functions.",
+    "test_modal: A test that test modals.",
+    "test_dashboards_page: Tests for the dashboards page.",
+    "test_dashboards_list_component: Tests for the dashboards list component.",
+    "test_list_component: Tests for the list component.",
     "dependency",
 ]
 

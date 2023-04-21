@@ -26,7 +26,7 @@ from dashboard.components.icon import icon
 RegistryItem: TypeAlias = dict[str, Any]
 PageRegistry: TypeAlias = OrderedDict[str, RegistryItem]
 
-HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-[#777df2]/30 "
+HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-light-purple/30 "
 NON_HIGHLIGHT_STYLE = (
     "mr-1 mt-2 hover:text-white opacity-80 hover:opacity-90 transition ease-in-out"
 )
@@ -91,7 +91,7 @@ def generate_navbar_link(path: str, name: str, class_name: str, icon_name: str) 
         icon_name (str): What google font icon should be used.
     """
     return dcc.Link(
-        id=f"{name}-button-navbar",
+        id=f"{name.replace(' ', '-').lower()}-button-navbar",
         href=path,
         className=class_name,
         children=[
@@ -129,7 +129,7 @@ def navbar_component() -> Component:
     """
     return html.Div(
         id="main-navbar",
-        className="bg-[#2f3273] justify-center text-left flex shadow-md hidden",
+        className="bg-dark-purple justify-center text-left flex shadow-md hidden overflow-auto",
         children=[
             dcc.Location(id="url", refresh=False),
             html.Div(
@@ -158,16 +158,20 @@ def generate_navbar_contents(
     upper_navbar_div = html.Div(
         id="upper-navbar-container",
         children=generate_upper_navbar_list(page_registry, item_to_highlight),
-        className="inline-block flex-col w-max flex "
-        "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
-        "text-white/75 [&>a]:block",
+        className=(
+            "inline-block flex-col w-max flex "
+            "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
+            "text-white/75 [&>a]:block"
+        ),
     )
     lower_navbar_div = html.Div(
         id="lower-navbar-container",
         children=generate_lower_navbar_list(),
-        className="inline-block flex-col w-max flex "
-        "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
-        "text-white/75 [&>a]:block",
+        className=(
+            "inline-block flex-col w-max flex "
+            "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
+            "text-white/75 [&>a]:block"
+        ),
     )
     return [upper_navbar_div, lower_navbar_div]
 
