@@ -2,7 +2,7 @@
 from typing import Optional
 
 import dash
-from dash import html
+from dash import dcc, html
 
 from dashboard.components.icon import icon
 
@@ -91,7 +91,7 @@ def layout() -> html.Div:
             html.Div(
                 className="flex justify-center w-full",
                 children=[
-                    html.Button(
+                    dcc.Link(
                         className=(
                             "bg-white w-[40rem] h-[25rem] duration-150 "
                             "[&>p]:text-2xl shadow-sm "
@@ -101,6 +101,7 @@ def layout() -> html.Div:
                         ),
                         children=[icon("add_circle", fill=1), html.P("Create dashboard")],
                         id="create-dashboard",
+                        href="/create-graph",
                     )
                 ],
             ),
