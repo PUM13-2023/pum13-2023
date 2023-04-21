@@ -12,7 +12,9 @@ dependencies = [
   "pymongo == 4.3.3",
   "mongoengine == 0.27.0",
   "python-dotenv == 0.21.1",
-  "blinker == 1.6.2"
+  "blinker == 1.6.2",
+  "dash-bootstrap-components == 1.4.1",
+  "jsonpickle == 3.0.1",
 ]
 name = "pum13-2023"
 description = "Data visualization dashboard written with Dash"
@@ -37,9 +39,6 @@ dev = [
   "selenium == 4.8.3",
   "pytest-dependency == 0.5.1",
   "mongomock == 4.1.2",
-  "dash-bootstrap-components == 1.4.1",
-  "mongomock == 4.1.2",
-  "jsonpickle == 3.0.1",
 ]
 
 prod = [
