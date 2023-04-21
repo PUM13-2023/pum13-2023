@@ -131,7 +131,7 @@ def file_name() -> Component:
     return input_field("file_name", "File name")
 
 
-def input_field(loc_id: str, loc_placeholder: str, disabled: bool = False) -> Component:
+def input_field(loc_id: str, loc_placeholder: str, disabled: bool = True) -> Component:
     """Input_field that lets user choose a color.
 
     Args:
@@ -141,9 +141,10 @@ def input_field(loc_id: str, loc_placeholder: str, disabled: bool = False) -> Co
     Returns:
         Component: epic component
     """
+        
     return dcc.Input(
-        className="bg-background flex items-center"
-        "justify-center mt-5 p-3 rounded-md shadow-inner",
+        className="bg-white flex items-center "
+        "justify-center mt-5 p-3 rounded-md shadow-inner border-2",
         id=loc_id,
         type="text",
         debounce=True,
@@ -161,10 +162,15 @@ def graph_window() -> Component:
     return html.Div(
         className="bg-white w-full ml-[3rem] my-[3rem] rounded-md shadow-md",
         children=[
-            input_field("figure_name", "Figure name"),
-            html.Div(id="graph_output", className="h-[70%] w-full"),
-            x_axis_name(),
-            y_axis_name(),
+            html.Div(className="h-[70] flex w-full flex-1 p-5", children=[
+                html.Div(className="border-2 rounded-md h-full w-full shadow-inner", id="graph_output")]),
+            html.Div(className = "flex flex-row space-x-2 mt-4 justify-center",
+                     children=[
+                        input_field("figure_name", "Figure name"),
+                        x_axis_name(),
+                        y_axis_name(),
+                        ])
+
         ],
     )
 
@@ -417,7 +423,9 @@ def parse_contents(contents: str) -> pl.DataFrame:
     Returns:
         A parsed and read version of the csv-file.
     """
-    content_type, content_string = contents.split(",")
+    
+    content_string = contents.split(",")[-1]
+    
     decoded = base64.b64decode(content_string)
 
     return pl.read_csv(io.StringIO(decoded.decode("utf-8")))
@@ -583,13 +591,23 @@ def patch_axis_names(x: str, y: str) -> Patch:
     patched_figure["layout"]["yaxis"]["title"] = y
     return patched_figure
 
+@callback(
+    Output("figure_name", "disabled"),
+    Output("graph_name", "disabled"),
+    Output("file_name", "disabled"),
+    Output("x_axis_name", "disabled"),
+    Output("y_axis_name", "disabled"),
+    Input("uploaded_data", "contents"),
+    prevent_initial_call=True
+)
+def enable_inputs(contents):
+    return False, False, False, False, False
 
 @callback(
     Output("graph_output", "children"),
     Output("graph_selector", "options"),
     Output("graph_selector", "value"),
     Output("fig_json", "value"),
-    Output("graph_name", "disabled"),
     Input("uploaded_data", "contents"),
 )
 def render_figure(contents: str) -> dcc.Graph | list[dict[str, str]]:
@@ -613,4 +631,4 @@ def render_figure(contents: str) -> dcc.Graph | list[dict[str, str]]:
     fig = go.Figure(data=created_figs)
     loc_graph = dcc.Graph(figure=fig, id="graph_id", config=loc_config)
     pickle = jsonpickle.encode(fig)
-    return loc_graph, figure_names, figure_names[0]["value"], pickle, False
+    return loc_graph, figure_names, figure_names[0]["value"], pickle
