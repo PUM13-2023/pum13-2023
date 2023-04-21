@@ -66,7 +66,7 @@ python -m dashboard.main
 
 ### Docker containerized
 
-To run the GraphIt dashboard application using Docker, Gunicorn and Nginx. Start the Docker daemon and go to the root directory and use the command below. 
+To run the GraphIt dashboard application using Docker, Gunicorn and Nginx. Start the Docker daemon and go to the root directory and use the command below.
 
 ```bash
 docker compose up --build
@@ -74,6 +74,11 @@ docker compose up --build
 
 This command will create two separate Docker containers, one for the dashboard and one for Nginx and run it on your machine.
 
+### Environment
+The project uses a `.env` file to store MongoDB url. This is to avoid commiting potentially sensitive information to GitHub. Creating this file is needed for running the project. Example:
+```bash
+DB_URL=mongodb://...
+```
 
 ## Contributing
 For information on how to contribute, see [`CONTRIBUTING.md`](./CONTRIBUTING.md)
