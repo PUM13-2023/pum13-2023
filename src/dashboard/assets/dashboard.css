@@ -771,6 +771,7 @@ video {
   height: 350px;
 }
 
+<<<<<<< HEAD
 .h-\[62\%\] {
   height: 62%;
 }
@@ -787,6 +788,12 @@ video {
   height: 9%;
 }
 
+=======
+.h-\[70\] {
+  height: 70%;
+}
+
+>>>>>>> 86b4748 (Update css)
 .h-fit {
   height: -moz-fit-content;
   height: fit-content;
@@ -1407,6 +1414,10 @@ video {
 .drop-shadow-sm {
   --tw-drop-shadow: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.shadow-inner {
+  box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
 }
 
 .grayscale {
