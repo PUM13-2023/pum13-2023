@@ -88,11 +88,11 @@ def singularize(article: str, amount: int) -> str:
 
 
 def to_human_time_delta(t1: datetime, t2: datetime) -> str:
-    """Convert a timedelta to a human readable form.
+    """Convert a time delta to a human readable form.
 
     Args:
-        delta (timedelta): A duration
-        of time.
+        t1 (datetime): A point in time.
+        t2 (datetime): A point in time.
 
     Returns:
         str: A human readable form of
