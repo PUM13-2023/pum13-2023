@@ -6,9 +6,10 @@ import pytest
 from dashboard.components.dashboards_list_component import generate_list_row_contents
 from dashboard.models.user import Dashboard
 
-a_minute_ago = datetime.now() - timedelta(minutes=1)
-an_hour_ago = datetime.now() - timedelta(hours=1)
-a_day_ago = datetime.now() - timedelta(days=1)
+now = datetime.now()
+a_minute_ago = now - timedelta(minutes=1)
+an_hour_ago = now - timedelta(hours=1)
+a_day_ago = now - timedelta(days=1)
 
 TIMES: list[tuple[datetime, str]] = [
     (a_minute_ago, "A minute ago"),
@@ -30,7 +31,7 @@ def dashboards_list_rows_contents() -> list[list[str]]:
     Returns:
         list[html.Div]: The dashboard list row elements.
     """
-    return [generate_list_row_contents(dashboard) for dashboard in DASHBOARDS]
+    return [generate_list_row_contents(now, dashboard) for dashboard in DASHBOARDS]
 
 
 @pytest.mark.test_dashboards_list_component
