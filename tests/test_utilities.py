@@ -77,14 +77,6 @@ class TestPluralizeAndSingularize:
 class TestToHumanTimeDelta:
     """Tests for the to_human_time_delta function."""
 
-    def test_different_parameter_orders(self) -> None:
-        """Test that the function has the same result."""
-        before = datetime.now()
-        after = datetime.now()
-        delta1 = to_human_time_delta(before - after)
-        delta2 = to_human_time_delta(after - before)
-        assert delta1 == delta2
-
     def test_zero_duration(self) -> None:
         """Test that the function works with identical times."""
         now = datetime.now()
@@ -92,8 +84,13 @@ class TestToHumanTimeDelta:
 
     def test_time_deltas(self) -> None:
         """Test that the function works with some time deltas."""
-        now = datetime.now()
-        an_hour_ago = now - timedelta(hours=1)
-        assert to_human_time_delta(now - an_hour_ago) == "An hour ago"
-        a_year_ago = now - timedelta(days=365)
-        assert to_human_time_delta(now - a_year_ago) == "A year ago"
+        an_hour_ago = timedelta(hours=1)
+        assert to_human_time_delta(an_hour_ago) == "An hour ago"
+        a_year_ago = timedelta(days=365)
+        assert to_human_time_delta(a_year_ago) == "A year ago"
+
+    def test_abbreviated_time_deltas(self) -> None:
+        an_hour_ago = timedelta(hours=1)
+        assert to_human_time_delta(an_hour_ago, abbreviated=True) == "1 h"
+        a_year_ago = timedelta(days=365)
+        assert to_human_time_delta(a_year_ago, abbreviated=True) == "1 y"

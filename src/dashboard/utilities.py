@@ -87,7 +87,7 @@ def singularize(article: str, amount: int) -> str:
     return str(amount)
 
 
-def to_human_time_delta(duration: timedelta) -> str:
+def to_human_time_delta(duration: timedelta, abbreviated: bool = False) -> str:
     """Convert a duration of time to a human readable form.
 
     Args:
@@ -97,22 +97,25 @@ def to_human_time_delta(duration: timedelta) -> str:
         str: A human readable form of
         the delta.
     """
-    units: list[tuple[str, str, timedelta]] = [
-        ("A", "year", timedelta(days=365)),
-        ("A", "month", timedelta(weeks=4)),
-        ("A", "week", timedelta(weeks=1)),
-        ("A", "day", timedelta(days=1)),
-        ("An", "hour", timedelta(hours=1)),
-        ("A", "minute", timedelta(minutes=1)),
-        ("A", "second", timedelta(seconds=1)),
+    units: list[tuple[str, str, str, timedelta]] = [
+        ("A", "year", "y", timedelta(days=365)),
+        ("A", "month", "mo", timedelta(weeks=4)),
+        ("A", "week", "w", timedelta(weeks=1)),
+        ("A", "day", "d", timedelta(days=1)),
+        ("An", "hour", "h", timedelta(hours=1)),
+        ("A", "minute", "m", timedelta(minutes=1)),
+        ("A", "second", "s", timedelta(seconds=1)),
     ]
     duration_seconds = duration.total_seconds()
-    for article, unit, unit_delta in units:
+    for article, unit, unit_abbr, unit_delta in units:
         unit_delta_seconds = unit_delta.total_seconds()
         duration_in_unit = int(duration_seconds // unit_delta_seconds)
-        if duration_in_unit >= 1:
-            return (
-                f"{singularize(article, duration_in_unit)} {pluralize(unit, duration_in_unit)} ago"
-            )
+        if duration_in_unit == 0:
+            continue
+
+        if abbreviated:
+            return f"{duration_in_unit} {unit_abbr}"
+
+        return f"{singularize(article, duration_in_unit)} {pluralize(unit, duration_in_unit)} ago"
 
     return "Just now"
