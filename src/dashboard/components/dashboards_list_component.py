@@ -25,8 +25,8 @@ def generate_list_row_contents(time: datetime, dashboard: Dashboard) -> list[str
     """
     return [
         dashboard.name,
-        to_human_time_delta(time, dashboard.modified),
-        to_human_time_delta(time, dashboard.created),
+        to_human_time_delta(time - dashboard.modified),
+        to_human_time_delta(time - dashboard.created),
     ]
 
 

@@ -1,5 +1,5 @@
 """Module with utility functions that are reused frequently."""
-from datetime import datetime
+from datetime import timedelta
 
 
 def set_classname(class_str: str, class_to_set: str, set_: bool) -> str:
@@ -87,32 +87,32 @@ def singularize(article: str, amount: int) -> str:
     return str(amount)
 
 
-def to_human_time_delta(t1: datetime, t2: datetime) -> str:
-    """Convert a time delta to a human readable form.
+def to_human_time_delta(duration: timedelta) -> str:
+    """Convert a duration of time to a human readable form.
 
     Args:
-        t1 (datetime): A point in time.
-        t2 (datetime): A point in time.
+        delta (timedelta): A duration of time.
 
     Returns:
         str: A human readable form of
         the delta.
     """
-    delta = abs(t1 - t2)
-    units: list[tuple[str, str, int]] = [
-        ("A", "week", 604800),
-        ("A", "day", 86400),
-        ("An", "hour", 3600),
-        ("A", "minute", 60),
-        ("A", "second", 1),
+    units: list[tuple[str, str, timedelta]] = [
+        ("A", "year", timedelta(days=365)),
+        ("A", "month", timedelta(weeks=4)),
+        ("A", "week", timedelta(weeks=1)),
+        ("A", "day", timedelta(days=1)),
+        ("An", "hour", timedelta(hours=1)),
+        ("A", "minute", timedelta(minutes=1)),
+        ("A", "second", timedelta(seconds=1)),
     ]
-    for article, unit, duration_seconds in units:
-        unit_duration = int(delta.total_seconds()) // duration_seconds
-        if unit_duration >= 1:
+    duration_seconds = duration.total_seconds()
+    for article, unit, unit_delta in units:
+        unit_delta_seconds = unit_delta.total_seconds()
+        duration_in_unit = int(duration_seconds // unit_delta_seconds)
+        if duration_in_unit >= 1:
             return (
-                f"{singularize(article, unit_duration)} {pluralize(unit, unit_duration)} ago"
-                if unit != "week"
-                else min(t1, t2).strftime("%d %b. %Y")
+                f"{singularize(article, duration_in_unit)} {pluralize(unit, duration_in_unit)} ago"
             )
 
     return "Just now"
