@@ -90,6 +90,7 @@ class TestToHumanTimeDelta:
         assert to_human_time_delta(a_year_ago) == "A year ago"
 
     def test_abbreviated_time_deltas(self) -> None:
+        """Test that the function returns abbreviated time deltas."""
         an_hour_ago = timedelta(hours=1)
         assert to_human_time_delta(an_hour_ago, abbreviated=True) == "1 h"
         a_year_ago = timedelta(days=365)
