@@ -25,12 +25,13 @@ def dashboards_add_button_clicked(n_clicks: int) -> Patch:
     """
     test_user = login_user("dashboards-page-test-user")
     new_index = len(test_user.dashboards)
-    added_dashboard = Dashboard(name=f"Added Dashboard #{new_index + 1}", created=datetime.now())
+    created = datetime.now()
+    added_dashboard = Dashboard(name=f"Added Dashboard #{new_index + 1}", created=created)
     test_user.dashboards.append(added_dashboard)
     test_user.save()
 
     children_patch = Patch()
     children_patch.append(
-        generate_list_row(new_index, generate_list_row_contents(added_dashboard))
+        generate_list_row(new_index, generate_list_row_contents(created, added_dashboard))
     )
     return children_patch
