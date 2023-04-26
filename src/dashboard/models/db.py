@@ -35,7 +35,11 @@ def _connect_mock_db(db_name: str, alias: str = "default") -> None:
     import mongomock
 
     mongoengine.connect(
-        db=db_name, alias=alias, host="127.0.0.1", mongo_client_class=mongomock.MongoClient
+        db=db_name,
+        alias=alias,
+        host="127.0.0.1",
+        mongo_client_class=mongomock.MongoClient,
+        uuidRepresentation="standard",
     )
 
 
@@ -52,7 +56,12 @@ def connect_data_db(db_name: str, alias: str = "data") -> None:
         return
 
     db_url = _get_db_url()
-    mongoengine.connect(db=db_name, alias=alias, host=db_url)
+    mongoengine.connect(
+        db=db_name,
+        alias=alias,
+        host=db_url,
+        uuidRepresentation="standard",
+    )
 
 
 def connect_user_db() -> None:
@@ -62,7 +71,11 @@ def connect_user_db() -> None:
         return
 
     db_url = _get_db_url()
-    mongoengine.connect(db=USER_DB_NAME, host=db_url)
+    mongoengine.connect(
+        db=USER_DB_NAME,
+        host=db_url,
+        uuidRepresentation="standard",
+    )
 
 
 def _is_project_db(db: Database[dict[str, Any]]) -> bool:
@@ -74,6 +87,6 @@ def _is_project_db(db: Database[dict[str, Any]]) -> bool:
 def list_project_dbs() -> list[str]:
     """Return a list of project dbs."""
     db_url = _get_db_url()
-    client: MongoClient[dict[str, Any]] = MongoClient(db_url)
+    client: MongoClient[dict[str, Any]] = MongoClient(db_url, uuidRepresentation="standard")
 
     return [db_name for db_name in client.list_database_names() if _is_project_db(client[db_name])]

@@ -13,7 +13,10 @@ from dashboard.models import user
 def connection():
     """Connect mongoengine to mongomock and return client."""
     conn = mongoengine.connect(
-        db="dashboard", host="mongodb://localhost", mongo_client_class=mongomock.MongoClient
+        db="dashboard",
+        host="mongodb://localhost",
+        mongo_client_class=mongomock.MongoClient,
+        uuidRepresentation="standard",
     )
 
     return conn
