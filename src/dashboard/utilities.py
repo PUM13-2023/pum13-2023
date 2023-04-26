@@ -106,10 +106,8 @@ def to_human_time_delta(duration: timedelta, abbreviated: bool = False) -> str:
         ("A", "minute", "m", timedelta(minutes=1)),
         ("A", "second", "s", timedelta(seconds=1)),
     ]
-    duration_seconds = duration.total_seconds()
     for article, unit, unit_abbr, unit_delta in units:
-        unit_delta_seconds = unit_delta.total_seconds()
-        duration_in_unit = int(duration_seconds // unit_delta_seconds)
+        duration_in_unit = duration // unit_delta
         if duration_in_unit == 0:
             continue
 
