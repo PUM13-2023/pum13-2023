@@ -55,7 +55,7 @@ strict = true
 
 
 [[tool.mypy.overrides]]
-module = ["dash.*", "plotly.*", "dash_bootstrap_components.*", "jsonpickle.*", "flask_login.*"]
+module = ["dash.*", "plotly.*", "dash_bootstrap_components.*", "jsonpickle.*", "dash_daq.*", "flask_login.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
