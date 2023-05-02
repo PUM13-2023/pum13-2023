@@ -5,7 +5,7 @@ of now it is just a stub.
 """
 from datetime import datetime
 
-from dash import ALL, Input, Output, State, callback, ctx
+from dash import Input, Output, State, callback, ctx
 
 from dashboard.models.user import Dashboard, login_user
 
@@ -19,6 +19,15 @@ input_css = "p-3 rounded-md shadow-inner bg-background "
     prevent_initial_call=True,
 )
 def toggle_create_dashboard(create_btn: int, cancel_btn: int) -> bool:
+    """Toggles the create dashboard modal.
+
+    Args:
+        create_btn (int): create dashboard button clicks
+        cancel_btn (int): cancel button clicks
+
+    Returns:
+        bool: value to toggle modal
+    """
     if "cancel-btn" == ctx.triggered_id:
         return False
     return True
@@ -33,19 +42,17 @@ def toggle_create_dashboard(create_btn: int, cancel_btn: int) -> bool:
     State("dashboard-desc", "value"),
     prevent_initial_call=True,
 )
-def add_dashboard_db(n_clicks: int, title: str, desc: str) -> bool | bool | bool:
-    """TODO
-        * Add empty title and desc error
-        * Remove invalid characters
-        * Add max length
+def add_dashboard_db(n_clicks: int, title: str, desc: str) -> tuple[bool, bool, bool]:
+    """Callback to add a new dashboard.
 
     Args:
-        n_clicks (int): _description_
-        title (str): _description_
-        desc (str): _description_
+        n_clicks (int): n_clicks for the button
+        title (str): Dashboard title
+        desc (str): Dashboard description
 
     Returns:
-        _type_: _description_
+        tuple[bool, bool, bool]: toggle modal bool, empty title bool,
+                                 empty desc bool
     """
     # Dash callback gives warnings if you pass bools to value but works
     empty_title = False
@@ -74,10 +81,20 @@ def add_dashboard_db(n_clicks: int, title: str, desc: str) -> bool | bool | bool
     Input("desc", "on"),
     prevent_initial_call=True,
 )
-def display_error(title_err: bool, desc_err: bool) -> str | str | str | str:
+def display_error(title_err: bool, desc_err: bool) -> tuple[str, str, str, str]:
+    """Callback to display error if title or description is empty.
+
+    Args:
+        title_err (bool): Title empty or not
+        desc_err (bool): Description empty or not
+
+    Returns:
+        tuple[str, str, str , str]: title, desc, title placeholder,
+                                    desc placeholder
+    """
     title = [input_css, ""]
     desc = [input_css, ""]
-    print(desc_err)
+
     if title_err:
         title[0] += "bg-red-100"
         title[1] = "Title cannot be empty"
@@ -92,6 +109,12 @@ def display_error(title_err: bool, desc_err: bool) -> str | str | str | str:
 
 
 def add_dashboard(name: str, desc: str) -> None:
+    """Adds dashboard to mongoDB.
+
+    Args:
+        name (str): Dashboard name
+        desc (str): Dashboard description
+    """
     test_user = login_user("dashboards-page-test-user")
     added_dashboard = Dashboard(name=name, description=desc, created=datetime.now())
     test_user.dashboards.append(added_dashboard)
