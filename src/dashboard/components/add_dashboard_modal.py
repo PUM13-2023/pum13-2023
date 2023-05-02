@@ -1,6 +1,7 @@
 """Modal for add dashboard buttons."""
 from dash import dcc, html
 
+from dashboard.components import modal
 from dashboard.components.button import button
 
 
@@ -37,7 +38,7 @@ def multiline_input(id: str, title: str, description: str) -> html.Div:
         description (str): placeholder of the multiline input
 
     Returns:
-        html.Div: A pre-styled multiline input with a title and placeholder
+        html.Div: pre-styled multiline input with title and placeholder
     """
     return html.Div(
         className="flex flex-col",
@@ -73,7 +74,8 @@ def buttons() -> html.Div:
     """Container for the modal buttons.
 
     Returns:
-        html.Div: A container with buttons for cancel and create dashboard
+        html.Div: Container with buttons for cancel and create
+                  dashboard
     """
     return html.Div(
         children=[
@@ -101,16 +103,39 @@ def buttons() -> html.Div:
 def add_dashboard_modal() -> html.Div:
     """Whole container for the modal.
 
+    This is the function used for the create dashboard modal.
+    If you want to use this predefined modal component create
+    a callback that modifies the add-dashboard-dialog open
+    property.
+
+    Example:
+        @callback(
+            Output({"type": "modal-dialog",
+                    "id": "add-dashboard-dialog"},
+                    "open", allow_duplicate=True),
+            Input("some_input", "property"),
+            prevent_initial_call=True,
+        )
+
     Returns:
         html.Div: Contains the inputs and buttons
     """
-    return html.Div(
-        id="add-dashboard-container",
-        className="shadow-md w-[40rem] rounded-md overflow-hidden",
+    return modal.modal_container(
         children=[
-            html.Div(
-                inputs(),
-            ),
-            html.Div(buttons()),
-        ],
+            modal.modal_dialog(
+                id="add-dashboard-dialog",
+                children=[
+                    html.Div(
+                        id="add-dashboard-container",
+                        className="shadow-md w-[40rem] rounded-md overflow-hidden",
+                        children=[
+                            html.Div(
+                                inputs(),
+                            ),
+                            html.Div(buttons()),
+                        ],
+                    )
+                ],
+            )
+        ]
     )

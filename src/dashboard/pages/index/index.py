@@ -124,10 +124,6 @@ def layout() -> html.Div:
                     carousel_layout("Shared dashboards", id_="shared-dashboards"),
                 ],
             ),
-            modal.modal_container(
-                children=[
-                    modal.modal_dialog(id="add-dashboard-dialog", children=[add_dashboard_modal()])
-                ]
-            ),
+            add_dashboard_modal(),
         ],
     )
