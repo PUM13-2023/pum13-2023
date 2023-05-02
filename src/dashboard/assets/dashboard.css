@@ -771,29 +771,14 @@ video {
   height: 350px;
 }
 
-<<<<<<< HEAD
-.h-\[62\%\] {
-  height: 62%;
-}
-
-.h-\[70\%\] {
-  height: 70%;
-}
-
-.h-\[80\%\] {
-  height: 80%;
-}
-
-.h-\[9\%\] {
-  height: 9%;
-}
-
-=======
 .h-\[70\] {
   height: 70%;
 }
 
->>>>>>> 86b4748 (Update css)
+.h-\[5rem\] {
+  height: 5rem;
+}
+
 .h-fit {
   height: -moz-fit-content;
   height: fit-content;
@@ -953,6 +938,10 @@ video {
 
 .justify-between {
   justify-content: space-between;
+}
+
+.justify-end {
+  justify-content: end;
 }
 
 .space-x-2 > :not([hidden]) ~ :not([hidden]) {
