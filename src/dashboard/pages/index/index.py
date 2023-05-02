@@ -2,10 +2,14 @@
 from typing import Optional
 
 import dash
-from dash import dcc, html
 from flask_login import current_user
 
-from dashboard.components import icon, login_required
+from dash import Input, Output, callback, dcc, html
+from dash_daq import BooleanSwitch
+
+from dashboard.components import icon, modal, login_required
+from dashboard.components.add_dashboard_modal import add_dashboard_modal
+import dashboard.pages.index.controller  # noqa: F401
 
 dash.register_page(__name__, path="/", name="Home", order=0, nav_item=True, icon_name="home")
 
@@ -26,8 +30,10 @@ def carousel_layout(container_title: str, id_: Optional[str] = None) -> html.Div
     Returns:
         html.Div: Div element with a carousel layout
     """
+    id = ""
     if container_title == LATEST_CONTAINER:
         empty_dashboard_text = "Create dashboard"
+        id = "create-dashboard-btn"
     else:
         empty_dashboard_text = "Add dashboard from link"
 
@@ -45,6 +51,7 @@ def carousel_layout(container_title: str, id_: Optional[str] = None) -> html.Div
                 ),
                 children=[
                     html.Div(
+                        id=id,
                         className="bg-white/70 h-full w-full flex items-center justify-center",
                         children=[icon("add_circle", fill=1, className="text-4xl text-black/75")],
                     ),
@@ -82,6 +89,9 @@ def layout() -> html.Div:
     return html.Div(
         className="flex flex-col bg-background p-10 pb-0",
         children=[
+            html.Div(id="db-add", className="hidden"),
+            BooleanSwitch(id="title", className="hidden", on=False),
+            BooleanSwitch(id="desc", className="hidden", on=False),
             html.Div(
                 className="block w-full text-3xl",
                 children=[
@@ -93,7 +103,7 @@ def layout() -> html.Div:
             html.Div(
                 className="flex justify-center w-full",
                 children=[
-                    dcc.Link(
+                    html.Button(
                         className=(
                             "bg-white w-[40rem] h-[25rem] duration-150 "
                             "[&>p]:text-2xl shadow-sm "
@@ -102,8 +112,8 @@ def layout() -> html.Div:
                             "hover:text-black hover:rounded-[20px]"
                         ),
                         children=[icon("add_circle", fill=1), html.P("Create dashboard")],
-                        id="create-dashboard",
-                        href="/create-graph",
+                        id="create-dashboard-btn",
+                        n_clicks=0,
                     )
                 ],
             ),
@@ -113,6 +123,11 @@ def layout() -> html.Div:
                     carousel_layout("Latest opened dashboards", id_="latest-opened-dashboards"),
                     carousel_layout("Shared dashboards", id_="shared-dashboards"),
                 ],
+            ),
+            modal.modal_container(
+                children=[
+                    modal.modal_dialog(id="add-dashboard-dialog", children=[add_dashboard_modal()])
+                ]
             ),
         ],
     )
