@@ -17,6 +17,7 @@ dependencies = [
   "jsonpickle == 3.0.1",
   "flask-login == 0.6.2",
   "kaleido == 0.2.1",
+  "dash-daq == 0.5.0",
 ]
 name = "pum13-2023"
 description = "Data visualization dashboard written with Dash"
