@@ -33,7 +33,7 @@ def carousel_layout(container_title: str, id_: Optional[str] = None) -> html.Div
     id = ""
     if container_title == LATEST_CONTAINER:
         empty_dashboard_text = "Create dashboard"
-        id = "create-dashboard-btn"
+        id = "create-dashboard-btn-carousel"
     else:
         empty_dashboard_text = "Add dashboard from link"
 

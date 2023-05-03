@@ -15,14 +15,16 @@ input_css = "p-3 rounded-md shadow-inner bg-background "
 @callback(
     Output({"type": "modal-dialog", "id": "add-dashboard-dialog"}, "open", allow_duplicate=True),
     Input("create-dashboard-btn", "n_clicks"),
+    Input("create-dashboard-btn-carousel", "n_clicks"),
     Input("cancel-btn", "n_clicks"),
     prevent_initial_call=True,
 )
-def toggle_create_dashboard(create_btn: int, cancel_btn: int) -> bool:
+def toggle_create_dashboard(create_btn: int, create_btn_2: int, cancel_btn: int) -> bool:
     """Toggles the create dashboard modal.
 
     Args:
-        create_btn (int): create dashboard button clicks
+        create_btn (int): create dashboard button main
+        create_btn_2 (int): create dashboard button carousel
         cancel_btn (int): cancel button clicks
 
     Returns:
@@ -57,19 +59,19 @@ def add_dashboard_db(n_clicks: int, title: str, desc: str) -> tuple[bool, bool, 
     # Dash callback gives warnings if you pass bools to value but works
     empty_title = False
     empty_desc = False
-    valid = False
+    open = True
 
-    if title is None:
+    if title is None or not title:
         empty_title = True
 
-    if desc is None:
+    if desc is None or not desc:
         empty_desc = True
 
     if desc and title:
-        valid = True
+        open = False
         add_dashboard(title, desc)
 
-    return not valid, empty_title, empty_desc
+    return open, empty_title, empty_desc
 
 
 @callback(
