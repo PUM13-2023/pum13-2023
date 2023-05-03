@@ -1,10 +1,13 @@
 """Test home page."""
 
+import mongoengine
+import mongomock
 import pytest
 from selenium.webdriver.remote.webelement import WebElement
 from tests import helper_test_functions as helper
 from tests import settings
 
+from dashboard.models import user
 from dashboard.pages.index import controller
 
 from .settings import DriverType
@@ -33,9 +36,32 @@ def login_session(browser_driver: DriverType) -> None:
     helper.try_login(browser_driver, USERNAME, PASSWORD)
 
 
+@pytest.fixture(autouse=True)
+def connection():
+    """Connect mongoengine to mongomock and return client."""
+    conn = mongoengine.connect(
+        db="dashboard",
+        host="mongodb://localhost",
+        mongo_client_class=mongomock.MongoClient,
+        uuidRepresentation="standard",
+    )
+
+    return conn
+
+
+@pytest.fixture(autouse=True)
+def example_user():
+    """Example user."""
+    username = "dashboards-page-test-user"
+    usr = user.login_user(username)
+    return usr
+
+
 @pytest.mark.test_home_page
 class TestHomePage:
-    """A class to group functions to test the dashboard capabilities."""
+    """A class to group functions to test home page."""
+
+    pytest.mark.usefixtures("start_server")
 
     @pytest.mark.usefixtures("start_server", "login_session")
     def test_create_dashboard_button(self, browser_driver: DriverType) -> None:
