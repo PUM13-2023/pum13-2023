@@ -1,13 +1,13 @@
 """Index controller module.
 
-This module is intented to contain callbacks used in the index page. As
-of now it is just a stub.
+Callbacks to the index page.
+Callbacks to toggle add dashboard modal
+and submitting a new dashboard.
 """
-from datetime import datetime
 
 from dash import Input, Output, State, callback, ctx
 
-from dashboard.models.user import Dashboard, login_user
+from dashboard.models.user import add_dashboard
 
 input_css = "p-3 rounded-md shadow-inner bg-background "
 
@@ -108,16 +108,3 @@ def display_error(title_err: bool, desc_err: bool) -> tuple[str, str, str, str]:
         desc[0] += "h-[17rem]"
 
     return title[0], desc[0], title[1], desc[1]
-
-
-def add_dashboard(name: str, desc: str) -> None:
-    """Adds dashboard to mongoDB.
-
-    Args:
-        name (str): Dashboard name
-        desc (str): Dashboard description
-    """
-    test_user = login_user("dashboards-page-test-user")
-    added_dashboard = Dashboard(name=name, description=desc, created=datetime.now())
-    test_user.dashboards.append(added_dashboard)
-    test_user.save()
