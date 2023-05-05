@@ -1,60 +1,13 @@
 """Modal for add dashboard buttons."""
-from dash import dcc, html
+from dash import html
 
 from dashboard.components import modal
 from dashboard.components.button import button
+from dashboard.components.multiline_input import multiline_input
+from dashboard.components.text_input import text_input
 
 
-def input(id: str, title: str, description: str) -> html.Div:
-    """Pre-styled input field.
-
-    Args:
-        id (str): Input id
-        title (str): input title
-        description (str): placeholder of the input
-
-    Returns:
-        html.Div: A pre-styled input with a title and placeholder
-    """
-    return html.Div(
-        className="flex flex-col",
-        children=[
-            html.P(title, className=""),
-            dcc.Input(
-                id=id,
-                className="p-3 rounded-md shadow-inner bg-background",
-                placeholder=description,
-            ),
-        ],
-    )
-
-
-def multiline_input(id: str, title: str, description: str) -> html.Div:
-    """Pre-styled multiline input.
-
-    Args:
-        id (str): id of the multiline input
-        title (str): title of the multiline input
-        description (str): placeholder of the multiline input
-
-    Returns:
-        html.Div: pre-styled multiline input with title and placeholder
-    """
-    return html.Div(
-        className="flex flex-col",
-        children=[
-            html.P(title, className=""),
-            dcc.Textarea(
-                id=id,
-                draggable=False,
-                className="p-3 rounded-md shadow-inner h-[17rem] bg-background",
-                placeholder=description,
-            ),
-        ],
-    )
-
-
-def inputs() -> html.Div:
+def generate_inputs() -> html.Div:
     """Input container.
 
     Returns:
@@ -64,13 +17,13 @@ def inputs() -> html.Div:
         className="flex flex-col px-[5rem] py-5 space-y-4",
         children=[
             html.P("Create dashboard", className="text-3xl"),
-            input("dashboard-title", "Dashboard title", "Enter dashboard title..."),
+            text_input("dashboard-title", "Dashboard title", "Enter dashboard title..."),
             multiline_input("dashboard-desc", "Description", "Enter dashboard description..."),
         ],
     )
 
 
-def buttons() -> html.Div:
+def generate_buttons() -> html.Div:
     """Container for the modal buttons.
 
     Returns:
@@ -130,9 +83,9 @@ def add_dashboard_modal() -> html.Div:
                         className="shadow-md w-[40rem] rounded-md overflow-hidden",
                         children=[
                             html.Div(
-                                inputs(),
+                                generate_inputs(),
                             ),
-                            html.Div(buttons()),
+                            generate_buttons(),
                         ],
                     )
                 ],
