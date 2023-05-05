@@ -5,8 +5,6 @@ Callbacks to toggle add dashboard modal
 and submitting a new dashboard.
 """
 
-from copy import deepcopy
-
 from dash import Input, Output, State, callback, ctx
 
 from dashboard.models.user import add_dashboard
@@ -112,9 +110,9 @@ def display_error(title_err: bool, desc_err: bool) -> tuple[str, str, str, str]:
         tuple[str, str, str , str]: title, desc, title placeholder,
                                     desc placeholder
     """
-    title_css = deepcopy(input_css)
+    title_css = input_css
     title_placeholder = ""
-    desc_css = f"{deepcopy(input_css)} h-[17rem] "
+    desc_css = f"{input_css} h-[17rem] "
     desc_placeholder = ""
 
     if title_err:
