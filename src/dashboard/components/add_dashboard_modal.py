@@ -28,24 +28,20 @@ def generate_buttons() -> html.Div:
                   dashboard
     """
     return html.Div(
+        className="flex bg-menu-back px-[5rem] justify-end h-[5rem] py-3",
         children=[
-            html.Div(
-                className="flex bg-menu-back px-[5rem] justify-end h-[5rem] py-3",
-                children=[
-                    button(
-                        id="cancel-btn",
-                        icon_name="",
-                        text="Cancel",
-                        className="bg-none text-white",
-                    ),
-                    button(
-                        id="add-dashboard",
-                        icon_name="",
-                        text="Create dashboard",
-                        className="bg-dark-purple text-white p-5",
-                    ),
-                ],
-            )
+            button(
+                id="cancel-btn",
+                icon_name="",
+                text="Cancel",
+                className="bg-none text-white",
+            ),
+            button(
+                id="add-dashboard",
+                icon_name="",
+                text="Create dashboard",
+                className="bg-dark-purple text-white p-5",
+            ),
         ],
     )
 
@@ -79,9 +75,7 @@ def add_dashboard_modal() -> html.Div:
                         id="add-dashboard-container",
                         className="shadow-md w-[40rem] rounded-md overflow-hidden",
                         children=[
-                            html.Div(
-                                generate_inputs(),
-                            ),
+                            generate_inputs(),
                             generate_buttons(),
                         ],
                     )
