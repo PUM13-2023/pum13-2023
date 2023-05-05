@@ -13,6 +13,7 @@ from dashboard.pages.index import controller
 from .settings import DriverType
 
 CREATE_DASHBOARD_BUTTON_ID = "create-dashboard-btn"
+DASHBOARD_MODAL_ID = "modal-container"
 LATEST_OPENED_DASHBOARDS_ID = "latest-opened-dashboards"
 SHARED_DASHBOARDS_ID = "shared-dashboards"
 USERNAME = "home-page-user"
@@ -61,8 +62,6 @@ def example_user():
 class TestHomePage:
     """A class to group functions to test home page."""
 
-    pytest.mark.usefixtures("start_server")
-
     @pytest.mark.usefixtures("start_server", "login_session")
     def test_create_dashboard_button(self, browser_driver: DriverType) -> None:
         """Test the create dashboard button.
@@ -76,20 +75,15 @@ class TestHomePage:
             browser_driver, CREATE_DASHBOARD_BUTTON_ID
         )
         create_dashboard.click()
+        dashboard_modal: WebElement = helper.get_element_by_id(browser_driver, DASHBOARD_MODAL_ID)
+        assert "hidden" not in dashboard_modal.get_attribute("class")
 
-    @pytest.mark.usefixtures("start_server")
-    def test_create_dashboard(self, browser_driver: DriverType) -> None:
+    def test_create_dashboard(self) -> None:
         """Tries to create dashboards using callback.
 
         Args:
             browser_driver (DriverType): webdriver used for selenium
         """
-        browser_driver.get(settings.HOME_PAGE_URL)
-
-        create_dashboard: WebElement = helper.get_element_by_id(
-            browser_driver, CREATE_DASHBOARD_BUTTON_ID
-        )
-        create_dashboard.click()
         empty_title_output = controller.add_dashboard_db(0, "", "Text")
         valid_dashboard_output = controller.add_dashboard_db(0, "Title", "Text")
         empty_desc_output = controller.add_dashboard_db(0, "Title", "")
