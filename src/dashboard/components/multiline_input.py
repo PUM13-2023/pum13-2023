@@ -18,7 +18,7 @@ def multiline_input(id: str, title: str, description: str) -> html.Div:
     return html.Div(
         className="flex flex-col",
         children=[
-            html.P(title, className=""),
+            html.Label(title),
             dcc.Textarea(
                 id=id,
                 draggable=False,

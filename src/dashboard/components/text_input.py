@@ -17,7 +17,7 @@ def text_input(id: str, title: str, description: str) -> html.Div:
     return html.Div(
         className="flex flex-col",
         children=[
-            html.P(title, className=""),
+            html.Label(title),
             dcc.Input(
                 id=id,
                 className="p-3 rounded-md shadow-inner bg-background",
