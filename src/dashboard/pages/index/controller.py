@@ -5,6 +5,8 @@ Callbacks to toggle add dashboard modal
 and submitting a new dashboard.
 """
 
+from copy import deepcopy
+
 from dash import Input, Output, State, callback, ctx
 
 from dashboard.models.user import add_dashboard
@@ -16,10 +18,9 @@ input_css = "p-3 rounded-md shadow-inner bg-background "
     Output({"type": "modal-dialog", "id": "add-dashboard-dialog"}, "open", allow_duplicate=True),
     Input("create-dashboard-btn", "n_clicks"),
     Input("create-dashboard-btn-carousel", "n_clicks"),
-    Input("cancel-btn", "n_clicks"),
     prevent_initial_call=True,
 )
-def toggle_create_dashboard(create_btn: int, create_btn_2: int, cancel_btn: int) -> bool:
+def toggle_create_dashboard(create_btn: int, create_btn_2: int) -> bool:
     """Toggles the create dashboard modal.
 
     Args:
@@ -30,9 +31,26 @@ def toggle_create_dashboard(create_btn: int, create_btn_2: int, cancel_btn: int)
     Returns:
         bool: value to toggle modal
     """
-    if "cancel-btn" == ctx.triggered_id:
-        return False
     return True
+
+
+@callback(
+    Output({"type": "modal-dialog", "id": "add-dashboard-dialog"}, "open", allow_duplicate=True),
+    Input("cancel-btn", "n_clicks"),
+    prevent_initial_call=True,
+)
+def cancel_modal(cancel_click: int) -> bool:
+    """Close modal on cancel button.
+
+    Args:
+        cancel_click (int): Cancel button click
+
+    Returns:
+        bool: True if cancel is pressed else False
+    """
+    # Linter thinks this is Any type. Declared as bool.
+    should_close: bool = ctx.triggered_id != "cancel-btn"
+    return should_close
 
 
 @callback(
@@ -94,17 +112,17 @@ def display_error(title_err: bool, desc_err: bool) -> tuple[str, str, str, str]:
         tuple[str, str, str , str]: title, desc, title placeholder,
                                     desc placeholder
     """
-    title = [input_css, ""]
-    desc = [input_css, ""]
+    title_css = deepcopy(input_css)
+    title_placeholder = ""
+    desc_css = f"{deepcopy(input_css)} h-[17rem] "
+    desc_placeholder = ""
 
     if title_err:
-        title[0] += "bg-red-100"
-        title[1] = "Title cannot be empty"
+        title_css += "bg-red-100"
+        title_placeholder = "Title cannot be empty"
 
     if desc_err:
-        desc[0] += "bg-red-100 h-[17rem]"
-        desc[1] = "Description cannot be empty"
-    else:
-        desc[0] += "h-[17rem]"
+        desc_css += "bg-red-100"
+        desc_placeholder = "Description cannot be empty"
 
-    return title[0], desc[0], title[1], desc[1]
+    return title_css, desc_css, title_placeholder, desc_placeholder
