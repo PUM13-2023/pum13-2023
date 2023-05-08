@@ -3,7 +3,7 @@ from collections.abc import Callable
 from functools import wraps
 
 from dash import dcc, html
-from dash.dev import Component
+from dash.dependencies import Component
 from flask_login import current_user
 
 
