@@ -18,6 +18,7 @@ def client():
         alias="data",
         host="mongodb://localhost",
         mongo_client_class=mongomock.MongoClient,
+        uuidRepresentation="standard",
     )
 
     return client

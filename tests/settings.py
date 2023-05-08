@@ -14,8 +14,8 @@ HOME_PAGE_URL = f"{URL}/"
 DASHBOARDS_PAGE_URL = f"{URL}/dashboards"
 SHARED_DASHBOARDS_PAGE_URL = f"{URL}/shared-dashboards"
 
-USERS_USERNAME = "admin"
-USERS_PASSWORD = "admin"
+USERS_USERNAME = "testuser"
+USERS_PASSWORD = "password"
 
 NORMAL_TIMEOUT = 1
 

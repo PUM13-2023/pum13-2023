@@ -15,12 +15,13 @@ dependencies = [
   "blinker == 1.6.2",
   "dash-bootstrap-components == 1.4.1",
   "jsonpickle == 3.0.1",
+  "flask-login == 0.6.2",
 ]
 name = "pum13-2023"
 description = "Data visualization dashboard written with Dash"
 readme = "README.md"
 requires-python = ">=3.10"
-version = "0.0.1"
+version = "0.3.0"
 
 [project.optional-dependencies]
 dev = [
@@ -53,7 +54,7 @@ strict = true
 
 
 [[tool.mypy.overrides]]
-module = ["dash.*", "plotly.*", "dash_bootstrap_components.*", "jsonpickle.*"]
+module = ["dash.*", "plotly.*", "dash_bootstrap_components.*", "jsonpickle.*", "flask_login.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

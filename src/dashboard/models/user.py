@@ -2,6 +2,7 @@
 from datetime import datetime
 from typing import Any
 
+import flask_login
 from mongoengine import (
     DateTimeField,
     Document,
@@ -75,10 +76,65 @@ class User(Document):
         username (str): The users username, used to identify the user.
         dashboards (list[Dashboard]): list of embedded dashboard
             documents.
+        is_authenticated (bool): True if the User is authenticated.
+        is_active (bool): True if the User is active, i.e. not
+            suspended or similar.
+        is_anonymous (bool): Always False for User objects.
     """
 
     username: str = StringField()
     dashboards: list[Dashboard] = EmbeddedDocumentListField(Dashboard)
+    _is_authenticated: bool
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        """Initialize a User."""
+        super().__init__(*args, **kwargs)
+        self._is_authenticated = kwargs.get("is_authenticated", False)
+
+    @property
+    def is_authenticated(self) -> bool:
+        """Get authentication status.
+
+        Required by flask-login. For more information, see
+        https://flask-login.readthedocs.io/en/latest/#your-user-class
+        """
+        return self._is_authenticated
+
+    @is_authenticated.setter
+    def is_authenticated(self, value: bool) -> None:
+        """Set authentication status."""
+        self._is_authenticated = value
+
+    @property
+    def is_active(self) -> bool:
+        """Return True if the user is active.
+
+        Currently all users are considered active.
+
+        Required by flask-login. For more information, see
+        https://flask-login.readthedocs.io/en/latest/#your-user-class
+        """
+        return True
+
+    @property
+    def is_anonymous(self) -> bool:
+        """Return True if the user is an anonymous user.
+
+        Anonymous users are not handled by this class, hence returns
+        False.
+
+        Required by flask-login. For more information, see
+        https://flask-login.readthedocs.io/en/latest/#your-user-class
+        """
+        return False
+
+    def get_id(self) -> str:
+        """Return user id as a string.
+
+        Required by flask-login. For more information, see
+        https://flask-login.readthedocs.io/en/latest/#your-user-class
+        """
+        return str(self.id)
 
 
 def register_user(username: str) -> User:
@@ -119,5 +175,9 @@ def login_user(username: str) -> User:
         user: User = User.objects(username=username)[0]
     except IndexError:
         user = register_user(username)
+
+    user.is_authenticated = True
+
+    flask_login.login_user(user)
 
     return user

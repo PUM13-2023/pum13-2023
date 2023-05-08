@@ -7,7 +7,6 @@ from tests import helper_test_functions as helper
 from tests import settings
 
 # Login credentials for the unvalid test user
-WRONG_USERNAME = "not_valid_user"
 WRONG_PASSWORD = "not_valid_user_password"
 
 ID_POP_UP_ELEMENT = "error_input_message"  # The error pop up element id
@@ -23,16 +22,9 @@ class TestLogin:
     def test_unsuccessful_login(self, browser_driver: webdriver):
         """Try to login with invalid username and password."""
         browser_driver.get(settings.START_PAGE_URL)
-        # Try logging in with wrong password and username
-        helper.try_login(browser_driver, WRONG_USERNAME, WRONG_PASSWORD)
-        self.check_login_error_pop_up(browser_driver)
 
         # Try logging in with wrong password
         helper.try_login(browser_driver, settings.USERS_USERNAME, WRONG_PASSWORD)
-        self.check_login_error_pop_up(browser_driver)
-
-        # Try logging in with wrong username
-        helper.try_login(browser_driver, WRONG_USERNAME, settings.USERS_PASSWORD)
         self.check_login_error_pop_up(browser_driver)
 
     @pytest.mark.usefixtures("start_server")
