@@ -14,12 +14,17 @@ Examples:
 
         $ gunicorn -w 4 dashboard.main:server
 """
+import os
+
 import dash
 from dash import Dash, dcc, html
 from dash.dependencies import Component
+from dotenv import load_dotenv
 from flask import Flask
+from flask_login import LoginManager
 
 from dashboard.components.navbar_component import navbar_component
+from dashboard.models.user import User
 
 external_stylesheets = [
     {
@@ -32,6 +37,8 @@ external_stylesheets = [
     },
 ]
 
+load_dotenv()
+
 server = Flask(__name__)
 app = Dash(
     __name__,
@@ -40,6 +47,25 @@ app = Dash(
     external_stylesheets=external_stylesheets,
     suppress_callback_exceptions=True,
 )
+
+server.secret_key = os.environ["SECRET_KEY"]
+login_manager = LoginManager()
+login_manager.init_app(server)
+login_manager.login_view = "/login"
+
+
+@login_manager.user_loader
+def load_user(user_id: str) -> User:
+    """Load a user by id.
+
+    Required by flask-login. For more information, see
+    https://flask-login.readthedocs.io/en/latest/#your-user-class
+    """
+    user: User = User.objects(id=user_id).get()
+    user.is_authenticated = True
+
+    return user
+
 
 PORT = 8000
 
