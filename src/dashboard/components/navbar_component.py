@@ -20,15 +20,16 @@ from typing import Any, Optional, OrderedDict, TypeAlias
 import dash
 from dash import Input, Output, State, callback, dcc, html
 from dash.dependencies import Component
+from flask_login import logout_user
 
 from dashboard.components.icon import icon
 
 RegistryItem: TypeAlias = dict[str, Any]
 PageRegistry: TypeAlias = OrderedDict[str, RegistryItem]
 
-HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-light-purple/30 "
+HIGHLIGHT_STYLE = "border-r-4 mt-2 border-r-white text-white bg-light-purple/30 px-5 py-5 block"
 NON_HIGHLIGHT_STYLE = (
-    "mr-1 mt-2 hover:text-white opacity-80 hover:opacity-90 transition ease-in-out"
+    "mr-1 mt-2 hover:text-white opacity-80 hover:opacity-90 transition ease-in-out px-5 py-5 block"
 )
 NAVBAR_ICON_SIZE: int = 40
 
@@ -79,6 +80,22 @@ def generate_upper_navbar_list(
     return upper_navbar_list
 
 
+def generate_navbar_icon_text(name: str, icon_name: str) -> Component:
+    """Generate a icon, name components for navbar items.
+
+    Args:
+        name (str): The name of the navbar item.
+        icon_name (str): Name of google font icon.
+    """
+    return html.Div(
+        className="flex items-center space-x-4",
+        children=[
+            icon(icon_name, size=NAVBAR_ICON_SIZE, fill=1),
+            html.P(name),
+        ],
+    )
+
+
 def generate_navbar_link(path: str, name: str, class_name: str, icon_name: str) -> dcc.Link:
     """Generate a dcc.Link.
 
@@ -94,15 +111,7 @@ def generate_navbar_link(path: str, name: str, class_name: str, icon_name: str) 
         id=f"{name.replace(' ', '-').lower()}-button-navbar",
         href=path,
         className=class_name,
-        children=[
-            html.Div(
-                className="flex items-center space-x-4",
-                children=[
-                    icon(icon_name, size=NAVBAR_ICON_SIZE, fill=1),
-                    html.P(name),
-                ],
-            )
-        ],
+        children=[generate_navbar_icon_text(name, icon_name)],
     )
 
 
@@ -113,7 +122,11 @@ def generate_lower_navbar_list() -> list[dcc.Link]:
     to be used in the lower navbar div.
     """
     lower_navbar_list: list[dcc.Link] = [
-        generate_navbar_link("/login", "Logout", NON_HIGHLIGHT_STYLE, "logout")
+        html.Button(
+            id="logout-button-navbar",
+            className=NON_HIGHLIGHT_STYLE,
+            children=[generate_navbar_icon_text("Logout", "logout")],
+        )
     ]
 
     return lower_navbar_list
@@ -131,7 +144,7 @@ def navbar_component() -> Component:
         id="main-navbar",
         className="bg-dark-purple justify-center text-left flex shadow-md hidden overflow-auto",
         children=[
-            dcc.Location(id="url", refresh=False),
+            dcc.Location(id="url", refresh="callback-nav"),
             html.Div(
                 id="main-navbar-container",
                 className="flex flex-col justify-between",
@@ -158,20 +171,12 @@ def generate_navbar_contents(
     upper_navbar_div = html.Div(
         id="upper-navbar-container",
         children=generate_upper_navbar_list(page_registry, item_to_highlight),
-        className=(
-            "inline-block flex-col w-max flex "
-            "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
-            "text-white/75 [&>a]:block"
-        ),
+        className=("inline-block flex-col w-max flex mt-[3.5rem] mb-[3.5rem] text-white/75"),
     )
     lower_navbar_div = html.Div(
         id="lower-navbar-container",
         children=generate_lower_navbar_list(),
-        className=(
-            "inline-block flex-col w-max flex "
-            "[&>a]:px-5 [&>a]:py-5 mt-[3.5rem] mb-[3.5rem] "
-            "text-white/75 [&>a]:block"
-        ),
+        className=("inline-block flex-col w-max flex mt-[3.5rem] mb-[3.5rem] text-white/75"),
     )
     return [upper_navbar_div, lower_navbar_div]
 
@@ -184,6 +189,15 @@ def generate_navbar_contents(
 def update_navbar(path_name: str) -> list[dcc.Link]:
     """Update the selected navbar item based on the current url."""
     return generate_upper_navbar_list(dash.page_registry, path_name)
+
+
+@callback(
+    Output("url", "pathname"), Input("logout-button-navbar", "n_clicks"), prevent_initial_call=True
+)
+def logout(n_clicks: int) -> str:
+    """Logout user when the logout button is pressed."""
+    logout_user()
+    return "/login"
 
 
 @callback(

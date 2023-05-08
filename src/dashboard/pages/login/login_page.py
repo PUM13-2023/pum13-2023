@@ -4,6 +4,8 @@ import dash
 from dash import callback, dcc, html
 from dash.dependencies import Component, Input, Output, State
 
+from dashboard.models.user import login_user
+
 PORT = 8000
 ADDRESS = "127.0.0.1"
 PATH = "/login"
@@ -103,7 +105,6 @@ def get_main_left_rectangle() -> Component:
         className="bg-menu-back flex flex-col items-center"
         " justify-center w-[600px] rounded-l-lg",
         children=[
-            html.Div(id="dcc_location_login"),
             get_username_input_field(),
             get_password_input_field(),
             get_login_button(),
@@ -189,12 +190,13 @@ def layout() -> Component:
         children=[
             # Layout for the login menu
             get_main_rectangle(),
+            dcc.Location(id="login-url", refresh="callback-nav"),
         ],
     )
 
 
 @callback(
-    Output("dcc_location_login", "children"),
+    Output("login-url", "pathname"),
     Output("error_input_message", "className"),
     Output("username", "className"),
     Output("password", "className"),
@@ -224,17 +226,20 @@ def update_login(
     """
     # If it is the correct username and password that we change the page
     # to the home page.
-    if username == "admin" and password == "admin":
+
+    if password == "password":
+        login_user(username)
+
         return (
-            dcc.Location(pathname="", id="dcc_location_login"),
+            "/",
             error_pop_up + " hidden",
             NORMAL_FIELD_CLASS,
             NORMAL_FIELD_CLASS + PASS_FIELD_EXTRA_CLASS,
         )
-    else:
-        return (
-            dash.no_update,
-            error_pop_up.replace("hidden", ""),
-            ERROR_FIELD_CLASS,
-            ERROR_FIELD_CLASS + PASS_FIELD_EXTRA_CLASS,
-        )
+
+    return (
+        dash.no_update,
+        error_pop_up.replace("hidden", ""),
+        ERROR_FIELD_CLASS,
+        ERROR_FIELD_CLASS + PASS_FIELD_EXTRA_CLASS,
+    )

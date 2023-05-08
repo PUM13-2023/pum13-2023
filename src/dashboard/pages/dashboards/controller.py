@@ -3,10 +3,11 @@
 from datetime import datetime
 
 from dash import Input, Output, Patch, callback
+from flask_login import current_user
 
 from dashboard.components.dashboards_list_component import generate_list_row_contents
 from dashboard.components.list_component import generate_list_row
-from dashboard.models.user import Dashboard, login_user
+from dashboard.models.user import Dashboard
 
 
 @callback(
@@ -23,12 +24,11 @@ def dashboards_add_button_clicked(n_clicks: int) -> Patch:
     Returns:
         List[Component]: The dashboards list rows with one more row.
     """
-    test_user = login_user("dashboards-page-test-user")
-    new_index = len(test_user.dashboards)
+    new_index = len(current_user.dashboards)
     created = datetime.now()
     added_dashboard = Dashboard(name=f"Added Dashboard #{new_index + 1}", created=created)
-    test_user.dashboards.append(added_dashboard)
-    test_user.save()
+    current_user.dashboards.append(added_dashboard)
+    current_user.save()
 
     children_patch = Patch()
     children_patch.append(

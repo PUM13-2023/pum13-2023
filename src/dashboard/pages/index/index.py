@@ -3,13 +3,13 @@ from typing import Optional
 
 import dash
 from dash import dcc, html
+from flask_login import current_user
 
-from dashboard.components.icon import icon
+from dashboard.components import icon, login_required
 
 dash.register_page(__name__, path="/", name="Home", order=0, nav_item=True, icon_name="home")
 
 # This username will be replaced later
-username = "cooluser"
 LATEST_CONTAINER = "Latest opened dashboards"
 SHARED_CONTAINER = "Shared dashboards"
 
@@ -67,16 +67,18 @@ def carousel_layout(container_title: str, id_: Optional[str] = None) -> html.Div
 
     if id_ is not None:
         carousel_container.id = id_
-
     return carousel_container
 
 
+@login_required
 def layout() -> html.Div:
     """Layout for home page.
 
     Returns:
         html.Div: Div tag with the home page layout
     """
+    username = current_user.username
+
     return html.Div(
         className="flex flex-col bg-background p-10 pb-0",
         children=[

@@ -38,11 +38,10 @@ class TestNavbarComponent:
         WebDriverWait(browser_driver, settings.NORMAL_TIMEOUT).until(
             ec.presence_of_element_located((By.ID, NAVBAR_CONTAINER_ID))
         )
+
         navbar = browser_driver.find_element(By.ID, NAVBAR_CONTAINER_ID)
-        navbar_items = navbar.find_elements(
-            By.TAG_NAME,
-            "a",
-        )
+        navbar_items = navbar.find_elements(By.TAG_NAME, "a")
+        navbar_items.extend(navbar.find_elements(By.TAG_NAME, "button"))
 
         assert len(navbar_items) == NAVBAR_COUNT, "Navbar items do not exist"
 

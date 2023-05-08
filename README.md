@@ -75,10 +75,14 @@ docker compose up --build
 This command will create two separate Docker containers, one for the dashboard and one for Nginx and run it on your machine.
 
 ### Environment
-The project uses a `.env` file to store MongoDB url. This is to avoid commiting potentially sensitive information to GitHub. Creating this file is needed for running the project. Example:
+The project uses a `.env` file to store various project configuration. This is to avoid commiting potentially sensitive information to GitHub. Creating this file is needed for running the project. Example:
 ```bash
 DB_URL=mongodb://...
+SECRET_KEY=...
 ```
+
+`DB_URL` stores the mongodb database url of the database url.
+`SECRET_KEY` is a secret token that is used by Flask to encrypt session tokens. https://flask.palletsprojects.com/en/2.3.x/config/#SECRET_KEY
 
 ## Contributing
 For information on how to contribute, see [`CONTRIBUTING.md`](./CONTRIBUTING.md)

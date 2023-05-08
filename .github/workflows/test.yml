@@ -28,6 +28,7 @@ jobs:
         run: nox -t test
         env:
           DB_URL: ${{ secrets.DB_URL }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
       - name: Save code coverage file
         uses: actions/upload-artifact@v3
         with:
