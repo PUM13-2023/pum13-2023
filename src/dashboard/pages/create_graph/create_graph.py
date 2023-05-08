@@ -4,20 +4,14 @@ This module displays different types of graphs based on input,
 from either a csv-file or from a database.
 """
 
-import base64
-import io
-from typing import Any
 
 import dash
-from dash import Patch, State, callback, dcc, html
-from dash.dependencies import Component, Input, Output
-from dash.exceptions import PreventUpdate
+from dash import dcc, html
+from dash.dependencies import Component
 import dash_bootstrap_components as dbc
-import jsonpickle
-import plotly.graph_objs as go
-import polars as pl
 
 from dashboard.components import button, icon
+import dashboard.pages.create_graph.controller  # noqa: F401
 
 dash.register_page(__name__, path="/create-graph", nav_item=False)
 
@@ -169,61 +163,6 @@ def graph_window() -> Component:
     )
 
 
-def create_fig(
-    df: pl.DataFrame,
-    graph_type: str,
-    color_input: str,
-    name: str,
-) -> go.Figure:
-    """Creates a graph based on the chosen type by the user.
-
-    Args:
-        df: a dataframe containg used for creating the graph.
-        graph_type: a string used to check what type of graph
-        to draw.
-        color_output: user chosen color of the graph
-        num: the graph number
-    if df is not None:
-        graph_name: user chosen name of the graph.
-        x_axis_name: user chosen name of the x-axis.
-        y_axis_name: user chosen name of y-axis.
-
-    Returns:
-        fig: a draw graph of the users choice with chosen
-        names for the graph and axis.
-    """
-    cols = df.columns
-    fig = None
-    if df is not None:
-        if graph_type == "line":
-            fig = go.Scatter(
-                x=df[cols[0]],
-                y=df[cols[1]],
-                marker_color=color_input,
-                mode="lines",
-                name=name,
-            )
-
-        if graph_type == "scatter":
-            fig = go.Scatter(
-                x=df[cols[0]],
-                y=df[cols[1]],
-                marker_color=color_input,
-                mode="markers",
-                name=name,
-            )
-
-        if graph_type == "bar":
-            fig = go.Bar(
-                x=df[cols[0]],
-                y=df[cols[1]],
-                marker_color=color_input,
-                name=name,
-            )
-
-    return fig
-
-
 def top_right_settings() -> html.Div:
     """Buttons for the graph settings.
 
@@ -370,20 +309,7 @@ def right_settings_bar() -> Component:
     )
 
 
-@callback(Output("graph_index", "value"), Input("graph_selector", "value"))
-def dropdown_select_graph(graph_value: int) -> int:
-    """Stores the current selectd graph index.
-
-    Args:
-        graph_value (int): The index of the graph to select
-
-    Returns:
-        int: Graph index
-    """
-    return graph_value
-
-
-def radio_item(name: str, value: str, icon_name: str) -> dict[str, html.Div]:
+def radio_item(name: str, value: str, icon_name: str) -> dict[str, html.Div | str]:
     """Creates a styled radio button.
 
     Args:
@@ -400,217 +326,6 @@ def radio_item(name: str, value: str, icon_name: str) -> dict[str, html.Div]:
         "bg-[#636af2] rounded-md shadow-md duration-150 hover:bg-[#2F3273] text-white"
     )
     return {
-        "label": [
-            html.Div(className=classname, children=[icon(icon_name, size=40), html.P(name)]),
-        ],
+        "label": html.Div(className=classname, children=[icon(icon_name, size=40), html.P(name)]),
         "value": value,
     }
-
-
-def parse_contents(contents: str) -> pl.DataFrame:
-    """Parses the input from a csv-file.
-
-    Args:
-        contents: the csv-file content.
-        filename: the csv-file name.
-
-    Returns:
-        A parsed and read version of the csv-file.
-    """
-    content_type, content_string = contents.split(",")
-    decoded = base64.b64decode(content_string)
-
-    return pl.read_csv(io.StringIO(decoded.decode("utf-8")))
-
-
-def convert_to_dataframe(contents: str) -> list[dict[str, list[Any]]]:
-    """Stores the uploaded frame in the form of a dataframe.
-
-    Args:
-        contents: uploaded csv-file the content.
-        filename: name of the csv-file.
-
-    Returns:
-        The a json version of the dataframe from the
-        parsed csv-file.
-    """
-    loc_list = []
-    if contents is None:
-        raise PreventUpdate
-
-    try:
-        for i in contents:
-            temp_df = parse_contents(i)
-
-            loc_list.append(temp_df)
-        return [df.to_dict(as_series=False) for df in loc_list]
-
-    except ValueError:
-        raise PreventUpdate
-
-
-@callback(
-    Output("graph_id", "figure", allow_duplicate=True),
-    Input("choose_graph_type", "value"),
-    State("graph_id", "figure"),
-    State("graph_index", "value"),
-    State("graph_name", "value"),
-    prevent_initial_call=True,
-)
-def patch_graph_type(
-    graph_type: str, graph_data: dict[str, list[Any]], i: int, graph_name: str
-) -> Patch:
-    """A patched figure object that patches the graph type.
-
-    Args:
-        graph_type (str): The new graph type
-        graph_data (_type_): Current graph data
-        i (int): Graph index
-
-    Returns:
-        Patch: Patched figure with new graph type
-    """
-    data_frame = pl.DataFrame({"x": graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]})
-    color = graph_data["data"][i]["marker"]
-    patched_figure = Patch()
-    patched_figure["data"][i] = create_fig(
-        data_frame, graph_type=graph_type, color_input=color["color"], name=graph_name
-    )
-    return patched_figure
-
-
-@callback(
-    Output("graph_id", "figure", allow_duplicate=True),
-    Input("color_input", "value"),
-    State("graph_index", "value"),
-    prevent_initial_call=True,
-)
-def patch_color(color: str, i: int) -> Patch:
-    """Patched figure with new selected line color.
-
-    Args:
-        color (str): New color
-        i (int): Graph index
-
-    Returns:
-        Patch: Patched figure object with new color
-    """
-    patched_figure = Patch()
-    patched_figure["data"][i]["marker"] = {"color": color}
-    return patched_figure
-
-
-@callback(
-    Output("graph_id", "figure", allow_duplicate=True),
-    Input("graph_name", "value"),
-    State("graph_index", "value"),
-    prevent_initial_call=True,
-)
-def patch_graph_name(name: str, index: int) -> Patch:
-    """Updates a selected graphs name.
-
-    Args:
-        name (str): Name of the graph
-        index (int): Selected graph index
-
-    Returns:
-        Patch: New figure with patched graph name
-    """
-    patched_figure = Patch()
-    patched_figure["data"][index]["name"] = name
-    return patched_figure
-
-
-@callback(
-    Output("download_fig", "data"),
-    Input("download_png", "n_clicks"),
-    State("fig_json", "value"),
-    State("file_name", "value"),
-    prevent_initial_call=True,
-)
-def download_fig(n_clicks: int, fig_json: str, file_name: str) -> Any:
-    """Callback for downloading figures.
-
-    Args:
-        n_clicks (int): number of clicks
-        fig_json (str): figure stored as a json string
-        file_name (str): desired filename
-
-    Returns:
-        dict[str, Any | None]: The file download
-    """
-    figure = jsonpickle.decode(fig_json)
-    return dcc.send_bytes(figure.write_image, f"{file_name}.png")
-
-
-@callback(
-    Output("graph_id", "figure", allow_duplicate=True),
-    Input("figure_name", "value"),
-    prevent_initial_call=True,
-)
-def patch_figure_name(name: str) -> Patch:
-    """Patches figure title.
-
-    Args:
-        name (str): figure title
-
-    Returns:
-        Patch: Patched figure with new title
-    """
-    patched_figure = Patch()
-    patched_figure["layout"]["title"]["text"] = name
-    return patched_figure
-
-
-@callback(
-    Output("graph_id", "figure", allow_duplicate=True),
-    Input("x_axis_name", "value"),
-    Input("y_axis_name", "value"),
-    prevent_initial_call=True,
-)
-def patch_axis_names(x: str, y: str) -> Patch:
-    """Renames figure graph names.
-
-    Args:
-        x (str): x-axis name
-        y (str): y-axis name
-
-    Returns:
-        Patch: Patched figure with new axis names
-    """
-    patched_figure = Patch()
-    patched_figure["layout"]["xaxis"]["title"] = x
-    patched_figure["layout"]["yaxis"]["title"] = y
-    return patched_figure
-
-
-@callback(
-    Output("graph_output", "children"),
-    Output("graph_selector", "options"),
-    Output("graph_selector", "value"),
-    Output("fig_json", "value"),
-    Output("graph_name", "disabled"),
-    Input("uploaded_data", "contents"),
-)
-def render_figure(contents: str) -> dcc.Graph | list[dict[str, str]]:
-    """Renders the figure using CSV-files.
-
-    Returns:
-        dcc.Graph: Graph to be rendered
-        list[dict[str: str]]: list of all the graph names
-    """
-    created_figs = []
-    figure_names = []
-    data_frame = convert_to_dataframe(contents)
-
-    data_frames = [pl.from_dict(x) for x in data_frame]
-    for num, i in enumerate(data_frames):
-        loc_fig = create_fig(i, "line", "#000000", name=f"Graph {num}")
-        figure_names.append({"label": loc_fig["name"], "value": num})
-        created_figs.append(loc_fig)
-
-    loc_config = {"doubleClick": "reset", "showTips": True, "displayModeBar": False}
-    fig = go.Figure(data=created_figs)
-    loc_graph = dcc.Graph(figure=fig, id="graph_id", config=loc_config)
-    pickle = jsonpickle.encode(fig)
-    return loc_graph, figure_names, figure_names[0]["value"], pickle, False

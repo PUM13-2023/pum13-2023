@@ -1,5 +1,9 @@
 """Module with utility functions that are reused frequently."""
+import base64
+import binascii
 from datetime import timedelta
+
+import polars as pl
 
 
 def set_classname(class_str: str, class_to_set: str, set_: bool) -> str:
@@ -117,3 +121,43 @@ def to_human_time_delta(duration: timedelta, abbreviated: bool = False) -> str:
         return f"{singularize(article, duration_in_unit)} {pluralize(unit, duration_in_unit)} ago"
 
     return "Just now"
+
+
+def convert_to_dataframes(contents: list[str]) -> list[pl.DataFrame]:
+    """Convert contents from csv files to polars dataframes.
+
+    Args:
+        contents: The string contents of the uploaded csv
+        files, each containing the file data type and data
+        seperated by a comma.
+
+    Returns: The polars dataframes, no entry is made if
+    contents is invalid.
+    """
+    loc_list = []
+    for c in contents:
+        df = convert_to_dataframe(c)
+        if df is not None:
+            loc_list.append(df)
+
+    return loc_list
+
+
+def convert_to_dataframe(contents: str) -> pl.DataFrame | None:
+    """Convert contents from csv file to polars dataframe.
+
+    Args:
+        contents: The string contents of the uploaded csv
+        file, containing the data type and data seperated
+        by a comma.
+
+    Returns: The polars dataframe if the file contents is
+    valid, else None.
+    """
+    content_type, contents_data = contents.split(",")
+    try:
+        decoded = base64.b64decode(contents_data)
+    except binascii.Error:
+        return None
+
+    return pl.read_csv(decoded)
