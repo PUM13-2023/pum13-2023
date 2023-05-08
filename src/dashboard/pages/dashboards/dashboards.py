@@ -2,10 +2,10 @@
 
 import dash
 from dash import html
+from flask_login import current_user
 
-from dashboard.components import button, dashboards_list_component
+from dashboard.components import button, dashboards_list_component, login_required
 from dashboard.models.db import connect_user_db
-from dashboard.models.user import login_user
 import dashboard.pages.dashboards.controller  # noqa: F401
 
 dash.register_page(
@@ -20,14 +20,13 @@ dash.register_page(
 connect_user_db()
 
 
+@login_required
 def layout() -> html.Div:
     """Create the dashboards page.
 
     Returns:
         html.Div: The dashboards page.
     """
-    test_user = login_user("dashboards-page-test-user")
-
     return html.Div(
         className="flex flex-col mx-4 py-4 h-screen max-h-screen",
         children=[
@@ -53,7 +52,7 @@ def layout() -> html.Div:
             ),
             html.Div(
                 className="flex grow overflow-hidden",
-                children=dashboards_list_component(test_user.dashboards, _id="dashboards-list"),
+                children=dashboards_list_component(current_user.dashboards, _id="dashboards-list"),
             ),
         ],
     )

@@ -618,6 +618,10 @@ video {
   margin: 3rem;
 }
 
+.m-auto {
+  margin: auto;
+}
+
 .mx-2 {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
@@ -918,6 +922,10 @@ video {
 
 .flex-col {
   flex-direction: column;
+}
+
+.content-center {
+  align-content: center;
 }
 
 .items-center {
@@ -1258,6 +1266,11 @@ video {
   line-height: 1.75rem;
 }
 
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
 .leading-none {
   line-height: 1;
 }
@@ -1580,20 +1593,6 @@ video {
   .lg\:w-\[950px\] {
     width: 950px;
   }
-}
-
-.\[\&\>a\]\:block>a {
-  display: block;
-}
-
-.\[\&\>a\]\:px-5>a {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-
-.\[\&\>a\]\:py-5>a {
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
 }
 
 .\[\&\>p\]\:text-2xl>p {
