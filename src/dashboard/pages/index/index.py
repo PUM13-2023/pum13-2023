@@ -2,12 +2,11 @@
 from typing import Optional
 
 import dash
+from dash import html
+from dash_daq import BooleanSwitch
 from flask_login import current_user
 
-from dash import Input, Output, callback, dcc, html
-from dash_daq import BooleanSwitch
-
-from dashboard.components import icon, modal, login_required
+from dashboard.components import icon, login_required
 from dashboard.components.add_dashboard_modal import add_dashboard_modal
 import dashboard.pages.index.controller  # noqa: F401
 

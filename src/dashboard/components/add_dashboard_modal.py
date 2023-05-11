@@ -1,7 +1,10 @@
 """Modal for add dashboard buttons."""
 from dash import html
 
-from dashboard.components import button, modal, multiline_input, text_input
+from dashboard.components import modal
+from dashboard.components.button import button
+from dashboard.components.multiline_input import multiline_input
+from dashboard.components.text_input import text_input
 
 
 def generate_inputs() -> html.Div:

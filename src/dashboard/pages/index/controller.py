@@ -6,8 +6,7 @@ and submitting a new dashboard.
 """
 
 from dash import Input, Output, State, callback, ctx
-
-from dashboard.models.user import add_dashboard
+from flask_login import current_user
 
 input_css = "p-3 rounded-md shadow-inner bg-background "
 
@@ -85,7 +84,7 @@ def add_dashboard_db(n_clicks: int, title: str, desc: str) -> tuple[bool, bool, 
 
     if desc and title:
         open = False
-        add_dashboard(title, desc)
+        current_user.add_dashboard(title, desc)
 
     return open, empty_title, empty_desc
 
