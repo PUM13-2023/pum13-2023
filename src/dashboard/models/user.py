@@ -136,6 +136,17 @@ class User(Document):
         """
         return str(self.id)
 
+    def add_dashboard(self, name: str, desc: str) -> None:
+        """Adds dashboard to mongoDB.
+
+        Args:
+            name (str): Dashboard name
+            desc (str): Dashboard description
+        """
+        added_dashboard = Dashboard(name=name, description=desc, created=datetime.now())
+        self.dashboards.append(added_dashboard)
+        self.save()
+
 
 def register_user(username: str) -> User:
     """Register a new user.
@@ -181,16 +192,3 @@ def login_user(username: str) -> User:
     flask_login.login_user(user)
 
     return user
-
-
-def add_dashboard(name: str, desc: str) -> None:
-    """Adds dashboard to mongoDB.
-
-    Args:
-        name (str): Dashboard name
-        desc (str): Dashboard description
-    """
-    test_user = login_user("dashboards-page-test-user")
-    added_dashboard = Dashboard(name=name, description=desc, created=datetime.now())
-    test_user.dashboards.append(added_dashboard)
-    test_user.save()
