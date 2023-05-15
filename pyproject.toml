@@ -37,7 +37,7 @@ dev = [
   "pep8-naming == 0.13.3",
   "pyproject-flake8 == 6.0.0.post1",
   "pytest-cov == 4.0.0",
-  "selenium == 4.8.3",
+  "selenium == 4.9.1",
   "pytest-dependency == 0.5.1",
   "mongomock == 4.1.2",
 ]
