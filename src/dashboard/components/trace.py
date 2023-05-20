@@ -3,13 +3,18 @@ from typing import Literal
 
 import plotly.graph_objs as go
 import polars as pl
+from enum import Enum
 
-GraphTypes = Literal["line", "scatter", "bar"]
+
+class TraceType(Enum):
+    LINE = "lines"
+    SCATTER = "markers"
+    BAR = "bar"
 
 
 def trace(
     df: pl.DataFrame,
-    trace_type: GraphTypes,
+    trace_type: TraceType,
     color_input: str,
     name: str,
 ) -> go.Scatter | go.Bar:
@@ -39,26 +44,28 @@ def trace(
     cols = df.columns
     if df is None:
         return go.Scatter()
-    elif trace_type == "line":
+    elif trace_type == TraceType.LINE:
         return go.Scatter(
             x=df[cols[0]],
             y=df[cols[1]],
             marker_color=color_input,
-            mode="lines",
+            mode=trace_type.value,
             name=name,
         )
-    elif trace_type == "scatter":
+    elif trace_type == TraceType.SCATTER:
         return go.Scatter(
             x=df[cols[0]],
             y=df[cols[1]],
             marker_color=color_input,
-            mode="markers",
+            mode=trace_type.value,
             name=name,
         )
-    elif trace_type == "bar":
+    elif trace_type == TraceType.BAR:
         return go.Bar(
             x=df[cols[0]],
             y=df[cols[1]],
             marker_color=color_input,
             name=name,
         )
+    else:  # apparently mypy does not detect that all cases are handled.
+        return go.Scatter()

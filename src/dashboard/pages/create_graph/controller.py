@@ -1,12 +1,13 @@
 from typing import Any, Tuple
 
-from dash import Input, Output, Patch, State, callback, dcc, no_update
+from dash import Input, Output, Patch, State, callback, dcc
+from dash.exceptions import PreventUpdate
 import jsonpickle
 import plotly.graph_objs as go
 import polars as pl
 
 from dashboard.components import trace
-from dashboard.components.trace import GraphTypes
+from dashboard.components.trace import TraceType
 from dashboard.utilities import convert_to_dataframes
 
 
@@ -32,7 +33,7 @@ def dropdown_select_graph(graph_value: int) -> int:
     prevent_initial_call=True,
 )
 def patch_graph_type(
-    graph_type: GraphTypes, graph_data: dict[str, list[Any]], i: int, graph_name: str
+    graph_type: str, graph_data: dict[str, list[Any]], i: int, graph_name: str
 ) -> Patch:
     """A patched figure object that patches the graph type.
 
@@ -44,12 +45,17 @@ def patch_graph_type(
     Returns:
         Patch: Patched figure with new graph type
     """
+    try:
+        trace_type = TraceType(graph_type)
+    except ValueError as err:
+        raise PreventUpdate from err
+
     i = int(i)  # NOTE: for some reason this is a string...
     data_frame = pl.DataFrame({"x": graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]})
     color = graph_data["data"][i]["marker"]
     patched_figure = Patch()
     patched_figure["data"][i] = trace(
-        data_frame, trace_type=graph_type, color_input=color["color"], name=graph_name
+        data_frame, trace_type=trace_type, color_input=color["color"], name=graph_name
     )
     return patched_figure
 
@@ -72,7 +78,7 @@ def patch_color(color: str, i: int) -> Patch:
     """
     i = int(i)  # NOTE: for some reason this is a string...
     patched_figure = Patch()
-    patched_figure["data"][i]["marker"] = {"color": color}
+    patched_figure["data"][i]["marker"]["color"] = color
     return patched_figure
 
 
@@ -118,7 +124,7 @@ def download_fig(n_clicks: int, fig_json: str, file_name: str) -> Any:
     """
     figure = jsonpickle.decode(fig_json)
     if not isinstance(figure, go.Figure):
-        return no_update
+        raise PreventUpdate
 
     return dcc.send_bytes(figure.write_image, f"{file_name}.png")
 
@@ -187,7 +193,7 @@ def render_figure(
     data_frames = convert_to_dataframes(contents)
 
     for num, i in enumerate(data_frames):
-        loc_fig = trace(i, "line", "#000000", name=f"Graph {num}")
+        loc_fig = trace(i, TraceType.LINE, "#000000", name=f"Graph {num}")
         label: str = loc_fig["name"]
         figure_names.append({"label": label, "value": num})
         created_figs.append(loc_fig)
@@ -197,6 +203,6 @@ def render_figure(
     loc_graph = dcc.Graph(figure=fig, id="graph_id", config=loc_config)
     pickle: str | None = jsonpickle.encode(fig)
     if pickle is None:
-        return no_update, no_update, no_update, no_update, no_update
+        raise PreventUpdate
 
     return loc_graph, figure_names, str(figure_names[0]["value"]), pickle, False

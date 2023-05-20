@@ -11,6 +11,7 @@ from dash.dependencies import Component
 import dash_bootstrap_components as dbc
 
 from dashboard.components import button, icon
+from dashboard.components.trace import TraceType
 import dashboard.pages.create_graph.controller  # noqa: F401
 
 dash.register_page(__name__, path="/create-graph", nav_item=False)
@@ -261,9 +262,9 @@ def radio_buttons() -> html.Div:
             dcc.RadioItems(
                 className="flex space-x-2",
                 options=[
-                    radio_item("Line", "line", "show_chart"),
-                    radio_item("Bar", "bar", "bar_chart"),
-                    radio_item("Scatter", "scatter", "scatter_plot"),
+                    radio_item("Line", TraceType.LINE.value, "show_chart"),
+                    radio_item("Bar", TraceType.BAR.value, "bar_chart"),
+                    radio_item("Scatter", TraceType.SCATTER.value, "scatter_plot"),
                 ],
                 inputClassName="peer hidden",
                 value="line",
