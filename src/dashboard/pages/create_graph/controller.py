@@ -11,24 +11,11 @@ from dashboard.components.trace import TraceType
 from dashboard.utilities import convert_to_dataframes
 
 
-@callback(Output("graph_index", "value"), Input("graph_selector", "value"))
-def dropdown_select_graph(graph_value: int) -> int:
-    """Stores the current selectd graph index.
-
-    Args:
-        graph_value (int): The index of the graph to select
-
-    Returns:
-        int: Graph index
-    """
-    return graph_value
-
-
 @callback(
     Output("graph_id", "figure", allow_duplicate=True),
     Input("choose_graph_type", "value"),
     State("graph_id", "figure"),
-    State("graph_index", "value"),
+    State("graph_selector", "value"),
     State("graph_name", "value"),
     prevent_initial_call=True,
 )
@@ -50,7 +37,6 @@ def patch_graph_type(
     except ValueError as err:
         raise PreventUpdate from err
 
-    i = int(i)  # NOTE: for some reason this is a string...
     data_frame = pl.DataFrame({"x": graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]})
     color = graph_data["data"][i]["marker"]
     patched_figure = Patch()
@@ -63,7 +49,7 @@ def patch_graph_type(
 @callback(
     Output("graph_id", "figure", allow_duplicate=True),
     Input("color_input", "value"),
-    State("graph_index", "value"),
+    State("graph_selector", "value"),
     prevent_initial_call=True,
 )
 def patch_color(color: str, i: int) -> Patch:
@@ -76,7 +62,6 @@ def patch_color(color: str, i: int) -> Patch:
     Returns:
         Patch: Patched figure object with new color
     """
-    i = int(i)  # NOTE: for some reason this is a string...
     patched_figure = Patch()
     patched_figure["data"][i]["marker"]["color"] = color
     return patched_figure
@@ -85,7 +70,7 @@ def patch_color(color: str, i: int) -> Patch:
 @callback(
     Output("graph_id", "figure", allow_duplicate=True),
     Input("graph_name", "value"),
-    State("graph_index", "value"),
+    State("graph_selector", "value"),
     prevent_initial_call=True,
 )
 def patch_graph_name(name: str, i: int) -> Patch:
@@ -98,7 +83,6 @@ def patch_graph_name(name: str, i: int) -> Patch:
     Returns:
         Patch: New figure with patched graph name
     """
-    i = int(i)  # NOTE: for some reason this is a string...
     patched_figure = Patch()
     patched_figure["data"][i]["name"] = name
     return patched_figure
@@ -181,7 +165,7 @@ def patch_axis_names(x: str, y: str) -> Patch:
 )
 def render_figure(
     contents: list[str],
-) -> Tuple[dcc.Graph, list[dict[str, str | int]], str, str, bool]:
+) -> Tuple[dcc.Graph, list[dict[str, str | int]], int, str, bool]:
     """Renders the figure using CSV-files.
 
     Returns:
@@ -205,4 +189,4 @@ def render_figure(
     if pickle is None:
         raise PreventUpdate
 
-    return loc_graph, figure_names, str(figure_names[0]["value"]), pickle, False
+    return loc_graph, figure_names, int(figure_names[0]["value"]), pickle, False

@@ -10,7 +10,7 @@ from dash import dcc, html
 from dash.dependencies import Component
 import dash_bootstrap_components as dbc
 
-from dashboard.components import button, icon
+from dashboard.components import button, icon, text_input
 from dashboard.components.trace import TraceType
 import dashboard.pages.create_graph.controller  # noqa: F401
 
@@ -35,7 +35,6 @@ def layout() -> Component:
             graph_window(),
             right_settings_bar(),
             dcc.Download(id="download_fig"),
-            dcc.Input(id="graph_index", value=0, className="hidden"),
             dcc.Input(id="fig_json", className="hidden"),
         ],
     )
@@ -92,7 +91,7 @@ def download_buttons() -> html.Div:
         className="flex flex-col",
         children=[
             html.P("Download as"),
-            file_name(),
+            text_input(id="file_name", placeholder="File name"),
             html.Div(
                 className="flex space-x-2 mt-2",
                 children=[
@@ -106,47 +105,6 @@ def download_buttons() -> html.Div:
     )
 
 
-def figure_name() -> Component:
-    """Takes user input for the graph label."""
-    return input_field("figure_name", "Figure name")
-
-
-def x_axis_name() -> Component:
-    """Takes user input for the x axis label."""
-    return input_field("x_axis_name", "x-axis name")
-
-
-def y_axis_name() -> Component:
-    """Takes user input for the y axis label."""
-    return input_field("y_axis_name", "y-axis name")
-
-
-def file_name() -> Component:
-    """Takes user input for the graph label."""
-    return input_field("file_name", "File name")
-
-
-def input_field(loc_id: str, loc_placeholder: str, disabled: bool = False) -> Component:
-    """Input_field that lets user choose a color.
-
-    Args:
-        loc_id: local id of the input field
-        loc_placeholder: a placeholder color
-
-    Returns:
-        Component: epic component
-    """
-    return dcc.Input(
-        className="bg-background flex items-center"
-        "justify-center mt-5 p-3 rounded-md shadow-inner",
-        id=loc_id,
-        type="text",
-        debounce=True,
-        placeholder=loc_placeholder,
-        disabled=disabled,
-    )
-
-
 def graph_window() -> Component:
     """A window used to display the created graph.
 
@@ -156,10 +114,10 @@ def graph_window() -> Component:
     return html.Div(
         className="bg-white w-full ml-[3rem] my-[3rem] rounded-md shadow-md",
         children=[
-            input_field("figure_name", "Figure name"),
+            text_input(id="figure_name", placeholder="Figure name"),
             html.Div(id="graph_output", className="h-[70%] w-full"),
-            x_axis_name(),
-            y_axis_name(),
+            text_input(id="x_axis_name", placeholder="x-axis name"),
+            text_input(id="y_axis_name", placeholder="y-axis name"),
         ],
     )
 
@@ -184,22 +142,13 @@ def top_right_settings() -> html.Div:
                 ],
             ),
             upload_buttons(),
-            dropdown(),
-            input_field("graph_name", "Name graph", disabled=True),
+            dcc.Dropdown([], placeholder="Select graph", id="graph_selector"),
+            text_input(id="graph_name", placeholder="Name graph", disabled=True),
             radio_buttons(),
             download_buttons(),
             color_picker(),
         ],
     )
-
-
-def dropdown() -> dcc.Dropdown:
-    """Makes a dcc dropdown to pick graphs.
-
-    Returns:
-        dcc.Dropdown: dropdown containing all of the uploaded graphs
-    """
-    return dcc.Dropdown([], placeholder="Select graph", id="graph_selector")
 
 
 def color_picker() -> html.Div:

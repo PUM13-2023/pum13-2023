@@ -1,9 +1,9 @@
 """Trace component."""
-from typing import Literal
 
-import plotly.graph_objs as go
-import polars as pl
 from enum import Enum
+
+import polars as pl
+import plotly.graph_objs as go
 
 
 class TraceType(Enum):
