@@ -16,12 +16,13 @@ dependencies = [
   "dash-bootstrap-components == 1.4.1",
   "jsonpickle == 3.0.1",
   "flask-login == 0.6.2",
+  "kaleido == 0.2.1",
 ]
 name = "pum13-2023"
 description = "Data visualization dashboard written with Dash"
 readme = "README.md"
 requires-python = ">=3.10"
-version = "0.3.0"
+version = "0.3.1"
 
 [project.optional-dependencies]
 dev = [
