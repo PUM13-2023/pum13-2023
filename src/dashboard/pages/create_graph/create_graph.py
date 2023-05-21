@@ -35,7 +35,6 @@ def layout() -> Component:
             graph_window(),
             right_settings_bar(),
             dcc.Download(id="download_fig"),
-            dcc.Input(id="fig_json", className="hidden"),
         ],
     )
 
@@ -115,7 +114,12 @@ def graph_window() -> Component:
         className="bg-white w-full ml-[3rem] my-[3rem] rounded-md shadow-md",
         children=[
             text_input(id="figure_name", placeholder="Figure name"),
-            html.Div(id="graph_output", className="h-[70%] w-full"),
+            dcc.Graph(
+                id="graph_id",
+                className="h-[70%] w-full",
+                figure={},
+                config={"doubleClick": "reset", "showTips": True, "displayModeBar": False},
+            ),
             text_input(id="x_axis_name", placeholder="x-axis name"),
             text_input(id="y_axis_name", placeholder="y-axis name"),
         ],

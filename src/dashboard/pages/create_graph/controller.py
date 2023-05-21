@@ -2,7 +2,6 @@ from typing import Any, Tuple
 
 from dash import Input, Output, Patch, State, callback, dcc
 from dash.exceptions import PreventUpdate
-import jsonpickle
 import plotly.graph_objs as go
 import polars as pl
 
@@ -91,26 +90,27 @@ def patch_graph_name(name: str, i: int) -> Patch:
 @callback(
     Output("download_fig", "data"),
     Input("download_png", "n_clicks"),
-    State("fig_json", "value"),
+    State("graph_id", "figure"),
     State("file_name", "value"),
     prevent_initial_call=True,
 )
-def download_fig(n_clicks: int, fig_json: str, file_name: str) -> Any:
+def download_fig(n_clicks: int, fig_dict: dict[str, Any], file_name: str) -> Any:
     """Callback for downloading figures.
 
     Args:
         n_clicks (int): number of clicks
-        fig_json (str): figure stored as a json string
+        fig_dict (dict[str, Any]): figure to download as dictionary
         file_name (str): desired filename
 
     Returns:
-        dict[str, Any | None]: The file download
+        Any: The file download
     """
-    figure = jsonpickle.decode(fig_json)
-    if not isinstance(figure, go.Figure):
-        raise PreventUpdate
+    try:
+        fig = go.Figure(fig_dict)
+    except ValueError as val_err:
+        raise PreventUpdate from val_err
 
-    return dcc.send_bytes(figure.write_image, f"{file_name}.png")
+    return dcc.send_bytes(fig.write_image, f"{file_name}.png")
 
 
 @callback(
@@ -155,17 +155,16 @@ def patch_axis_names(x: str, y: str) -> Patch:
 
 
 @callback(
-    Output("graph_output", "children"),
+    Output("graph_id", "figure"),
     Output("graph_selector", "options"),
     Output("graph_selector", "value"),
-    Output("fig_json", "value"),
     Output("graph_name", "disabled"),
     Input("uploaded_data", "contents"),
     prevent_initial_call=True,
 )
 def render_figure(
     contents: list[str],
-) -> Tuple[dcc.Graph, list[dict[str, str | int]], int, str, bool]:
+) -> Tuple[go.Figure, list[dict[str, str | int]], int, bool]:
     """Renders the figure using CSV-files.
 
     Returns:
@@ -182,11 +181,13 @@ def render_figure(
         figure_names.append({"label": label, "value": num})
         created_figs.append(loc_fig)
 
-    loc_config = {"doubleClick": "reset", "showTips": True, "displayModeBar": False}
-    fig = go.Figure(data=created_figs)
-    loc_graph = dcc.Graph(figure=fig, id="graph_id", config=loc_config)
-    pickle: str | None = jsonpickle.encode(fig)
-    if pickle is None:
-        raise PreventUpdate
+    fig = go.Figure(
+        data=created_figs,
+        layout=go.Layout(
+            plot_bgcolor="#FFFFFF",
+            xaxis=go.layout.XAxis(linecolor="black", gridcolor="gray"),
+            yaxis=go.layout.YAxis(linecolor="black", gridcolor="gray"),
+        ),
+    )
 
-    return loc_graph, figure_names, int(figure_names[0]["value"]), pickle, False
+    return fig, figure_names, int(figure_names[0]["value"]), False
