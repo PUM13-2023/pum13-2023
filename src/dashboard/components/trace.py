@@ -7,6 +7,8 @@ import plotly.graph_objs as go
 
 
 class TraceType(Enum):
+    """Contains the available trace types."""
+
     LINE = "lines"
     SCATTER = "markers"
     BAR = "bar"
@@ -67,5 +69,5 @@ def trace(
             marker_color=color_input,
             name=name,
         )
-    else:  # apparently mypy does not detect that all cases are handled.
+    else:  # mypy does not detect that all cases are handled.
         return go.Scatter()
