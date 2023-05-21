@@ -17,10 +17,10 @@ class TraceType(Enum):
 def trace(
     df: pl.DataFrame,
     trace_type: TraceType,
-    color_input: str,
+    trace_color: str,
     name: str,
 ) -> go.Scatter | go.Bar:
-    """Creates a trace based on the chosen type by the user.
+    """Creates a trace based on a trace type.
 
     A trace can not be used as an html element
     and must first be embedded into a dcc.Graph
@@ -33,16 +33,15 @@ def trace(
         gr = dcc.Graph(figure=fg)
 
     Args:
-        df: a dataframe containg used for creating the trace.
-        trace_type: a string used to check what type of trace
-        to draw.
-        color_input: user chosen color of the trace
-        name: user chosen name of the trace.
+        df (pl.DataFrame): a dataframe containg used for creating the trace.
+        trace_type (TraceType): The type of trace to create.
+        trace_color (str): The color of the trace.
+        name (str): The name of the trace.
 
     Returns:
-        fig: a draw trace of the users choice with chosen
-        names for the trace and axis.
+        go.Scatter | go.Bar: The created trace.
     """
+
     cols = df.columns
     if df is None:
         return go.Scatter()
@@ -50,7 +49,7 @@ def trace(
         return go.Scatter(
             x=df[cols[0]],
             y=df[cols[1]],
-            marker_color=color_input,
+            marker_color=trace_color,
             mode=trace_type.value,
             name=name,
         )
@@ -58,7 +57,7 @@ def trace(
         return go.Scatter(
             x=df[cols[0]],
             y=df[cols[1]],
-            marker_color=color_input,
+            marker_color=trace_color,
             mode=trace_type.value,
             name=name,
         )
@@ -66,7 +65,7 @@ def trace(
         return go.Bar(
             x=df[cols[0]],
             y=df[cols[1]],
-            marker_color=color_input,
+            marker_color=trace_color,
             name=name,
         )
     else:  # mypy does not detect that all cases are handled.

@@ -39,9 +39,7 @@ def patch_graph_type(
     data_frame = pl.DataFrame({"x": graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]})
     color = graph_data["data"][i]["marker"]
     patched_figure = Patch()
-    patched_figure["data"][i] = trace(
-        data_frame, trace_type=trace_type, color_input=color["color"], name=graph_name
-    )
+    patched_figure["data"][i] = trace(data_frame, trace_type, color["color"], graph_name)
     return patched_figure
 
 
@@ -175,8 +173,8 @@ def render_figure(
     figure_names: list[dict[str, str | int]] = []
     data_frames = convert_to_dataframes(contents)
 
-    for num, i in enumerate(data_frames):
-        loc_fig = trace(i, TraceType.LINE, "#000000", name=f"Graph {num}")
+    for num, df in enumerate(data_frames):
+        loc_fig = trace(df, TraceType.LINE, "#000000", name=f"Graph {num}")
         label: str = loc_fig["name"]
         figure_names.append({"label": label, "value": num})
         created_figs.append(loc_fig)
@@ -190,4 +188,4 @@ def render_figure(
         ),
     )
 
-    return fig, figure_names, int(figure_names[0]["value"]), False
+    return fig, figure_names, 0, False
