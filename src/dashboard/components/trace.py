@@ -2,8 +2,8 @@
 
 from enum import Enum
 
-import polars as pl
 import plotly.graph_objs as go
+import polars as pl
 
 
 class TraceType(Enum):
@@ -33,7 +33,7 @@ def trace(
         gr = dcc.Graph(figure=fg)
 
     Args:
-        df (pl.DataFrame): a dataframe containg used for creating the trace.
+        df (pl.DataFrame): The dataframe to create the trace from.
         trace_type (TraceType): The type of trace to create.
         trace_color (str): The color of the trace.
         name (str): The name of the trace.
@@ -41,11 +41,11 @@ def trace(
     Returns:
         go.Scatter | go.Bar: The created trace.
     """
-
     cols = df.columns
     if df is None:
         return go.Scatter()
-    elif trace_type == TraceType.LINE:
+
+    if trace_type == TraceType.LINE:
         return go.Scatter(
             x=df[cols[0]],
             y=df[cols[1]],
@@ -53,7 +53,8 @@ def trace(
             mode=trace_type.value,
             name=name,
         )
-    elif trace_type == TraceType.SCATTER:
+
+    if trace_type == TraceType.SCATTER:
         return go.Scatter(
             x=df[cols[0]],
             y=df[cols[1]],
@@ -61,12 +62,13 @@ def trace(
             mode=trace_type.value,
             name=name,
         )
-    elif trace_type == TraceType.BAR:
+
+    if trace_type == TraceType.BAR:
         return go.Bar(
             x=df[cols[0]],
             y=df[cols[1]],
             marker_color=trace_color,
             name=name,
         )
-    else:  # mypy does not detect that all cases are handled.
-        return go.Scatter()
+
+    return go.Scatter()

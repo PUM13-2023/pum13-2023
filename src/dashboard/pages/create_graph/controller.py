@@ -1,3 +1,5 @@
+"""The controller for create_graph."""
+
 from typing import Any, Tuple
 
 from dash import Input, Output, Patch, State, callback, dcc
