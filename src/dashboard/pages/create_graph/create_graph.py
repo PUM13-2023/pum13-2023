@@ -49,12 +49,8 @@ def csv_button() -> Component:
         className="bg-menu-back duration-150 shrink flex flex-col "
         "cursor-pointer p-3 mr-2 rounded-md hover:bg-dark-purple",
         id="uploaded_data",
-        children=html.Div(
-            className="flex items-center",
-            children=[
-                icon("upload", size=36, className="mr-1"),
-                html.P(className="whitespace-nowrap", children="CSV-file"),
-            ],
+        children=button(
+            "upload", "CSV file", size=26, className="whitespace-nowrap bg-transparent"
         ),
         # True so multiple files can be uploaded
         multiple=True,
@@ -89,8 +85,7 @@ def download_buttons() -> html.Div:
     return html.Div(
         className="flex flex-col",
         children=[
-            html.P("Download as"),
-            text_input(id="file_name", title="File name", description="File name"),
+            text_input(id="file_name", title="Download as", description="Enter file name..."),
             html.Div(
                 className="flex space-x-2 mt-2",
                 children=[
@@ -110,18 +105,21 @@ def graph_window() -> Component:
     Returns:
         A html.div containing the created graph.
     """
+    # NOTE: dcc.Graph will not shrink dynamically unless
+    # min-width is set on the parent element!
     return html.Div(
-        className="bg-white w-full ml-[3rem] my-[3rem] rounded-md shadow-md",
+        className=(
+            "[&>*]:mx-[1em] w-full min-w-[220px] bg-white ml-[3rem] my-[3rem] rounded-md shadow-md"
+        ),
         children=[
-            text_input(id="figure_name", title="Figure name", description="Figure name"),
+            text_input(id="figure_name", title="Figure name", description="Enter figure name..."),
             dcc.Graph(
                 id="graph_id",
-                className="h-[70%] w-full",
                 figure={},
                 config={"doubleClick": "reset", "showTips": True, "displayModeBar": False},
             ),
-            text_input(id="x_axis_name", title="x-axis name", description="x-axis name"),
-            text_input(id="y_axis_name", title="y-axis name", description="y-axis name"),
+            text_input(id="x_axis_name", title="x-axis name", description="Enter x-axis name..."),
+            text_input(id="y_axis_name", title="y-axis name", description="Enter y-axis name..."),
         ],
     )
 
@@ -148,7 +146,10 @@ def top_right_settings() -> html.Div:
             upload_buttons(),
             dcc.Dropdown([], placeholder="Select graph", id="graph_selector"),
             text_input(
-                id="graph_name", title="Name graph", description="Name graph", disabled=True
+                id="graph_name",
+                title="Graph name",
+                description="Enter graph name...",
+                disabled=True,
             ),
             radio_buttons(),
             download_buttons(),
@@ -170,7 +171,7 @@ def color_picker() -> html.Div:
             dbc.Input(
                 type="color",
                 id="color_input",
-                value="#0000FF",
+                value="#000000",
                 style={"width": 75, "height": 50},
                 debounce=True,
             ),
@@ -222,7 +223,7 @@ def radio_buttons() -> html.Div:
                     radio_item("Scatter", TraceType.SCATTER.value, "scatter_plot"),
                 ],
                 inputClassName="peer hidden",
-                value="line",
+                value=TraceType.LINE.value,
                 labelStyle={"": ""},
                 labelClassName="flex-1",
                 id="choose_graph_type",
