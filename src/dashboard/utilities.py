@@ -127,37 +127,45 @@ def convert_to_dataframes(contents: list[str]) -> list[pl.DataFrame]:
     """Convert contents from csv files to polars dataframes.
 
     Args:
-        contents: The string contents of the uploaded csv
-        files, each containing the file data type and data
+        contents (list[str]): The string contents of the uploaded
+        csv files, each containing the file data type and data
         seperated by a comma.
 
-    Returns: The polars dataframes, no entry is made if
-    contents is invalid.
+    Returns:
+        list[pl.DataFrame]: The polars dataframes. No entry is made
+        for each file's contents that is invalid.
     """
-    loc_list = []
+    dataframes = []
     for c in contents:
-        df = convert_to_dataframe(c)
-        if df is not None:
-            loc_list.append(df)
+        try:
+            df = convert_to_dataframe(c)
+        except (ValueError, binascii.Error):
+            continue
 
-    return loc_list
+        dataframes.append(df)
+
+    return dataframes
 
 
-def convert_to_dataframe(contents: str) -> pl.DataFrame | None:
+def convert_to_dataframe(contents: str) -> pl.DataFrame:
     """Convert contents from csv file to polars dataframe.
 
     Args:
-        contents: The string contents of the uploaded csv
-        file, containing the data type and data seperated
+        contents (str): The string contents of the uploaded
+        csv file, containing the data type and data seperated
         by a comma.
 
-    Returns: The polars dataframe if the file contents is
-    valid, else None.
+    Raises:
+        ValueError: If the contents of the csv file is incorrectly
+        formatted, invalid in any way or if the string contents does
+        not contain two values separated by a comma.
+        binascii.Error: If the contents data is not valid base64.
+
+    Returns:
+        pl.DataFrame: The polars dataframe if the file contents is
+        valid, else None.
     """
     content_type, contents_data = contents.split(",")
-    try:
-        decoded = base64.b64decode(contents_data)
-    except binascii.Error:
-        return None
+    decoded = base64.b64decode(contents_data)
 
     return pl.read_csv(decoded)
