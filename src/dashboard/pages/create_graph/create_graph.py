@@ -90,7 +90,7 @@ def download_buttons() -> html.Div:
         className="flex flex-col",
         children=[
             html.P("Download as"),
-            text_input(id="file_name", placeholder="File name"),
+            text_input(id="file_name", title="File name", description="File name"),
             html.Div(
                 className="flex space-x-2 mt-2",
                 children=[
@@ -113,15 +113,15 @@ def graph_window() -> Component:
     return html.Div(
         className="bg-white w-full ml-[3rem] my-[3rem] rounded-md shadow-md",
         children=[
-            text_input(id="figure_name", placeholder="Figure name"),
+            text_input(id="figure_name", title="Figure name", description="Figure name"),
             dcc.Graph(
                 id="graph_id",
                 className="h-[70%] w-full",
                 figure={},
                 config={"doubleClick": "reset", "showTips": True, "displayModeBar": False},
             ),
-            text_input(id="x_axis_name", placeholder="x-axis name"),
-            text_input(id="y_axis_name", placeholder="y-axis name"),
+            text_input(id="x_axis_name", title="x-axis name", description="x-axis name"),
+            text_input(id="y_axis_name", title="y-axis name", description="y-axis name"),
         ],
     )
 
@@ -147,7 +147,9 @@ def top_right_settings() -> html.Div:
             ),
             upload_buttons(),
             dcc.Dropdown([], placeholder="Select graph", id="graph_selector"),
-            text_input(id="graph_name", placeholder="Name graph", disabled=True),
+            text_input(
+                id="graph_name", title="Name graph", description="Name graph", disabled=True
+            ),
             radio_buttons(),
             download_buttons(),
             color_picker(),

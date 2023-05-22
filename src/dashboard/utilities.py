@@ -1,6 +1,5 @@
 """Module with utility functions that are reused frequently."""
 import base64
-import binascii
 from datetime import timedelta
 
 import polars as pl
@@ -135,11 +134,11 @@ def convert_to_dataframes(contents: list[str]) -> list[pl.DataFrame]:
         list[pl.DataFrame]: The polars dataframes. No entry is made
         for each file's contents that is invalid.
     """
-    dataframes = []
+    dataframes: list[pl.DataFrame] = []
     for c in contents:
         try:
             df = convert_to_dataframe(c)
-        except (ValueError, binascii.Error):
+        except ValueError:
             continue
 
         dataframes.append(df)

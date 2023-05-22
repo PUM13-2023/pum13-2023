@@ -1,5 +1,6 @@
 """Modal for add dashboard buttons."""
 from dash import html
+from dash.dependencies import Component
 
 from dashboard.components import modal
 from dashboard.components.button import button
@@ -17,7 +18,11 @@ def generate_inputs() -> html.Div:
         className="flex flex-col px-[5rem] py-5 space-y-4",
         children=[
             html.P("Create dashboard", className="text-3xl"),
-            text_input("dashboard-title", "Dashboard title", "Enter dashboard title..."),
+            text_input(
+                id="dashboard-title",
+                title="Dashboard title",
+                description="Enter dashboard title...",
+            ),
             multiline_input("dashboard-desc", "Description", "Enter dashboard description..."),
         ],
     )
@@ -49,7 +54,7 @@ def generate_buttons() -> html.Div:
     )
 
 
-def add_dashboard_modal() -> html.Div:
+def add_dashboard_modal() -> Component:
     """Whole container for the modal.
 
     This is the function used for the create dashboard modal.
