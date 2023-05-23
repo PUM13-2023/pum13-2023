@@ -1,15 +1,16 @@
 """A pre-styled text input component."""
+from typing import Any
 
 from dash import dcc, html
 
 
-def text_input(id: str, title: str, description: str) -> html.Div:
+def text_input(title: str, description: str, **kwargs: Any) -> html.Div:
     """Pre-styled text input field.
 
     Args:
-        id (str): input id
         title (str): input title
         description (str): placeholder of the input
+        kwargs (Any): Forwarded to dcc.Input.
 
     Returns:
         html.Div: A pre-styled input with a title and placeholder
@@ -19,7 +20,7 @@ def text_input(id: str, title: str, description: str) -> html.Div:
         children=[
             html.Label(title),
             dcc.Input(
-                id=id,
+                **kwargs,
                 className="p-3 rounded-md shadow-inner bg-background",
                 placeholder=description,
             ),

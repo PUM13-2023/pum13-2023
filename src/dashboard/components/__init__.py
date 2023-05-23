@@ -6,6 +6,7 @@ from dashboard.components.icon import icon
 from dashboard.components.multiline_input import multiline_input
 from dashboard.components.navbar_component import navbar_component
 from dashboard.components.text_input import text_input
+from dashboard.components.trace import trace
 
 __all__ = [
     "button",
@@ -16,4 +17,5 @@ __all__ = [
     "add_dashboard_modal",
     "text_input",
     "multiline_input",
+    "trace",
 ]

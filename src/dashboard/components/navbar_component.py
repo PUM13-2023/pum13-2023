@@ -142,7 +142,9 @@ def navbar_component() -> Component:
     """
     return html.Div(
         id="main-navbar",
-        className="bg-dark-purple justify-center text-left flex shadow-md hidden overflow-auto",
+        className=(
+            "bg-dark-purple min-w-max justify-center text-left flex shadow-md hidden overflow-auto"
+        ),
         children=[
             dcc.Location(id="url", refresh="callback-nav"),
             html.Div(
@@ -171,12 +173,12 @@ def generate_navbar_contents(
     upper_navbar_div = html.Div(
         id="upper-navbar-container",
         children=generate_upper_navbar_list(page_registry, item_to_highlight),
-        className=("inline-block flex-col w-max flex mt-[3.5rem] mb-[3.5rem] text-white/75"),
+        className=("inline-block flex-col flex mt-[3.5rem] mb-[3.5rem] text-white/75"),
     )
     lower_navbar_div = html.Div(
         id="lower-navbar-container",
         children=generate_lower_navbar_list(),
-        className=("inline-block flex-col w-max flex mt-[3.5rem] mb-[3.5rem] text-white/75"),
+        className=("inline-block flex-col flex mt-[3.5rem] mb-[3.5rem] text-white/75"),
     )
     return [upper_navbar_div, lower_navbar_div]
 
