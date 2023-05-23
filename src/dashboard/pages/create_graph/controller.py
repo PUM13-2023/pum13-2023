@@ -10,6 +10,10 @@ import polars as pl
 from dashboard.components import trace
 from dashboard.components.trace import TraceType
 from dashboard.utilities import convert_to_dataframes
+from dashboard.models import db
+from dashboard.models.data import Data, DataType, XyData
+from bson.objectid import ObjectId
+import polars as pl
 
 
 @callback(
@@ -162,8 +166,15 @@ def patch_axis_names(x: str, y: str) -> Patch:
     Input("uploaded_data", "contents"),
     prevent_initial_call=True,
 )
-def render_figure(
+def render_figure_from_upload(
     contents: list[str],
+) -> Tuple[go.Figure, list[dict[str, str | int]], int, bool]:
+    data_frames = convert_to_dataframes(contents)
+    return render_figure(data_frames)
+
+
+def render_figure(
+    data_frames: list[pl.DataFrame],
 ) -> Tuple[go.Figure, list[dict[str, str | int]], int, bool]:
     """Renders the figure using CSV-files.
 
@@ -173,7 +184,6 @@ def render_figure(
     """
     created_figs: list[go.Scatter | go.Bar] = []
     figure_names: list[dict[str, str | int]] = []
-    data_frames = convert_to_dataframes(contents)
 
     for num, df in enumerate(data_frames):
         loc_fig = trace(df, TraceType.LINE, "#000000", name=f"Graph {num}")
@@ -191,3 +201,79 @@ def render_figure(
     )
 
     return fig, figure_names, 0, False
+
+
+@callback(
+    Output({"type": "modal-dialog", "id": "database_dialog"}, "open", allow_duplicate=True),
+    Output("project_selector", "options"),
+    Input("database_button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_database_dialog(n_clicks: int) -> Tuple[bool, list[dict[str, str]]]:
+    """Opens the database dialog."""
+    project_dbs = db.list_project_dbs()
+    print(project_dbs)
+    database_dialog_open = True
+    project_selector_options = [
+        {"label": project_db, "value": project_db}
+        for project_db in project_dbs
+        # {"label": "works", "value": "WORKS?"}
+    ]
+    return database_dialog_open, project_selector_options
+
+
+@callback(
+    Output("document_selector", "disabled"),
+    Output("document_selector", "options"),
+    Input("project_selector", "value"),
+    prevent_initial_call=True,
+)
+def populate_document_selector(project_db: str) -> Tuple[bool, list[dict[str, str]]]:
+    """Opens the database dialog."""
+    if project_db is None:
+        document_selector_disabled = True
+        document_selector_options = []
+    else:
+        db.connect_data_db(project_db)
+        document_selector_disabled = False
+        document_selector_options = [
+            {"label": document.name, "value": str(document.id)}
+            for document in Data.objects()
+            # {"label": "works", "value": "WORKS!"}
+        ]
+
+    return document_selector_disabled, document_selector_options
+
+
+@callback(
+    Output("database_dialog_select", "disabled"),
+    Input("document_selector", "value"),
+    prevent_initial_call=True,
+)
+def enable_database_dialog_select(document_id: str):
+    return False
+
+
+@callback(
+    Output({"type": "modal-dialog", "id": "database_dialog"}, "open", allow_duplicate=True),
+    Output("project_selector", "options", allow_duplicate=True),
+    Output("document_selector", "disabled", allow_duplicate=True),
+    Output("document_selector", "options", allow_duplicate=True),
+    Output("graph_id", "figure", allow_duplicate=True),
+    Output("graph_selector", "options", allow_duplicate=True),
+    Output("graph_selector", "value", allow_duplicate=True),
+    Output("graph_name", "disabled", allow_duplicate=True),
+    Input("database_dialog_select", "n_clicks"),
+    State("document_selector", "value"),
+    prevent_initial_call=True,
+)
+def close_database_dialog(n_clicks: int, document_id: str):
+    """Handle closing of the database dialog."""
+
+    document: Data = Data.objects.get(id=ObjectId(document_id), type=DataType.XY_PLOT.value)
+
+    xy_data: XyData = document.resolve()
+
+    df = pl.DataFrame({"x": xy_data.x, "y": xy_data.y})
+
+    return False, [], True, [], *render_figure([df])

@@ -6,7 +6,15 @@ from enum import Enum
 from typing import Any, Union
 
 from bson.objectid import ObjectId
-from mongoengine import DateTimeField, Document, EnumField, ReferenceField, StringField, signals
+from mongoengine import (
+    DateTimeField,
+    Document,
+    DynamicDocument,
+    EnumField,
+    ReferenceField,
+    StringField,
+    signals,
+)
 
 
 @dataclass
@@ -74,7 +82,7 @@ class DataType(Enum):
 
 
 # TODO: to polars df
-class Data(Document):
+class Data(DynamicDocument):
     """Database model for the data document.
 
     The data document has three sub types: numeric, array and xy-plot.

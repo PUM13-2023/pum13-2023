@@ -11,8 +11,13 @@ from dash.dependencies import Component
 import dash_bootstrap_components as dbc
 
 from dashboard.components import button, icon, text_input
+from dashboard.components.modal import modal_container, modal_dialog
 from dashboard.components.trace import TraceType
 import dashboard.pages.create_graph.controller  # noqa: F401
+
+from dashboard.models import db
+from dashboard.models.data import Data, Settings, DataType
+from datetime import datetime
 
 dash.register_page(__name__, path="/create-graph", nav_item=False)
 
@@ -28,6 +33,25 @@ def layout() -> Component:
     Returns:
         A html.div component with all other components.
     """
+
+    db.connect_data_db("create_graph_test_db")
+
+    for obj in Settings.objects.filter(test_case="test_case1"):
+        obj.delete()
+    for obj in Data.objects.filter(type=DataType.XY_PLOT.value):
+        obj.delete()
+
+    test_settings = Settings(test_case="test_case1", time=datetime.now())
+    test_settings.save()
+    test_data = Data(
+        settings=test_settings,
+        name="test_document1",
+        type=DataType.XY_PLOT,
+    )
+    test_data.x = [1, 2, 3, 4, 5]
+    test_data.y = [2, 3, 4, 5, 6]
+    test_data.save()
+
     # main background element
     return html.Div(
         className="bg-background flex h-screen",
@@ -35,6 +59,41 @@ def layout() -> Component:
             graph_window(),
             right_settings_bar(),
             dcc.Download(id="download_fig"),
+            modal_container(
+                children=[
+                    modal_dialog(
+                        children=[
+                            html.Div(
+                                className="[&>*]:m-[4px] w-[300px]",
+                                children=[
+                                    html.P("Select data from database"),
+                                    dcc.Dropdown(
+                                        options=[],
+                                        placeholder="Select a project",
+                                        id="project_selector",
+                                    ),
+                                    dcc.Dropdown(
+                                        options=[],
+                                        placeholder="Select a document",
+                                        id="document_selector",
+                                        disabled=True,
+                                    ),
+                                    button(
+                                        "done",
+                                        "Select",
+                                        id="database_dialog_select",
+                                        className="hover:bg-dark-purple bg-menu-back text-white cursor-pointer",
+                                        n_clicks=0,
+                                        disabled=True,
+                                    ),
+                                ],
+                            )
+                        ],
+                        id="database_dialog",
+                        open_=False,
+                    )
+                ]
+            ),
         ],
     )
 
@@ -194,8 +253,9 @@ def upload_buttons() -> html.Div:
                 children=[
                     csv_button(),
                     button(
-                        "database",
-                        "Database",
+                        id="database_button",
+                        icon_name="database",
+                        text="Database",
                         size=18,
                         className="bg-menu-back hover:bg-dark-purple justify-center flex-1",
                     ),
