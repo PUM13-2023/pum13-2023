@@ -1,8 +1,10 @@
 """The controller for create_graph."""
 
-from typing import Any, Tuple
+import functools
+from io import BytesIO
+from typing import Any, Callable, Tuple
 
-from dash import Input, Output, Patch, State, callback, dcc
+from dash import Input, Output, Patch, State, callback, ctx, dcc
 from dash.exceptions import PreventUpdate
 import plotly.graph_objs as go
 import polars as pl
@@ -37,6 +39,9 @@ def patch_graph_type(
         trace_type = TraceType(graph_type)
     except ValueError as err:
         raise PreventUpdate from err
+
+    if "data" not in graph_data:
+        raise PreventUpdate
 
     data_frame = pl.DataFrame({"x": graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]})
     color = graph_data["data"][i]["marker"]
@@ -90,27 +95,47 @@ def patch_graph_name(name: str, i: int) -> Patch:
 @callback(
     Output("download_fig", "data"),
     Input("download_png", "n_clicks"),
+    Input("download_jpeg", "n_clicks"),
+    Input("download_pdf", "n_clicks"),
+    Input("download_html", "n_clicks"),
     State("graph_id", "figure"),
     State("file_name", "value"),
     prevent_initial_call=True,
 )
-def download_fig(n_clicks: int, fig_dict: dict[str, Any], file_name: str) -> Any:
+def download_fig(
+    png_n_clicks: int,
+    jpeg_n_clicks: int,
+    pdf_n_clicks: int,
+    html_n_clicks: int,
+    fig_dict: dict[str, Any],
+    file_name: str,
+) -> Any:
     """Callback for downloading figures.
 
     Args:
-        n_clicks (int): number of clicks
+        png_n_clicks (int): number of clicks
+        jpeg_n_clicks (int): number of clicks
+        pdf_n_clicks (int): number of clicks
+        html_n_clicks (int): number of clicks
         fig_dict (dict[str, Any]): figure to download as dictionary
         file_name (str): desired filename
 
     Returns:
         Any: The file download
     """
+    file_format = ctx.triggered_id.split("_")[1]
+    full_name = f"{file_name}.{file_format}"
+
     try:
         fig = go.Figure(fig_dict)
     except ValueError as val_err:
         raise PreventUpdate from val_err
 
-    return dcc.send_bytes(fig.write_image, f"{file_name}.png")
+    if file_format in ("png", "jpeg", "pdf"):
+        exporter: Callable[BytesIO] = functools.partial(fig.write_image, format=file_format)
+        return dcc.send_bytes(exporter, full_name)
+    elif file_format == "html":
+        return dcc.send_string(fig.write_html, full_name)
 
 
 @callback(

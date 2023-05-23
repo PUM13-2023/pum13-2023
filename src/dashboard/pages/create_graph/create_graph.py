@@ -72,7 +72,8 @@ def download_button(icon: str, text: str, id: str) -> html.Button:
         icon_name=icon,
         text=text,
         id=id,
-        className="bg-menu-back hover:bg-dark-purple justify-center flex-1 text-white",
+        className="bg-menu-back hover:bg-dark-purple justify-center flex-1 "
+        "text-white text-xs font-bold",
     )
 
 
@@ -89,10 +90,10 @@ def download_buttons() -> html.Div:
             html.Div(
                 className="flex space-x-2 mt-2",
                 children=[
-                    download_button(icon="image", text="Png", id="download_png"),
-                    download_button(icon="image", text="Jpeg", id="download_jpeg"),
-                    download_button(icon="picture_as_pdf", text="Pdf", id="download_pdf"),
-                    download_button(icon="html", text="Html", id="download_html"),
+                    download_button(icon="image", text="PNG", id="download_png"),
+                    download_button(icon="image", text="JPEG", id="download_jpeg"),
+                    download_button(icon="picture_as_pdf", text="PDF", id="download_pdf"),
+                    download_button(icon="html", text="HTML", id="download_html"),
                 ],
             ),
         ],
