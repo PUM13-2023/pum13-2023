@@ -38,6 +38,9 @@ def patch_graph_type(
     except ValueError as err:
         raise PreventUpdate from err
 
+    if "data" not in graph_data:
+        raise PreventUpdate
+
     data_frame = pl.DataFrame({"x": graph_data["data"][i]["x"], "y": graph_data["data"][i]["y"]})
     color = graph_data["data"][i]["marker"]
     patched_figure = Patch()
