@@ -136,6 +136,17 @@ class User(Document):
         """
         return str(self.id)
 
+    def add_dashboard(self, name: str, desc: str) -> None:
+        """Adds dashboard to mongoDB.
+
+        Args:
+            name (str): Dashboard name
+            desc (str): Dashboard description
+        """
+        added_dashboard = Dashboard(name=name, description=desc, created=datetime.now())
+        self.dashboards.append(added_dashboard)
+        self.save()
+
 
 def register_user(username: str) -> User:
     """Register a new user.
